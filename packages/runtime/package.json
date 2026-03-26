@@ -1,0 +1,20 @@
+{
+  "name": "@fiyuu/runtime",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./cli": "./src/cli.ts"
+  },
+  "dependencies": {
+    "@fiyuu/core": "0.1.0",
+    "chokidar": "^4.0.3",
+    "esbuild": "^0.25.2",
+    "ws": "^8.18.1"
+  },
+  "peerDependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  }
+}

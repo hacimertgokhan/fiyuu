@@ -1,0 +1,13 @@
+{
+  "name": "@fiyuu/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "fiyuu": "./src/index.ts"
+  },
+  "dependencies": {
+    "@fiyuu/core": "0.1.0",
+    "@fiyuu/runtime": "0.1.0",
+    "typescript": "^5.8.2"
+  }
+}

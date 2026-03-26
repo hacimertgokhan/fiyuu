@@ -1,0 +1,8 @@
+{
+  "name": "create-fiyuu-app",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "create-fiyuu-app": "./bin/create-fiyuu-app.mjs"
+  }
+}

@@ -264,3 +264,32 @@ It is a structured system where:
 * Code is predictable
 * Behavior is explicit
 * AI is a first-class participant in development
+
+---
+
+## Package Releases
+
+The repository now includes a release workflow for the workspace packages under `packages/`.
+
+### Local package build
+
+```bash
+npm run build:packages
+```
+
+This command:
+
+* compiles the workspace with TypeScript
+* prepares standalone package folders under `dist/release/`
+* rewrites package entry points from TypeScript source paths to built JavaScript files
+
+### GitHub release flow
+
+The GitHub Actions workflow at `.github/workflows/release-packages.yml` runs when you push a tag matching `v*` or trigger it manually.
+
+It will:
+
+* install dependencies with `npm ci`
+* build every package release payload
+* archive each package as `tar.gz`
+* attach those archives to the related GitHub Release

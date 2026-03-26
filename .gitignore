@@ -1,0 +1,4 @@
+node_modules/
+dist/
+.fiyuu/
+.DS_Store
