@@ -2,7 +2,34 @@
 
 Fiyuu is a **Gea-first fullstack framework** focused on clarity, deterministic structure, and AI-assisted development.
 
-It is built for teams who want a predictable codebase that both humans and AI tools can understand quickly.
+## What is Fiyuu?
+
+Fiyuu is a fullstack TypeScript framework that replaces React with a lightweight GEA runtime. Every route is a folder with fixed files — `page.tsx`, `query.ts`, `action.ts`, `schema.ts`, `meta.ts` — so the file system itself defines behavior. The framework generates a machine-readable project graph (`.fiyuu/graph.json`) that AI tools can parse, extend, and refactor without guessing.
+
+## Why Fiyuu?
+
+- **No React dependency** — GEA runtime renders components server-side without React, reducing bundle size and complexity
+- **AI can understand your project** — deterministic structure + project graph means AI assistants can safely generate, modify, and reason about your codebase
+- **Built-in devtools** — unified console with runtime info, AI insights panel, and live server trace (dev-only)
+- **`fiyuu doctor`** — checks for React imports, missing schemas, SEO gaps, and zero-JS violations
+- **Skills system** — project-aware automation scripts that run with full graph context
+
+## Performance
+
+Fiyuu uses Node.js native HTTP server (no Express, no framework layer). Client assets are bundled with esbuild. SSG routes are cached in memory. Query results support TTL-based caching. A benchmark script is included:
+
+```bash
+npm run benchmark:gea
+```
+
+This measures per-route latency (avg, p50, p95) and bundle sizes.
+
+## Use Cases
+
+- **AI-assisted teams** — developers who use Copilot, Cursor, or local LLMs and want a codebase those tools can reliably operate on
+- **React-free fullstack apps** — projects that need server rendering without React's runtime overhead
+- **Rapid prototyping** — deterministic scaffolding with `npm create fiyuu-app` and `fiyuu generate`
+- **Small-to-medium web apps** — dashboards, admin panels, content sites, internal tools
 
 ## Core Focus
 
