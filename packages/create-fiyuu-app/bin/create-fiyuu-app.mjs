@@ -5,6 +5,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import readline from "node:readline/promises";
+import { emitKeypressEvents } from "node:readline";
 import { stdin as input, stdout as output } from "node:process";
 
 const useColor = output.isTTY;
@@ -48,12 +49,13 @@ renderSuccess(packageName, targetDirectory, answers);
 
 async function collectAnswers(useDefaultsFlag) {
   const defaults = {
-    sockets: true,
-    database: true,
+    sockets: false,
+    database: false,
     encryption: true,
     skills: true,
-    authHints: true,
-    aboutPage: true,
+    selectedSkills: ["product-strategist", "seo-optimizer"],
+    theming: true,
+    authHints: false,
   };
 
   if (useDefaultsFlag) {
@@ -64,27 +66,45 @@ async function collectAnswers(useDefaultsFlag) {
 
   try {
     renderSetupIntro();
-    console.log(`${ui.bold}${ui.moss}Realtime & Data${ui.reset}`);
+    console.log(`${ui.bold}${ui.moss}Features (space separated)${ui.reset}`);
+    console.log(`${ui.muted}Type one or more keys, then Enter. Example: f1 socket${ui.reset}`);
 
     const result = {
-      sockets: await askBoolean(rl, "Include socket-ready realtime server scaffolding?", defaults.sockets),
-      database: await askBoolean(rl, "Include the lightweight F1 database scaffolding?", defaults.database),
-      authHints: await askBoolean(rl, "Include auth-ready middleware and request guards?", defaults.authHints),
+      sockets: defaults.sockets,
+      database: defaults.database,
+      authHints: defaults.authHints,
       encryption: defaults.encryption,
       skills: defaults.skills,
-      aboutPage: defaults.aboutPage,
+      selectedSkills: [...defaults.selectedSkills],
+      theming: defaults.theming,
     };
 
+    const selectedFeatures = await askInteractiveSelect("Enable optional features", [
+      { key: "f1", label: "F1 database" },
+      { key: "socket", label: "Socket route" },
+      { key: "auth", label: "Auth starter" },
+      { key: "encryption", label: "Request encryption" },
+      { key: "theme", label: "Integrated theme toggle" },
+    ], [
+      ...(defaults.encryption ? ["encryption"] : []),
+      ...(defaults.theming ? ["theme"] : []),
+    ]);
+
+    result.database = selectedFeatures.has("f1");
+    result.sockets = selectedFeatures.has("socket");
+    result.authHints = selectedFeatures.has("auth");
+    result.encryption = selectedFeatures.has("encryption");
+    result.theming = selectedFeatures.has("theme");
+
     console.log("");
-    console.log(`${ui.bold}${ui.moss}AI & Security${ui.reset}`);
-
-    result.encryption = await askBoolean(rl, "Include request signing and encryption helpers?", defaults.encryption);
-    result.skills = await askBoolean(rl, "Include starter AI skills and AI config?", defaults.skills);
-
-    console.log("");
-    console.log(`${ui.bold}${ui.moss}Routes & Examples${ui.reset}`);
-
-    result.aboutPage = await askBoolean(rl, "Generate an example /about route too?", defaults.aboutPage);
+    console.log(`${ui.bold}${ui.moss}AI Skills (space separated)${ui.reset}`);
+    const selectedSkills = await askInteractiveSelect("Choose starter skills", [
+      { key: "product-strategist", label: "Product strategist" },
+      { key: "support-triage", label: "Support triage" },
+      { key: "seo-optimizer", label: "SEO optimizer" },
+    ], defaults.selectedSkills);
+    result.selectedSkills = [...selectedSkills];
+    result.skills = result.selectedSkills.length > 0;
 
     renderAnswerSummary(result);
     return result;
@@ -93,16 +113,99 @@ async function collectAnswers(useDefaultsFlag) {
   }
 }
 
-async function askBoolean(rl, question, defaultValue) {
-  const suffix = defaultValue ? `${ui.moss}Y${ui.reset}/${ui.muted}n${ui.reset}` : `${ui.muted}y${ui.reset}/${ui.moss}N${ui.reset}`;
-  const prompt = `${ui.border}•${ui.reset} ${ui.cream}${question}${ui.reset} ${ui.muted}(${suffix})${ui.reset} `;
+async function askMultiSelect(rl, question, options, defaultKeys = []) {
+  const optionsText = options
+    .map((option) => `${ui.cream}${option.key}${ui.reset}=${ui.muted}${option.label}${ui.reset}`)
+    .join(` ${ui.border}|${ui.reset} `);
+  const defaultText = defaultKeys.length > 0 ? defaultKeys.join(" ") : "none";
+  const prompt = `${ui.border}•${ui.reset} ${ui.cream}${question}${ui.reset}\n  ${optionsText}\n  ${ui.muted}default: ${defaultText}${ui.reset}\n  > `;
   const answer = (await rl.question(prompt)).trim().toLowerCase();
+  const tokens = answer.length === 0 ? [...defaultKeys] : answer.split(/\s+/g).filter(Boolean);
+  const valid = new Set(options.map((option) => option.key));
+  const selected = new Set(tokens.filter((token) => valid.has(token)));
+  return selected;
+}
 
-  if (!answer) {
-    return defaultValue;
+async function askInteractiveSelect(question, options, defaultKeys = []) {
+  if (!input.isTTY || !output.isTTY) {
+    const fakeRl = readline.createInterface({ input, output });
+    try {
+      return await askMultiSelect(fakeRl, question, options, defaultKeys);
+    } finally {
+      fakeRl.close();
+    }
   }
 
-  return answer === "y" || answer === "yes";
+  emitKeypressEvents(input);
+  if (typeof input.setRawMode === "function") {
+    input.setRawMode(true);
+  }
+
+  let index = 0;
+  const selected = new Set(defaultKeys);
+
+  return await new Promise((resolve) => {
+    function render() {
+      output.write("\x1Bc");
+      console.log("");
+      console.log(`${ui.bold}${ui.olive}Fiyuu Setup${ui.reset}`);
+      console.log(`${ui.border}${"─".repeat(44)}${ui.reset}`);
+      console.log(`${ui.bold}${ui.moss}${question}${ui.reset}`);
+      console.log(`${ui.muted}Use ↑/↓ to move, space to toggle, enter to confirm.${ui.reset}`);
+      console.log("");
+      options.forEach((option, optionIndex) => {
+        const pointer = optionIndex === index ? `${ui.moss}›${ui.reset}` : " ";
+        const mark = selected.has(option.key) ? `${ui.success}[x]${ui.reset}` : `${ui.muted}[ ]${ui.reset}`;
+        console.log(`${pointer} ${mark} ${ui.cream}${option.key}${ui.reset} ${ui.muted}- ${option.label}${ui.reset}`);
+      });
+      console.log("");
+    }
+
+    function cleanup() {
+      input.off("keypress", onKeypress);
+      if (typeof input.setRawMode === "function") {
+        input.setRawMode(false);
+      }
+      console.log("");
+    }
+
+    function onKeypress(_str, key) {
+      if (key?.name === "up") {
+        index = (index - 1 + options.length) % options.length;
+        render();
+        return;
+      }
+      if (key?.name === "down") {
+        index = (index + 1) % options.length;
+        render();
+        return;
+      }
+      if (key?.name === "space") {
+        const current = options[index];
+        if (current) {
+          if (selected.has(current.key)) {
+            selected.delete(current.key);
+          } else {
+            selected.add(current.key);
+          }
+          render();
+        }
+        return;
+      }
+      if (key?.name === "return") {
+        cleanup();
+        resolve(new Set(selected));
+        return;
+      }
+      if (key?.ctrl && key?.name === "c") {
+        cleanup();
+        process.exit(1);
+      }
+    }
+
+    render();
+    input.on("keypress", onKeypress);
+  });
 }
 
 function renderSetupIntro() {
@@ -115,12 +218,14 @@ function renderSetupIntro() {
 
 function renderAnswerSummary(answers) {
   const entries = [
-    ["Sockets", answers.sockets],
+    ["One-page home", true],
+    ["Extra routes", false],
     ["F1 Database", answers.database],
-    ["Middleware/Auth", answers.authHints],
+    ["Sockets", answers.sockets],
+    ["Auth", answers.authHints],
     ["Request Security", answers.encryption],
+    ["Theme", answers.theming],
     ["AI Skills", answers.skills],
-    ["About Route", answers.aboutPage],
   ];
 
   console.log("");
@@ -128,6 +233,7 @@ function renderAnswerSummary(answers) {
   for (const [label, enabled] of entries) {
     console.log(`${ui.border}•${ui.reset} ${ui.cream}${label}${ui.reset} ${enabled ? `${ui.success}enabled${ui.reset}` : `${ui.muted}disabled${ui.reset}`}`);
   }
+  console.log(`${ui.border}•${ui.reset} ${ui.cream}Skill set${ui.reset} ${ui.muted}${answers.selectedSkills.join(", ") || "none"}${ui.reset}`);
   console.log("");
 }
 
@@ -140,9 +246,11 @@ function renderSuccess(packageName, targetDirectory, answers) {
   console.log(`${ui.border}3.${ui.reset} ${ui.cream}npm run dev${ui.reset}`);
   console.log("");
   console.log(`${ui.bold}${ui.olive}Selected${ui.reset}`);
-  console.log(`${ui.border}•${ui.reset} ${ui.muted}Sockets:${ui.reset} ${answers.sockets ? `${ui.success}on${ui.reset}` : `${ui.muted}off${ui.reset}`}`);
+  console.log(`${ui.border}•${ui.reset} ${ui.muted}One-page home:${ui.reset} ${ui.success}on${ui.reset}`);
+  console.log(`${ui.border}•${ui.reset} ${ui.muted}Extra routes:${ui.reset} ${ui.muted}off${ui.reset}`);
   console.log(`${ui.border}•${ui.reset} ${ui.muted}F1:${ui.reset} ${answers.database ? `${ui.success}on${ui.reset}` : `${ui.muted}off${ui.reset}`}`);
-  console.log(`${ui.border}•${ui.reset} ${ui.muted}Middleware:${ui.reset} ${answers.authHints ? `${ui.success}on${ui.reset}` : `${ui.muted}off${ui.reset}`}`);
+  console.log(`${ui.border}•${ui.reset} ${ui.muted}Socket:${ui.reset} ${answers.sockets ? `${ui.success}on${ui.reset}` : `${ui.muted}off${ui.reset}`}`);
+  console.log(`${ui.border}•${ui.reset} ${ui.muted}Theme:${ui.reset} ${answers.theming ? `${ui.success}on${ui.reset}` : `${ui.muted}off${ui.reset}`}`);
   console.log(`${ui.border}•${ui.reset} ${ui.muted}AI:${ui.reset} ${answers.skills ? `${ui.success}on${ui.reset}` : `${ui.muted}off${ui.reset}`}`);
 }
 
@@ -170,9 +278,9 @@ async function createProject(targetDirectory, packageName, dependencyVersion, an
     ["fiyuu.config.ts", createFiyuuConfig(answers)],
     ["app/layout.tsx", createRootLayout()],
     ["app/layout.meta.ts", createRootLayoutMeta()],
-    ["app/middleware.ts", createAppMiddleware(answers)],
+    ["app/not-found.tsx", createNotFoundPage()],
+    ["app/error.tsx", createErrorPage()],
     ["app/api/health/route.ts", createHealthApiRoute()],
-    ["app/action.ts", createHomeAction(answers)],
     ["app/meta.ts", createHomeMeta(answers)],
     ["app/query.ts", createHomeQuery(answers)],
     ["app/schema.ts", createHomeSchema(answers)],
@@ -184,13 +292,16 @@ async function createProject(targetDirectory, packageName, dependencyVersion, an
     [".fiyuu/FEATURES.md", createDotFiyuuFeatures(answers)],
     [".fiyuu/env", createDotFiyuuEnv()],
     [".fiyuu/SECRET", "replace-this-with-a-server-only-secret\n"],
-    ["lib/analytics.ts", createAnalyticsModule()],
-    ["lib/feature-flags.ts", createFeatureFlagsModule()],
   ]);
 
-  if (answers.skills) {
+  if (answers.selectedSkills.includes("product-strategist")) {
     files.set("skills/product-strategist.md", createProductStrategistSkill());
+  }
+  if (answers.selectedSkills.includes("support-triage")) {
     files.set("skills/support-triage.md", createSupportTriageSkill());
+  }
+  if (answers.selectedSkills.includes("seo-optimizer")) {
+    files.set("skills/seo-optimizer.md", createSeoOptimizerSkill());
   }
 
   if (answers.database) {
@@ -224,13 +335,6 @@ async function createProject(targetDirectory, packageName, dependencyVersion, an
     files.set("lib/client-crypto.ts", createClientCrypto());
   }
 
-  if (answers.aboutPage) {
-    files.set("app/about/meta.ts", createAboutMeta(answers));
-    files.set("app/about/query.ts", createAboutQuery());
-    files.set("app/about/schema.ts", createAboutSchema());
-    files.set("app/about/page.tsx", createAboutPage());
-  }
-
   for (const [relativePath, content] of files) {
     const absolutePath = path.join(targetDirectory, relativePath);
     await mkdir(path.dirname(absolutePath), { recursive: true });
@@ -240,7 +344,7 @@ async function createProject(targetDirectory, packageName, dependencyVersion, an
 
 function createPackageJson(projectName, dependencyVersion) {
   const usesLocalFramework = dependencyVersion.startsWith("file:");
-  const includeSockets = true;
+  const includeSockets = false;
 
   return `${JSON.stringify(
     {
@@ -255,15 +359,12 @@ function createPackageJson(projectName, dependencyVersion) {
       },
       dependencies: {
         fiyuu: dependencyVersion,
-        react: "^19.1.0",
-        "react-dom": "^19.1.0",
+        "@geajs/core": "^1.0.12",
         ...(includeSockets ? { ws: "^8.18.1" } : {}),
         zod: "^3.24.2",
       },
       devDependencies: {
         "@types/node": "^22.13.10",
-        "@types/react": "^19.1.2",
-        "@types/react-dom": "^19.1.2",
         ...(includeSockets ? { "@types/ws": "^8.5.14" } : {}),
       },
     },
@@ -283,7 +384,8 @@ function createTsConfig() {
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "jsx": "react-jsx",
+    "jsx": "preserve",
+    "jsxImportSource": "@geajs/core",
     "strict": true,
     "skipLibCheck": true,
     "outDir": "dist",
@@ -296,7 +398,6 @@ function createTsConfig() {
 function createReadme(projectName, answers) {
   const optionalLines = [];
 
-  if (answers.aboutPage) optionalLines.push("- /about -> example folder-based route");
   if (answers.sockets) optionalLines.push("- /live -> websocket-powered live counter example");
   if (answers.database) optionalLines.push("- /requests -> F1-backed global request list example");
   if (answers.authHints) optionalLines.push("- /auth -> F1-backed auth starter example");
@@ -306,8 +407,7 @@ function createReadme(projectName, answers) {
   if (answers.sockets) optionalLines.push("- server/socket.ts -> realtime server scaffold");
   if (answers.encryption) optionalLines.push("- server/crypto.ts and lib/client-crypto.ts -> request protection helpers");
   if (answers.skills) optionalLines.push("- skills/ -> AI prompts for product and support workflows");
-  optionalLines.push("- lib/analytics.ts -> startup analytics stub");
-  optionalLines.push("- lib/feature-flags.ts -> startup feature flag helpers");
+  if (answers.theming) optionalLines.push("- built-in light/dark theme toggle with localStorage persistence");
 
   return `# ${projectName}
 
@@ -318,25 +418,27 @@ Generated with create-fiyuu-app.
 - npm run dev
 - npm run build
 - npm run start
+- npx fiyuu feat list
+- npx fiyuu feat socket on|off
 
 ## Starter Routes
 
-- / -> Fiyuu home page
+- / -> Fiyuu one-page home
 ${optionalLines.join("\n")}
 
 ## Notes
 
 - Folder-based routing lives directly under app/
-- Creating app/about/page.tsx + app/about/meta.ts creates the /about route
+- This starter ships with only the root page by default
 - Root and nested layouts are supported with app/layout.tsx and layout.meta.ts
+- Custom fallback views can be edited at app/not-found.tsx and app/error.tsx
 - Backend route handlers live under app/api/**/route.ts
-- Large client-side collections can use the built-in VirtualList helper
-- F1 persists to .fiyuu/data/f1.json with a tiny ORM-like table API
-- Middleware lives at app/middleware.ts and runs before route handling
+- Middleware is optional and can be added later under app/middleware.ts
+- Optional features can be toggled later with fiyuu feat ...
 - Runtime environment lives in .fiyuu/env and .fiyuu/SECRET
 - AI-readable markdown docs live in .fiyuu/PROJECT.md, .fiyuu/PATHS.md, .fiyuu/STATES.md, and .fiyuu/FEATURES.md
 - Client-visible transport obfuscation reduces readability, but absolute secrecy still requires server-only keys and HTTPS
-${answers.authHints ? "- Starter auth credentials: username `founder` password `fiyuu123`" : ""}
+- UI layer is Gea-first (@geajs/core) with compile-time JSX output
 `;
 }
 
@@ -350,7 +452,7 @@ function createFiyuuConfig(answers) {
   ai: {
     enabled: ${String(answers.skills)},
     skillsDirectory: "./skills",
-    defaultSkills: ${JSON.stringify(answers.skills ? ["product-strategist", "support-triage"] : [])},
+    defaultSkills: ${JSON.stringify(answers.selectedSkills)},
     graphContext: true,
   },
   fullstack: {
@@ -439,18 +541,17 @@ export const middleware = [requestHeaders, authGuard, warningsHeader];
 }
 
 function createRootLayout() {
-  return `import { defineLayout, type LayoutProps } from "fiyuu/client";
+  return `import { Component } from "@geajs/core";
+import { defineLayout, html, type LayoutProps } from "fiyuu/client";
 
 export const layout = defineLayout({
   name: "root",
 });
 
-export default function RootLayout({ children }: LayoutProps) {
-  return (
-    <div className="min-h-screen bg-[#f7f3ea] text-[#33412f]">
-      {children}
-    </div>
-  );
+export default class RootLayout extends Component<LayoutProps> {
+  template({ children }: LayoutProps = this.props) {
+    return html\`<div class="min-h-screen bg-[#f7f3ea] text-[#33412f] dark:bg-[#111513] dark:text-[#e8f1ea]">\${children ?? ""}</div>\`;
+  }
 }
 `;
 }
@@ -466,6 +567,65 @@ export default defineMeta({
     description: "Fiyuu starter with layouts, metadata, realtime, auth, and API routes.",
   },
 });
+`;
+}
+
+function createNotFoundPage() {
+  return `import { Component } from "@geajs/core";
+import { escapeHtml, html } from "fiyuu/client";
+
+type NotFoundData = {
+  title?: string;
+  route?: string;
+  method?: string;
+};
+
+export default class NotFoundPage extends Component<{ data?: NotFoundData }> {
+  template({ data }: { data?: NotFoundData } = this.props) {
+    return html\`
+      <main class="min-h-screen w-full px-5 py-8 text-[#30402a]">
+        <section class="w-full rounded-2xl border border-[#7a8f6b]/20 bg-[#f8f4ec] p-6">
+          <p class="text-xs uppercase tracking-[0.22em] text-[#627356]">404</p>
+          <h1 class="mt-3 text-3xl font-semibold text-[#24311f]">\${escapeHtml(data?.title ?? "Page not found")}</h1>
+          <p class="mt-3 text-sm text-[#5a6753]">The requested route is not available in this Fiyuu app.</p>
+          <p class="mt-4 text-sm text-[#5a6753]">Route: \${escapeHtml(data?.route ?? "/")}</p>
+          <p class="mt-1 text-sm text-[#5a6753]">Method: \${escapeHtml(data?.method ?? "GET")}</p>
+        </section>
+      </main>
+    \`;
+  }
+}
+`;
+}
+
+function createErrorPage() {
+  return `import { Component } from "@geajs/core";
+import { escapeHtml, html } from "fiyuu/client";
+
+type ErrorData = {
+  message?: string;
+  route?: string;
+  method?: string;
+  stack?: string;
+};
+
+export default class ErrorPage extends Component<{ data?: ErrorData }> {
+  template({ data }: { data?: ErrorData } = this.props) {
+    const stack = data?.stack ? html\`<pre class="mt-4 overflow-auto rounded-xl border border-[#8f5f5f]/20 bg-[#2a1717] p-3 text-xs text-[#ffe9e9]">\${escapeHtml(data.stack)}</pre>\` : "";
+    return html\`
+      <main class="min-h-screen w-full px-5 py-8 text-[#3d2b2b]">
+        <section class="w-full rounded-2xl border border-[#8f5f5f]/24 bg-[#f7ece7] p-6">
+          <p class="text-xs uppercase tracking-[0.22em] text-[#8f5f5f]">500</p>
+          <h1 class="mt-3 text-3xl font-semibold text-[#3a2020]">Application error</h1>
+          <p class="mt-3 text-sm text-[#684545]">\${escapeHtml(data?.message ?? "Unknown error")}</p>
+          <p class="mt-4 text-sm text-[#684545]">Route: \${escapeHtml(data?.route ?? "/")}</p>
+          <p class="mt-1 text-sm text-[#684545]">Method: \${escapeHtml(data?.method ?? "GET")}</p>
+          \${stack}
+        </section>
+      </main>
+    \`;
+  }
+}
 `;
 }
 
@@ -567,7 +727,6 @@ AI-readable project summary for the starter app.
 - framework: Fiyuu
 - style: AI-first fullstack framework
 - primary route: /
-- optional about route: ${answers.aboutPage ? "enabled" : "disabled"}
 
 ## Capabilities
 
@@ -588,7 +747,6 @@ function createDotFiyuuPaths(answers) {
 ${answers.sockets ? "- /live -> app/live/" : ""}
 ${answers.database ? "- /requests -> app/requests/" : ""}
 ${answers.authHints ? "- /auth -> app/auth/" : ""}
-${answers.aboutPage ? "- /about -> app/about/" : ""}
 
 ## Fixed Files
 
@@ -660,6 +818,21 @@ Use this skill when debugging incidents or handling customer-facing issues.
 `;
 }
 
+function createSeoOptimizerSkill() {
+  return `# SEO Optimizer
+
+Use this skill when improving discoverability and social previews.
+
+## Focus
+
+- check every route for seo.title and seo.description
+- keep titles specific and concise
+- keep descriptions clear and action-oriented
+- flag duplicate title/description combinations
+- suggest schema-ready copy improvements
+`;
+}
+
 function createHomeAction(answers) {
   const maybeF1 = answers.database ? 'import { saveTodoDraft } from "../server/f1/index.js";\n' : "";
   const maybeBody = answers.database
@@ -695,19 +868,17 @@ function createHomeMeta(answers) {
 export default defineMeta({
   intent: "Home page introducing the Fiyuu framework with a calm starter experience",
   title: "Home",
-  render: "csr",
+  render: "ssr",
   seo: {
     title: "Fiyuu Starter",
-    description: "AI-first fullstack starter with auth, realtime, F1 data, and API routes.",
+    description: "Gea-first one-page starter for AI-readable fullstack projects.",
   },
 });
 `;
 }
 
 function createHomeQuery(answers) {
-  const skills = answers.skills ? ["product-strategist", "support-triage"] : [];
-  const realtime = answers.sockets ? "Socket-ready" : "HTTP-first";
-  const database = answers.database ? "F1 built-in" : "Not enabled";
+  const skills = answers.selectedSkills;
 
   return `import { z } from "zod";
 import { defineQuery } from "fiyuu/client";
@@ -729,9 +900,9 @@ export const query = defineQuery({
 export async function execute() {
   return {
     stats: [
-      { label: "Render Modes", value: "CSR + SSR" },
-      { label: "Realtime", value: ${JSON.stringify(realtime)} },
-      { label: "Data Layer", value: ${JSON.stringify(database)} },
+      { label: "Layout", value: "One page" },
+      { label: "Viewport", value: "100% screen" },
+      { label: "Render", value: "SSR" },
       { label: "Devtools", value: "Built in" },
     ],
     skills: ${JSON.stringify(skills)},
@@ -792,8 +963,8 @@ export const description = "Loads starter websocket metadata for the live counte
 }
 
 function createLivePage() {
-  return `import { useEffect, useMemo, useState } from "react";
-import { definePage, type PageProps } from "fiyuu/client";
+  return `import { Component } from "@geajs/core";
+import { definePage, escapeHtml, html, type PageProps } from "fiyuu/client";
 
 type LiveData = {
   initialCount: number;
@@ -804,66 +975,24 @@ export const page = definePage({
   intent: "Live counter page demonstrating websocket updates",
 });
 
-export default function Page({ data }: PageProps<LiveData>) {
-  const [count, setCount] = useState(data?.initialCount ?? 0);
-  const [status, setStatus] = useState("connecting");
-
-  const socketUrl = useMemo(() => {
-    if (typeof window === "undefined") {
-      return "";
-    }
-
-    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-    return \`\${protocol}://\${window.location.host}/__fiyuu/ws\`;
-  }, []);
-
-  useEffect(() => {
-    if (!socketUrl) {
-      return;
-    }
-
-    const socket = new WebSocket(socketUrl);
-
-    socket.addEventListener("open", () => setStatus("connected"));
-    socket.addEventListener("close", () => setStatus("closed"));
-    socket.addEventListener("message", (event) => {
-      try {
-        const payload = JSON.parse(event.data) as { type?: string; count?: number };
-        if (payload.type === "counter:tick" && typeof payload.count === "number") {
-          setCount(payload.count);
-        }
-      } catch {
-        setStatus("message-error");
-      }
-    });
-
-    return () => {
-      socket.close();
-    };
-  }, [socketUrl]);
-
-  return (
-    <main className="min-h-screen bg-[#f7f3ea] px-6 py-16 text-[#31402b]">
-      <div className="mx-auto max-w-5xl rounded-[2rem] border border-[#7a8f6b]/20 bg-white/70 p-10 shadow-[0_24px_80px_rgba(68,84,57,0.10)]">
-        <div className="text-xs uppercase tracking-[0.24em] text-[#6d805f]">Realtime Example</div>
-        <h1 className="mt-4 text-4xl font-semibold text-[#24311f]">Live Counter</h1>
-        <p className="mt-4 max-w-2xl text-lg leading-8 text-[#5f6d58]">
-          This route listens to the starter websocket server and updates a counter in real time.
-        </p>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-3xl bg-[#31402b] p-8 text-[#f7f3ea]">
-            <div className="text-xs uppercase tracking-[0.2em] text-[#cdd7c6]">Channel</div>
-            <div className="mt-3 text-3xl font-semibold">{data?.channel}</div>
-          </div>
-          <div className="rounded-3xl border border-[#7a8f6b]/20 bg-[#fcfaf5] p-8">
-            <div className="text-xs uppercase tracking-[0.2em] text-[#7a8b71]">Live Count</div>
-            <div className="mt-3 text-5xl font-semibold text-[#24311f]">{count}</div>
-            <div className="mt-3 text-sm text-[#61705b]">Socket status: {status}</div>
+export default class Page extends Component<PageProps<LiveData>> {
+  template({ data }: PageProps<LiveData> = this.props) {
+    const script = "const count=document.getElementById('fiyuu-live-count');const status=document.getElementById('fiyuu-live-status');const protocol=location.protocol==='https:'?'wss':'ws';const path='__FIYUU_WS_PATH__'.replace('__FIYUU_WS_PATH__','/__fiyuu/ws');const socket=new WebSocket(protocol+'://'+location.host+path);const fail=()=>{if(status)status.textContent='unavailable';};const timeout=setTimeout(fail,3500);socket.addEventListener('open',()=>{clearTimeout(timeout);if(status)status.textContent='connected';});socket.addEventListener('error',()=>{clearTimeout(timeout);fail();});socket.addEventListener('close',()=>{if(status&&status.textContent!=='unavailable')status.textContent='closed';});socket.addEventListener('message',(event)=>{try{const payload=JSON.parse(event.data);if(payload&&payload.type==='counter:tick'&&typeof payload.count==='number'&&count){count.textContent=String(payload.count);}}catch{if(status)status.textContent='message-error';}});";
+    return html\`
+      <main class="min-h-screen w-full px-6 py-12 text-[#31402b]">
+        <div class="w-full rounded-[2rem] border border-[#7a8f6b]/20 bg-white/70 p-8">
+          <div class="text-xs uppercase tracking-[0.24em] text-[#6d805f]">Realtime Example</div>
+          <h1 class="mt-4 text-4xl font-semibold text-[#24311f]">Live Counter</h1>
+          <p class="mt-4 max-w-2xl text-lg leading-8 text-[#5f6d58]">This route listens to the starter websocket server and updates a counter in real time.</p>
+          <div class="mt-8 grid gap-4 sm:grid-cols-2">
+            <div class="rounded-3xl bg-[#31402b] p-8 text-[#f7f3ea]"><div class="text-xs uppercase tracking-[0.2em] text-[#cdd7c6]">Channel</div><div class="mt-3 text-3xl font-semibold">\${escapeHtml(data?.channel ?? "updates")}</div></div>
+            <div class="rounded-3xl border border-[#7a8f6b]/20 bg-[#fcfaf5] p-8"><div class="text-xs uppercase tracking-[0.2em] text-[#7a8b71]">Live Count</div><div id="fiyuu-live-count" class="mt-3 text-5xl font-semibold text-[#24311f]">\${String(data?.initialCount ?? 0)}</div><div class="mt-3 text-sm text-[#61705b]">Socket status: <span id="fiyuu-live-status">connecting</span></div></div>
           </div>
         </div>
-      </div>
-    </main>
-  );
+      </main>
+      <script type="module">\${script}</script>
+    \`;
+  }
 }
 `;
 }
@@ -932,7 +1061,8 @@ export const description = "Loads request records from the F1 starter store";
 }
 
 function createRequestsPage() {
-  return `import { definePage, type PageProps, VirtualList, useClientMemo } from "fiyuu/client";
+  return `import { Component } from "@geajs/core";
+import { definePage, escapeHtml, html, type PageProps } from "fiyuu/client";
 
 type RequestsData = {
   requests: Array<{
@@ -947,47 +1077,33 @@ export const page = definePage({
   intent: "Request list page showing records from the F1 starter store",
 });
 
-export default function Page({ data }: PageProps<RequestsData>) {
-  const rows = useClientMemo(
-    () => Array.from({ length: 100000 }, (_, index) => data?.requests[index % (data?.requests.length || 1)] ?? { id: "n/a", route: "/", method: "GET", source: "empty" }),
-    [data],
-  );
+export default class Page extends Component<PageProps<RequestsData>> {
+  template({ data }: PageProps<RequestsData> = this.props) {
+    const baseRequests = data?.requests ?? [];
+    const rows = Array.from({ length: 400 }, (_, index) =>
+      baseRequests[index % (baseRequests.length || 1)] ?? { id: "n/a", route: "/", method: "GET", source: "empty" },
+    );
+    const rowsHtml = rows
+      .map(
+        (request, index) => html\`<div class="grid grid-cols-[1.2fr_1fr_1fr_1fr] gap-4 border-b border-[#7a8f6b]/10 px-6 py-4 text-sm text-[#364330]"><div>\${escapeHtml(request.id)}-\${index}</div><div>\${escapeHtml(request.route)}</div><div>\${escapeHtml(request.method)}</div><div>\${escapeHtml(request.source)}</div></div>\`,
+      )
+      .join("");
 
-  return (
-    <main className="min-h-screen bg-[#f7f3ea] px-6 py-16 text-[#31402b]">
-      <div className="mx-auto max-w-6xl rounded-[2rem] border border-[#7a8f6b]/20 bg-white/70 p-10 shadow-[0_24px_80px_rgba(68,84,57,0.10)]">
-        <div className="text-xs uppercase tracking-[0.24em] text-[#6d805f]">F1 Example</div>
-        <h1 className="mt-4 text-4xl font-semibold text-[#24311f]">Global Request List</h1>
-        <p className="mt-4 max-w-2xl text-lg leading-8 text-[#5f6d58]">
-          This route reads starter records from the lightweight F1 store and renders a virtualized list so very large datasets stay responsive.
-        </p>
-        <div className="mt-6 rounded-2xl bg-[#edf3e7] px-4 py-4 text-sm text-[#4d5d47]">
-          Virtualized rows: 100,000 generated from the base F1 dataset.
-        </div>
-        <div className="mt-8 overflow-hidden rounded-3xl border border-[#7a8f6b]/15 bg-[#fcfaf5]">
-          <div className="grid grid-cols-[1.2fr_1fr_1fr_1fr] gap-4 border-b border-[#7a8f6b]/10 px-6 py-4 text-xs uppercase tracking-[0.2em] text-[#7a8b71]">
-            <div>ID</div>
-            <div>Route</div>
-            <div>Method</div>
-            <div>Source</div>
+    return html\`
+      <main class="min-h-screen bg-[#f7f3ea] px-6 py-12 text-[#31402b]">
+        <div class="mx-auto max-w-6xl rounded-[2rem] border border-[#7a8f6b]/20 bg-white/70 p-8">
+          <div class="text-xs uppercase tracking-[0.24em] text-[#6d805f]">F1 Example</div>
+          <h1 class="mt-4 text-4xl font-semibold text-[#24311f]">Global Request List</h1>
+          <p class="mt-4 max-w-2xl text-lg leading-8 text-[#5f6d58]">This route reads starter records from the lightweight F1 store and renders a deterministic list in Gea mode.</p>
+          <div class="mt-6 rounded-2xl bg-[#edf3e7] px-4 py-4 text-sm text-[#4d5d47]">Rows rendered: \${rows.length}</div>
+          <div class="mt-8 overflow-hidden rounded-3xl border border-[#7a8f6b]/15 bg-[#fcfaf5]">
+            <div class="grid grid-cols-[1.2fr_1fr_1fr_1fr] gap-4 border-b border-[#7a8f6b]/10 px-6 py-4 text-xs uppercase tracking-[0.2em] text-[#7a8b71]"><div>ID</div><div>Route</div><div>Method</div><div>Source</div></div>
+            \${rowsHtml}
           </div>
-          <VirtualList
-            items={rows}
-            height={520}
-            itemHeight={64}
-            renderItem={(request, index) => (
-              <div className="grid grid-cols-[1.2fr_1fr_1fr_1fr] gap-4 border-b border-[#7a8f6b]/10 px-6 py-4 text-sm text-[#364330]">
-                <div>{request.id}-{index}</div>
-                <div>{request.route}</div>
-                <div>{request.method}</div>
-                <div>{request.source}</div>
-              </div>
-            )}
-          />
         </div>
-      </div>
-    </main>
-  );
+      </main>
+    \`;
+  }
 }
 `;
 }
@@ -1077,7 +1193,8 @@ ${body}}
 }
 
 function createAuthPage() {
-  return `import { definePage, type PageProps } from "fiyuu/client";
+  return `import { Component } from "@geajs/core";
+import { definePage, escapeHtml, html, type PageProps } from "fiyuu/client";
 
 type AuthData = {
   users: Array<{ id: string; username: string; role: string }>;
@@ -1089,66 +1206,32 @@ export const page = definePage({
   intent: "Auth page demonstrating F1-backed users and sessions",
 });
 
-export default function Page({ data }: PageProps<AuthData>) {
-  return (
-    <main className="min-h-screen bg-[#f7f3ea] px-6 py-16 text-[#31402b]">
-      <div className="mx-auto max-w-6xl rounded-[2rem] border border-[#7a8f6b]/20 bg-white/70 p-10 shadow-[0_24px_80px_rgba(68,84,57,0.10)]">
-        <div className="text-xs uppercase tracking-[0.24em] text-[#6d805f]">Auth Example</div>
-        <h1 className="mt-4 text-4xl font-semibold text-[#24311f]">F1-backed Auth Starter</h1>
-        <p className="mt-4 max-w-2xl text-lg leading-8 text-[#5f6d58]">
-          This route shows how user and session records can live in the F1 store while your UI stays inside the same deterministic feature structure.
-        </p>
-        <div className="mt-8 grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-          <section className="rounded-3xl border border-[#7a8f6b]/15 bg-[#fcfaf5] p-6">
-            <h2 className="text-lg font-semibold text-[#24311f]">Sign in</h2>
-            <p className="mt-2 text-sm text-[#61705b]">Use the default starter account to test a working username/password flow.</p>
-            <div className="mt-4 rounded-2xl bg-[#eef4e8] px-4 py-4 text-sm text-[#44513f]">
-              username: <strong>{data?.hint.username}</strong><br />
-              password: <strong>{data?.hint.password}</strong>
-            </div>
-            <form id="fiyuu-auth-form" className="mt-5 space-y-3">
-              <input id="fiyuu-auth-username" name="username" defaultValue={data?.hint.username} placeholder="Username" className="w-full rounded-2xl border border-[#7a8f6b]/20 bg-white px-4 py-3 outline-none" />
-              <input id="fiyuu-auth-password" name="password" defaultValue={data?.hint.password} type="password" placeholder="Password" className="w-full rounded-2xl border border-[#7a8f6b]/20 bg-white px-4 py-3 outline-none" />
-              <button id="fiyuu-auth-submit" type="submit" className="rounded-2xl bg-[#31402b] px-5 py-3 text-sm font-medium text-[#f7f3ea] disabled:opacity-60">
-                Sign in
-              </button>
-            </form>
-            <div id="fiyuu-auth-result" className="mt-4 text-sm text-[#55654e]"></div>
-          </section>
-          <section className="rounded-3xl border border-[#7a8f6b]/15 bg-[#fcfaf5] p-6">
-            <h2 className="text-lg font-semibold text-[#24311f]">Users</h2>
-            <div className="mt-4 space-y-3">
-              {data?.users.map((user) => (
-                <div key={user.id} className="rounded-2xl border border-[#7a8f6b]/10 px-4 py-4 text-sm">
-                  <div className="font-medium text-[#24311f]">{user.username}</div>
-                  <div className="mt-1 text-[#61705b]">{user.role} · {user.id}</div>
-                </div>
-              ))}
-            </div>
-          </section>
-          <section className="rounded-3xl bg-[#31402b] p-6 text-[#f7f3ea]">
-            <h2 className="text-lg font-semibold">Sessions</h2>
-            <div className="mt-4 space-y-3">
-              {data?.sessions.map((session) => (
-                <div key={session.id} className="rounded-2xl border border-white/10 px-4 py-4 text-sm">
-                  <div className="font-medium">{session.id}</div>
-                  <div className="mt-1 text-[#dbe5d4]">{session.userId} · {session.status}</div>
-                </div>
-              ))}
-            </div>
-          </section>
+export default class Page extends Component<PageProps<AuthData>> {
+  template({ data }: PageProps<AuthData> = this.props) {
+    const usersHtml = (data?.users ?? [])
+      .map((user) => html\`<div class="rounded-2xl border border-[#7a8f6b]/10 px-4 py-4 text-sm"><div class="font-medium text-[#24311f]">\${escapeHtml(user.username)}</div><div class="mt-1 text-[#61705b]">\${escapeHtml(user.role)} · \${escapeHtml(user.id)}</div></div>\`)
+      .join("");
+    const sessionsHtml = (data?.sessions ?? [])
+      .map((session) => html\`<div class="rounded-2xl border border-white/10 px-4 py-4 text-sm"><div class="font-medium">\${escapeHtml(session.id)}</div><div class="mt-1 text-[#dbe5d4]">\${escapeHtml(session.userId)} · \${escapeHtml(session.status)}</div></div>\`)
+      .join("");
+    const script = "const form=document.getElementById('fiyuu-auth-form');const username=document.getElementById('fiyuu-auth-username');const password=document.getElementById('fiyuu-auth-password');const result=document.getElementById('fiyuu-auth-result');const submit=document.getElementById('fiyuu-auth-submit');form&&form.addEventListener('submit',async(event)=>{event.preventDefault();if(!username||!password||!result||!submit)return;submit.setAttribute('disabled','true');result.textContent='Signing in...';const response=await fetch('/auth',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({username:username.value,password:password.value})});const payload=await response.json();result.textContent=payload.message||'Finished';submit.removeAttribute('disabled');if(payload.success){location.reload();}});";
+
+    return html\`
+      <main class="min-h-screen w-full bg-[#f7f3ea] px-6 py-12 text-[#31402b]">
+        <div class="w-full rounded-[2rem] border border-[#7a8f6b]/20 bg-white/70 p-8">
+          <div class="text-xs uppercase tracking-[0.24em] text-[#6d805f]">Auth Example</div>
+          <h1 class="mt-4 text-4xl font-semibold text-[#24311f]">F1-backed Auth Starter</h1>
+          <p class="mt-4 max-w-2xl text-lg leading-8 text-[#5f6d58]">This route shows how user and session records can live in the F1 store while your UI stays inside the same deterministic feature structure.</p>
+          <div class="mt-8 grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+            <section class="rounded-3xl border border-[#7a8f6b]/15 bg-[#fcfaf5] p-6"><h2 class="text-lg font-semibold text-[#24311f]">Sign in</h2><p class="mt-2 text-sm text-[#61705b]">Use the default starter account to test a working username/password flow.</p><div class="mt-4 rounded-2xl bg-[#eef4e8] px-4 py-4 text-sm text-[#44513f]">username: <strong>\${escapeHtml(data?.hint.username ?? "founder")}</strong><br/>password: <strong>\${escapeHtml(data?.hint.password ?? "fiyuu123")}</strong></div><form id="fiyuu-auth-form" class="mt-5 space-y-3"><input id="fiyuu-auth-username" name="username" value="\${escapeHtml(data?.hint.username ?? "founder")}" placeholder="Username" class="w-full rounded-2xl border border-[#7a8f6b]/20 bg-white px-4 py-3 outline-none"/><input id="fiyuu-auth-password" name="password" value="\${escapeHtml(data?.hint.password ?? "fiyuu123")}" type="password" placeholder="Password" class="w-full rounded-2xl border border-[#7a8f6b]/20 bg-white px-4 py-3 outline-none"/><button id="fiyuu-auth-submit" type="submit" class="rounded-2xl bg-[#31402b] px-5 py-3 text-sm font-medium text-[#f7f3ea]">Sign in</button></form><div id="fiyuu-auth-result" class="mt-4 text-sm text-[#55654e]"></div></section>
+            <section class="rounded-3xl border border-[#7a8f6b]/15 bg-[#fcfaf5] p-6"><h2 class="text-lg font-semibold text-[#24311f]">Users</h2><div class="mt-4 space-y-3">\${usersHtml}</div></section>
+            <section class="rounded-3xl bg-[#31402b] p-6 text-[#f7f3ea]"><h2 class="text-lg font-semibold">Sessions</h2><div class="mt-4 space-y-3">\${sessionsHtml}</div></section>
+          </div>
         </div>
-      </div>
-      <script
-        type="module"
-        dangerouslySetInnerHTML={{
-          __html: ${JSON.stringify(
-            'const form=document.getElementById("fiyuu-auth-form");const username=document.getElementById("fiyuu-auth-username");const password=document.getElementById("fiyuu-auth-password");const result=document.getElementById("fiyuu-auth-result");const submit=document.getElementById("fiyuu-auth-submit");form?.addEventListener("submit",async(event)=>{event.preventDefault();if(!username||!password||!result||!submit)return;submit.setAttribute("disabled","true");result.textContent="Signing in...";const response=await fetch("/auth",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({username:username.value,password:password.value})});const payload=await response.json();result.textContent=payload.message||"Finished";submit.removeAttribute("disabled");if(payload.success){window.location.reload();}});',
-          )},
-        }}
-      />
-    </main>
-  );
+      </main>
+      <script type="module">\${script}</script>
+    \`;
+  }
 }
 `;
 }
@@ -1173,14 +1256,20 @@ export const description = "Loads the starter content for the Fiyuu home page";
 }
 
 function createHomePage(answers) {
-  const routeLinks = [
-    '{ href: "/auth", label: "Auth", helper: "Username/password starter" }',
-    '{ href: "/requests", label: "F1 Requests", helper: "Shared data example" }',
-    '{ href: "/live", label: "Live", helper: "Realtime counter" }',
-    '{ href: "/about", label: "About", helper: "Framework overview" }',
-  ].join(", ");
-
-  return `import { definePage, type PageProps } from "fiyuu/client";
+  const themeMainClasses = answers.theming
+    ? 'min-h-screen bg-[linear-gradient(180deg,#f7f3ea_0%,#f1ebde_58%,#e9e0d0_100%)] px-4 py-4 text-[#33412f] dark:bg-[linear-gradient(180deg,#121614_0%,#171f1a_100%)] dark:text-[#e6efe8] sm:px-6 sm:py-5'
+    : 'min-h-screen bg-[linear-gradient(180deg,#f7f3ea_0%,#f1ebde_58%,#e9e0d0_100%)] px-4 py-4 text-[#33412f] sm:px-6 sm:py-5';
+  const themeSectionClasses = answers.theming
+    ? 'flex min-h-[calc(100vh-2rem)] w-full flex-col justify-between rounded-[1.5rem] border border-[#7a8f6b]/20 bg-[#f8f4ec]/80 p-5 dark:border-[#4f6756]/35 dark:bg-[#1b241f]/90 sm:min-h-[calc(100vh-2.5rem)] sm:p-7'
+    : 'flex min-h-[calc(100vh-2rem)] w-full flex-col justify-between rounded-[1.5rem] border border-[#7a8f6b]/20 bg-[#f8f4ec]/80 p-5 sm:min-h-[calc(100vh-2.5rem)] sm:p-7';
+  const themeNav = answers.theming
+    ? '<nav class="flex items-center justify-between"><p class="text-xs uppercase tracking-[0.22em] text-[#627356] dark:text-[#95b39d]">Fiyuu starter</p><button id="fiyuu-theme-toggle" type="button" class="rounded-full border border-[#7a8f6b]/20 px-3 py-1 text-xs text-[#43523f] dark:border-[#6f8d77]/30 dark:text-[#d1e3d6]">Dark</button></nav>'
+    : '<p class="text-xs uppercase tracking-[0.22em] text-[#627356]">Fiyuu starter</p>';
+  const themeScript = answers.theming
+    ? "const root=document.documentElement;const button=document.getElementById('fiyuu-theme-toggle');const saved=localStorage.getItem('fiyuu-theme');const initial=saved||'light';if(initial==='dark'){root.classList.add('dark');}if(button){button.textContent=root.classList.contains('dark')?'Light':'Dark';button.addEventListener('click',()=>{const next=root.classList.contains('dark')?'light':'dark';root.classList.toggle('dark',next==='dark');localStorage.setItem('fiyuu-theme',next);button.textContent=next==='dark'?'Light':'Dark';});}"
+    : "";
+  return `import { Component } from "@geajs/core";
+import { definePage, escapeHtml, html, type PageProps } from "fiyuu/client";
 
 type HomeData = {
   stats: Array<{
@@ -1191,159 +1280,45 @@ type HomeData = {
 };
 
 export const page = definePage({
-  intent: "Home page introducing the Fiyuu framework with a calm starter experience",
+  intent: "Minimal one-page home route for a focused Fiyuu starter",
 });
 
-export default function Page({ data }: PageProps<HomeData>) {
-  const links = [${routeLinks}];
-
-  return (
-    <div className="min-h-screen bg-[#f7f3ea] text-[#33412f]">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(107,128,92,0.18),_transparent_38%),linear-gradient(180deg,_#f7f3ea_0%,_#f1ebde_58%,_#e9e0d0_100%)]" />
-      <main className="relative mx-auto max-w-7xl px-6 py-16 lg:px-10 lg:py-20">
-        <section className="overflow-hidden rounded-[2.5rem] border border-[#7a8f6b]/20 bg-white/70 p-8 shadow-[0_30px_120px_rgba(68,84,57,0.10)] backdrop-blur-xl lg:p-12">
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_420px] lg:items-start">
-            <div>
-              <div className="inline-flex rounded-full border border-[#7a8f6b]/25 bg-[#eef3e8] px-3 py-1 text-xs uppercase tracking-[0.24em] text-[#627356]">
-                AI-first fullstack framework
-              </div>
-              <h1 className="mt-6 max-w-3xl text-5xl font-semibold tracking-tight text-[#24311f] sm:text-6xl lg:text-7xl">
-                Build product systems that stay clear for engineers and AI.
-              </h1>
-              <p className="mt-6 max-w-2xl text-lg leading-8 text-[#55654e] sm:text-xl">
-                Fiyuu keeps frontend, backend, realtime flows, and project context in one deterministic app structure.
-              </p>
-              <div className="mt-8 flex flex-wrap items-center gap-4">
-                <a href="https://github.com/hacimertgokhan/fiyuu" target="_blank" rel="noreferrer" className="inline-flex items-center rounded-2xl bg-[#31402b] px-5 py-3 text-sm font-medium text-[#f7f3ea] transition hover:bg-[#283422]">
-                  View GitHub
-                </a>
-                <a href="/auth" className="inline-flex items-center rounded-2xl border border-[#7a8f6b]/20 bg-white px-5 py-3 text-sm font-medium text-[#42513d] transition hover:bg-[#f8f4ec]">
-                  Open Starter Auth
-                </a>
-              </div>
-              <div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                {links.map((link) => (
-                  <a key={link.href} href={link.href} className="rounded-2xl border border-[#7a8f6b]/15 bg-[#fcfaf5] px-5 py-5 transition hover:-translate-y-0.5 hover:shadow-lg">
-                    <div className="text-sm font-semibold text-[#2f3d2a]">{link.label}</div>
-                    <div className="mt-2 text-sm leading-6 text-[#65735f]">{link.helper}</div>
-                    <div className="mt-4 text-xs uppercase tracking-[0.2em] text-[#7a8b71]">{link.href}</div>
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            <aside className="rounded-[2rem] bg-[#31402b] p-6 text-[#f7f3ea] shadow-2xl shadow-[#31402b]/10 lg:sticky lg:top-10">
-              <div className="text-xs uppercase tracking-[0.24em] text-[#d4dfcd]">Project snapshot</div>
-              <div className="mt-6 space-y-3">
-                {data?.stats.map((item) => (
-                  <div key={item.label} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
-                    <div className="text-xs uppercase tracking-[0.2em] text-[#c7d3c0]">{item.label}</div>
-                    <div className="mt-2 text-2xl font-semibold text-white">{item.value}</div>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-6 rounded-2xl bg-[#25311f] px-4 py-4">
-                <div className="text-xs uppercase tracking-[0.2em] text-[#c7d3c0]">Included skills</div>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {data?.skills.map((skill) => (
-                    <span key={skill} className="rounded-full bg-white/10 px-3 py-1 text-sm text-[#eef3e8]">{skill}</span>
-                  ))}
-                </div>
-              </div>
-            </aside>
-          </div>
+export default class Page extends Component<PageProps<HomeData>> {
+  template({ data }: PageProps<HomeData> = this.props) {
+    const statsHtml = (data?.stats ?? [])
+      .map(
+        (item) => html\`<div class="rounded-xl border border-[#7a8f6b]/18 bg-[#fcfaf5] px-4 py-3"><p class="text-[11px] uppercase tracking-[0.2em] text-[#708067]">\${escapeHtml(item.label)}</p><p class="mt-1 text-2xl font-semibold text-[#263320]">\${escapeHtml(item.value)}</p></div>\`,
+      )
+      .join("");
+    const skillsHtml = (data?.skills ?? [])
+      .map((skill) => html\`<span class="rounded-full border border-[#7a8f6b]/20 px-3 py-1 text-xs text-[#44513f]">\${escapeHtml(skill)}</span>\`)
+      .join("");
+    const explainHtml = [
+      { title: "Single structure", body: "Routes, queries, actions, and metadata live in predictable folders." },
+      { title: "AI-readable", body: "Project docs and contracts stay explicit so assistants can reason safely." },
+      { title: "Gea-first runtime", body: "Rendering is optimized for Gea components with deterministic behavior." },
+    ]
+      .map((item) => html\`<article class="rounded-xl border border-[#7a8f6b]/16 bg-[#fcfaf5] px-4 py-4"><h2 class="text-sm font-semibold text-[#24311f]">\${item.title}</h2><p class="mt-2 text-sm leading-6 text-[#5c6955]">\${item.body}</p></article>\`)
+      .join("");
+    return html\`
+      <main class="${themeMainClasses}">
+        <section class="${themeSectionClasses}">
+          ${themeNav}
+          <header>
+            <h1 class="mt-3 text-4xl font-semibold tracking-tight text-[#24311f] dark:text-[#ecf5ef] sm:text-5xl lg:text-6xl">Fiyuu is a structured fullstack framework for humans and AI.</h1>
+            <p class="mt-4 max-w-4xl text-base leading-7 text-[#56654e] dark:text-[#b9cabc] sm:text-lg">It keeps route UI, server logic, and metadata in one deterministic layout so teams ship faster without losing clarity.</p>
+          </header>
+          <div class="mt-5 grid gap-3 lg:grid-cols-3">\${explainHtml}</div>
+          <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">\${statsHtml}</div>
+          <footer class="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-[#7a8f6b]/15 pt-4">
+            <p class="text-sm text-[#5f6d58] dark:text-[#acc1b1]">AI-first fullstack framework structure with deterministic routing.</p>
+            <div class="flex flex-wrap gap-2">\${skillsHtml}</div>
+          </footer>
         </section>
       </main>
-    </div>
-  );
-}
-`;
-}
-
-function createAboutMeta(answers) {
-  return `import { defineMeta } from "fiyuu/client";
-
-export default defineMeta({
-  intent: "About page describing route folders in the Fiyuu starter",
-  title: "About",
-  render: "ssr",
-  seo: {
-    title: "About - Fiyuu",
-    description: "Overview of the Fiyuu framework structure and startup-ready features.",
-  },
-});
-`;
-}
-
-function createAboutQuery() {
-  return `import { z } from "zod";
-import { defineQuery } from "fiyuu/client";
-
-export const query = defineQuery({
-  input: z.object({}),
-  output: z.object({
-    headline: z.string(),
-    body: z.string(),
-    pillars: z.array(z.string()),
-  }),
-  description: "Loads content for the about route",
-});
-
-export async function execute() {
-  return {
-    headline: "Fiyuu keeps fullstack work readable",
-    body: "Every feature lives in a route folder with explicit files for metadata, schema, reads, writes, and UI. That keeps implementation predictable for engineers and understandable for AI systems.",
-    pillars: ["Folder-based routes", "Typed contracts", "Realtime and data scaffolds", "AI-readable project context"],
-  };
-}
-`;
-}
-
-function createAboutSchema() {
-  return `import { z } from "zod";
-
-export const input = z.object({});
-
-export const output = z.object({
-  headline: z.string(),
-  body: z.string(),
-  pillars: z.array(z.string()),
-});
-
-export const description = "Loads content for the about route";
-`;
-}
-
-function createAboutPage() {
-  return `import { definePage, type PageProps } from "fiyuu/client";
-
-type AboutData = {
-  headline: string;
-  body: string;
-  pillars: string[];
-};
-
-export const page = definePage({
-  intent: "About page describing route folders in the Fiyuu starter",
-});
-
-export default function Page({ data }: PageProps<AboutData>) {
-  return (
-    <main className="min-h-screen bg-[#f7f3ea] px-6 py-16 text-[#31402b]">
-      <div className="mx-auto max-w-4xl rounded-[2rem] border border-[#7a8f6b]/20 bg-white/70 p-10 shadow-[0_24px_80px_rgba(68,84,57,0.10)]">
-        <div className="text-xs uppercase tracking-[0.24em] text-[#6d805f]">About</div>
-        <h1 className="mt-4 text-4xl font-semibold text-[#24311f]">{data?.headline}</h1>
-        <p className="mt-4 text-lg leading-8 text-[#5f6d58]">{data?.body}</p>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2">
-          {data?.pillars.map((pillar) => (
-            <div key={pillar} className="rounded-2xl border border-[#7a8f6b]/15 bg-[#fcfaf5] px-5 py-5 text-sm text-[#44513f]">
-              {pillar}
-            </div>
-          ))}
-        </div>
-      </div>
-    </main>
-  );
+      ${answers.theming ? `<script type="module">${themeScript}</script>` : ''}
+    \`;
+  }
 }
 `;
 }

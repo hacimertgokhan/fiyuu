@@ -14,6 +14,12 @@ export interface FiyuuConfig {
     skillsDirectory?: string;
     defaultSkills?: string[];
     graphContext?: boolean;
+    inspector?: {
+      enabled?: boolean;
+      localModelCommand?: string;
+      timeoutMs?: number;
+      autoSetupPrompt?: boolean;
+    };
   };
   fullstack?: {
     client?: boolean;
@@ -57,6 +63,18 @@ export interface FiyuuConfig {
   featureFlags?: {
     enabled?: boolean;
     defaults?: Record<string, boolean>;
+  };
+  errors?: {
+    /**
+     * Called for every unhandled server error.
+     * Use this to send errors to Sentry, Datadog, etc.
+     */
+    handler?: (error: Error, context: { route: string; method: string; requestId: string }) => void | Promise<void>;
+    /**
+     * Whether to expose error details (stack trace, message) in responses.
+     * Defaults to true in dev, false in production.
+     */
+    expose?: boolean;
   };
 }
 

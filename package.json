@@ -18,6 +18,7 @@
     "build:packages": "node ./scripts/build-packages.mjs",
     "start": "tsx packages/cli/src/index.ts start",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "benchmark:gea": "tsx scripts/benchmark-gea-runtime.ts",
     "sync": "tsx packages/cli/src/index.ts sync",
     "generate:page": "tsx packages/cli/src/index.ts generate page",
     "generate:action": "tsx packages/cli/src/index.ts generate action"

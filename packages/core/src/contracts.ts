@@ -1,5 +1,4 @@
 import { z } from "zod";
-import type React from "react";
 
 export type AnyZodSchema = z.ZodTypeAny;
 
@@ -19,10 +18,22 @@ export interface QueryDefinition<TInput extends AnyZodSchema = AnyZodSchema, TOu
   kind: "query";
 }
 
+export interface QueryCacheConfig {
+  /** Cache TTL in seconds. Set to 0 to disable. */
+  ttl: number;
+  /** Cache key varies by these URL query string parameters. */
+  vary?: string[];
+}
+
 export interface MetaDefinition {
   intent: string;
   title?: string;
   render?: RenderMode;
+  /**
+   * Mark this page as zero-JS.
+   * `fiyuu doctor` will warn if <script> tags are detected in page.tsx.
+   */
+  noJs?: boolean;
   seo?: {
     title?: string;
     description?: string;
@@ -39,17 +50,19 @@ export interface LayoutDefinition {
   name?: string;
 }
 
-export type RenderMode = "ssr" | "csr";
+export type RenderMode = "ssr" | "csr" | "ssg";
 
 export interface PageProps<TData = unknown> {
   data: TData | null;
   route: string;
   intent: string;
   render: RenderMode;
+  /** Dynamic route parameters extracted from the URL, e.g. { id: "42" } for /blog/[id] */
+  params: Record<string, string>;
 }
 
 export interface LayoutProps {
-  children: React.ReactNode;
+  children: string;
   route: string;
 }
 

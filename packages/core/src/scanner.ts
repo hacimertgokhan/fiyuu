@@ -3,7 +3,7 @@ import path from "node:path";
 
 const FIXED_FILES = ["page.tsx", "action.ts", "query.ts", "schema.ts", "meta.ts"] as const;
 const REQUIRED_FILES = ["schema.ts", "meta.ts"] as const;
-const SUPPLEMENTARY_FILES = ["middleware.ts", "layout.tsx", "layout.meta.ts", "route.ts"] as const;
+const SUPPLEMENTARY_FILES = ["middleware.ts", "layout.tsx", "layout.meta.ts", "route.ts", "not-found.tsx", "error.tsx"] as const;
 const GENERATED_FILE_PATTERN = /\.(js|jsx|d\.ts|map)$/;
 
 export interface FeatureRecord {
@@ -15,8 +15,17 @@ export interface FeatureRecord {
   intent: string | null;
   pageIntent: string | null;
   descriptions: string[];
-  render: "ssr" | "csr";
+  render: "ssr" | "csr" | "ssg";
   warnings: string[];
+  /** Names of dynamic segments in order, e.g. ["id"] for /blog/[id] */
+  params: string[];
+  /** True if route has any dynamic [param] or [...slug] segments */
+  isDynamic: boolean;
+  /**
+   * Human-readable pattern string, e.g. "/blog/:id" or "/docs/:slug*"
+   * Stored for AI docs and devtools display only — not used for matching.
+   */
+  routePattern: string;
 }
 
 export interface ProjectGraph {
@@ -37,7 +46,7 @@ export interface ProjectGraph {
     route: string;
     file: string;
     descriptions: string[];
-    render: "ssr" | "csr";
+    render: "ssr" | "csr" | "ssg";
   }>;
   relations: Array<{
     from: string;
@@ -127,6 +136,49 @@ async function visit(currentDirectory: string, directories: string[], appDirecto
   );
 }
 
+/**
+ * Parses dynamic segment syntax from a route string.
+ *
+ * Supported formats (mirrors Next.js conventions):
+ *   [param]         — single dynamic segment      /blog/[id]
+ *   [...slug]       — required catch-all           /docs/[...slug]
+ *   [[...slug]]     — optional catch-all           /docs/[[...slug]]
+ */
+export function parseRouteSegments(route: string): {
+  params: string[];
+  isDynamic: boolean;
+  routePattern: string;
+} {
+  const params: string[] = [];
+  const patternParts = route
+    .split("/")
+    .filter(Boolean)
+    .map((segment) => {
+      const optionalCatchAll = segment.match(/^\[\[\.\.\.(\w+)\]\]$/);
+      if (optionalCatchAll) {
+        params.push(optionalCatchAll[1]);
+        return `:${optionalCatchAll[1]}?*`;
+      }
+      const catchAll = segment.match(/^\[\.\.\.(\w+)\]$/);
+      if (catchAll) {
+        params.push(catchAll[1]);
+        return `:${catchAll[1]}*`;
+      }
+      const dynamic = segment.match(/^\[(\w+)\]$/);
+      if (dynamic) {
+        params.push(dynamic[1]);
+        return `:${dynamic[1]}`;
+      }
+      return segment;
+    });
+
+  return {
+    params,
+    isDynamic: params.length > 0,
+    routePattern: `/${patternParts.join("/")}`,
+  };
+}
+
 async function scanFeature(appDirectory: string, featureDirectory: string): Promise<FeatureRecord> {
   const relativeDirectory = path.relative(appDirectory, featureDirectory);
   const feature = relativeDirectory.split(path.sep).join("/");
@@ -163,6 +215,8 @@ async function scanFeature(appDirectory: string, featureDirectory: string): Prom
     ...extraFiles.map((fileName) => `Non-standard file in feature directory: ${fileName}`),
   ];
 
+  const { params, isDynamic, routePattern } = parseRouteSegments(route);
+
   return {
     route,
     feature,
@@ -174,6 +228,9 @@ async function scanFeature(appDirectory: string, featureDirectory: string): Prom
     descriptions: extractStringList(schemaSource, "description"),
     render: extractRenderMode(metaSource),
     warnings,
+    params,
+    isDynamic,
+    routePattern,
   };
 }
 
@@ -190,7 +247,13 @@ function normalizePath(filePath: string): string {
   return filePath.split(path.sep).join("/");
 }
 
-function extractRenderMode(source: string): "ssr" | "csr" {
+function extractRenderMode(source: string): "ssr" | "csr" | "ssg" {
   const render = extractStringValue(source, "render");
-  return render === "csr" ? "csr" : "ssr";
+  if (render === "csr") {
+    return "csr";
+  }
+  if (render === "ssg") {
+    return "ssg";
+  }
+  return "ssr";
 }

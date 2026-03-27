@@ -8,6 +8,7 @@
     "./cli": "./src/cli.ts"
   },
   "dependencies": {
+    "@geajs/core": "^1.0.12",
     "@fiyuu/core": "0.1.0",
     "chokidar": "^4.0.3",
     "esbuild": "^0.25.2",
