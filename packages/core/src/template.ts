@@ -1,4 +1,18 @@
 /**
+ * Embeds server-side data as a JSON script tag for client access via fiyuu.data(id).
+ *
+ * @example
+ * // In page.tsx template:
+ * ${clientData('my-posts', posts.map(p => ({ id: p.id, title: p.title })))}
+ *
+ * // In inline script:
+ * const posts = fiyuu.data('my-posts');
+ */
+export function clientData<T>(id: string, data: T): string {
+  return `<script type="application/json" id="${id}">${JSON.stringify(data)}</script>`;
+}
+
+/**
  * RawHtml — marks a string as already-safe HTML.
  * Used as a utility type; html`` does NOT require wrapping with raw().
  */
@@ -20,8 +34,9 @@ export function raw(value: string | RawHtml): RawHtml {
   return value instanceof RawHtml ? value : new RawHtml(value);
 }
 
-export function escapeHtml(value: string): string {
-  return value
+export function escapeHtml(value: unknown): string {
+  const text = value == null ? "" : String(value);
+  return text
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")

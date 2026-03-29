@@ -1,43 +1,72 @@
 # Fiyuu
 
-Fiyuu is a **Gea-first fullstack framework** focused on clarity, deterministic structure, and AI-assisted development.
+Fiyuu is an **AI-native fullstack framework** built on GEA.
+It makes app structure deterministic and exports machine-readable artifacts so both developers and AI tools can work with the same reliable context.
 
-## What is Fiyuu?
+## What problem does Fiyuu solve?
 
-Fiyuu is a fullstack TypeScript framework that replaces React with a lightweight GEA runtime. Every route is a folder with fixed files — `page.tsx`, `query.ts`, `action.ts`, `schema.ts`, `meta.ts` — so the file system itself defines behavior. The framework generates a machine-readable project graph (`.fiyuu/graph.json`) that AI tools can parse, extend, and refactor without guessing.
+Routing and rendering are already solved by strong frameworks.
+Fiyuu focuses on a different bottleneck: **AI and humans often misread intent in large, fast-changing codebases**.
+
+Fiyuu enforces fixed route contracts (`page.tsx`, `query.ts`, `action.ts`, `schema.ts`, `meta.ts`) and generates `.fiyuu/graph.json` plus AI docs (`PROJECT.md`, `PATHS.md`, `EXECUTION.md`, and more). This reduces guesswork in generation, refactors, and review flows.
 
 ## Why Fiyuu?
 
-- **No React dependency** — GEA runtime renders components server-side without React, reducing bundle size and complexity
-- **AI can understand your project** — deterministic structure + project graph means AI assistants can safely generate, modify, and reason about your codebase
-- **Built-in devtools** — unified console with runtime info, AI insights panel, and live server trace (dev-only)
-- **`fiyuu doctor`** — checks for React imports, missing schemas, SEO gaps, and zero-JS violations
-- **Skills system** — project-aware automation scripts that run with full graph context
+- **AI-native project context** — `fiyuu sync` exports graph + AI docs from real app structure
+- **Deterministic fullstack contracts** — fixed file conventions reduce hidden behavior and drift
+- **GEA-first runtime** — app route code stays React-free at the framework layer
+- **Built-in diagnostics** — `fiyuu doctor` validates structure and common anti-patterns
+- **AI assistant bridge** — `fiyuu ai "<prompt>"` prints route-aware context for external LLM workflows
 
-## Performance
+## Measurable differentiation
 
-Fiyuu uses Node.js native HTTP server (no Express, no framework layer). Client assets are bundled with esbuild. SSG routes are cached in memory. Query results support TTL-based caching. A benchmark script is included:
+Fiyuu tracks performance and DX scorecards by release.
+
+| Metric | How to measure | Current (v0.1.x) | Target (v0.2) |
+| --- | --- | --- | --- |
+| Cold build time | `time npm run build` | Baseline pending | >= 20% better on reference app profile |
+| SSR latency (avg/p95) | `npm run benchmark:gea` | Baseline pending | >= 15% lower p95 on reference profile |
+| Client JS bundle size | `npm run benchmark:gea` (bundle output) | Baseline pending | >= 20% smaller on reference profile |
+| AI context readiness time | `time fiyuu sync` | Baseline pending | <= 1s for 100-route reference app |
+
+Until public scorecards are published, treat Fiyuu as an early-stage framework.
+
+## Performance and benchmark tooling
+
+Fiyuu uses Node.js native HTTP server (no Express). Client assets are bundled with esbuild. SSG routes are cached in memory with optional `meta.revalidate` (ISR-style TTL). Query results support TTL caching with in-flight de-duplication. Navigation responses and HTML support ETag/304, and client navigation prefetches links on hover/focus/viewport.
+
+For app-layer UI performance, `fiyuu/client` also provides `optimizedImage`, `optimizedVideo`, and responsive helpers (`responsiveStyle`, `mediaUp`, `fluid`, etc.) so teams can ship faster pages without adding heavy UI runtime dependencies.
+
+Run benchmark:
 
 ```bash
 npm run benchmark:gea
+npm run benchmark:scorecard
 ```
 
-This measures per-route latency (avg, p50, p95) and bundle sizes.
+This reports per-route latency (`avg`, `p50`, `p95`, `min`, `max`) and total client bundle size.
+The scorecard command also records build/sync/doctor outputs into `docs/benchmarks/latest-scorecard.md`.
 
-## Use Cases
+## Current scope (v2 direction)
 
-- **AI-assisted teams** — developers who use Copilot, Cursor, or local LLMs and want a codebase those tools can reliably operate on
-- **React-free fullstack apps** — projects that need server rendering without React's runtime overhead
-- **Rapid prototyping** — deterministic scaffolding with `npm create fiyuu-app` and `fiyuu generate`
-- **Small-to-medium web apps** — dashboards, admin panels, content sites, internal tools
+- Primary: **AI-first routing framework** with deterministic contracts
+- Shipping priority: graph tooling, diagnostics, and SSR + cache primitives
+- Secondary: broader adapters, plugin ecosystem depth, CSR/SSG parity
 
-## Core Focus
+## Competitive snapshot
 
-- **Deterministic structure**: route folders use fixed files (`page.tsx`, `query.ts`, `action.ts`, `schema.ts`, `meta.ts`)
-- **Gea-first runtime**: no React dependency in generated app routes
-- **AI-ready by default**: project graph and docs are generated in `.fiyuu/`
-- **Developer visibility**: unified dev console with runtime, insights, and live server trace (dev-only)
-- **Render flexibility**: supports `ssr`, `csr`, and `ssg`
+Fiyuu is not positioned as a full replacement for Next.js, Nuxt, or Astro today.
+It is positioned as an AI-native framework workflow where deterministic graph context is a first-class feature.
+
+- Ecosystem breadth: behind mature frameworks (current reality)
+- AI-readable architecture context: core investment area
+- Public benchmark scorecards: in progress (`docs/benchmark-matrix.md`)
+
+## Use cases
+
+- **AI-assisted teams** using Copilot, Cursor, or local LLM pipelines
+- **React-free app layer** teams that prefer explicit route contracts
+- **Internal tools and dashboards** where deterministic structure matters more than maximal abstraction
 
 ## Quick Start
 
@@ -48,7 +77,7 @@ npm install
 npm run dev
 ```
 
-## Useful Commands
+## Useful commands
 
 ```bash
 fiyuu dev
@@ -56,34 +85,32 @@ fiyuu build
 fiyuu start
 fiyuu sync
 fiyuu doctor
+fiyuu doctor --fix
+fiyuu graph stats
+fiyuu graph export --format markdown --out docs/graph.md
+fiyuu ai "explain route dependencies for /requests"
+fiyuu skill list
+fiyuu skill run seo-baseline
 fiyuu feat list
 fiyuu feat socket on
 fiyuu feat socket off
-fiyuu ai setup
 ```
 
-## Default Starter
+## Default starter
 
 - One-page home layout
 - Optional feature selection during setup (interactive multi-select)
 - Optional light/dark theme toggle with localStorage persistence
 - Built-in `app/not-found.tsx` and `app/error.tsx`
 
-## AI Inspector
-
-Fiyuu includes a local AI inspector flow.
-
-- Works in devtools insights panel
-- Can run with a local JS LLM runner
-- Falls back safely if model/runtime is unavailable
-
----
-
-Fiyuu aims to keep modern fullstack apps **structured, readable, and AI-operable** without hidden magic.
-
-Documentation:
+## Documentation
 
 - English: `docs/en.md`
 - Turkish: `docs/tr.md`
 - Skills (EN): `docs/skills.md`
 - Skills (TR): `docs/skills.tr.md`
+- v2 Product Spec (TR): `docs/v2-product-spec.tr.md`
+- Benchmark Matrix: `docs/benchmark-matrix.md`
+- Benchmarks Folder: `docs/benchmarks/README.md`
+- AI Demo Walkthrough: `docs/ai-demo.md`
+- AI-for-Framework Guide: `docs/ai-for-framework.md`

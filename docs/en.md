@@ -60,10 +60,14 @@ fiyuu build
 fiyuu start
 fiyuu sync
 fiyuu doctor
+fiyuu doctor --fix
+fiyuu graph stats
+fiyuu graph export --format markdown --out docs/graph.md
 fiyuu feat list
 fiyuu feat socket on
 fiyuu feat socket off
-fiyuu ai setup
+fiyuu skill list
+fiyuu skill run seo-baseline
 ```
 
 ## Render Modes
@@ -73,6 +77,16 @@ Set mode in route `meta.ts`:
 - `ssr`: server render per request
 - `csr`: client render
 - `ssg`: static-like cached render in start mode
+
+## Media and Responsive Helpers
+
+`fiyuu/client` now includes lightweight helpers for performance-focused UI blocks:
+
+- `optimizedImage(...)` for lazy loading, decoding hints, fetch priority, and optional `<picture>` sources
+- `optimizedVideo(...)` for preload defaults, source lists, and better playback attributes
+- `responsiveStyle(...)`, `mediaUp(...)`, `mediaDown(...)`, `mediaBetween(...)`, `fluid(...)`, `responsiveSizes(...)`
+
+These helpers are string-based and keep the runtime small while still giving Next.js-like ergonomics.
 
 ## Dev Console (Development only)
 
@@ -84,16 +98,13 @@ In dev mode, Fiyuu shows a unified console panel with:
 
 Not active in production.
 
-## AI Inspector
+## AI-for-Framework Model
 
-Run:
+Fiyuu does not run an integrated LLM inside runtime.
 
-```bash
-fiyuu ai setup
-```
-
-This prepares local AI files in `.fiyuu/ai/`.
-You can run local model mode or fallback mode.
+- AI-facing docs are generated into `.fiyuu/` by `fiyuu sync`
+- deterministic suggestions are shown in Insights
+- automatic safe interventions are available via `fiyuu doctor --fix`
 
 ## Theming
 
@@ -116,5 +127,17 @@ Common sections:
 ## Troubleshooting
 
 - Run `fiyuu doctor` for structure and compatibility checks.
+- Run `fiyuu doctor --fix` for safe deterministic fixes.
 - Run `fiyuu sync` after adding routes/features.
 - If local package updates are not reflected: reinstall dependencies.
+
+`fiyuu doctor` also warns about raw `<img>` and `<video>` usage in `page.tsx` and suggests optimized helpers.
+
+## Strategy and Benchmarks
+
+- Product direction (TR): `docs/v2-product-spec.tr.md`
+- Benchmark methodology: `docs/benchmark-matrix.md`
+- Benchmark logs and release scorecards: `docs/benchmarks/README.md`
+- AI workflow walkthrough: `docs/ai-demo.md`
+- AI-for-framework guide: `docs/ai-for-framework.md`
+- Skill reference: `docs/skills.md`

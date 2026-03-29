@@ -1,4 +1,5 @@
 import { promises as fs, existsSync } from "node:fs";
+import { createHash } from "node:crypto";
 import path from "node:path";
 import { build } from "esbuild";
 import type { FeatureRecord, RenderMode } from "@fiyuu/core";
@@ -20,16 +21,17 @@ export async function bundleClient(features: FeatureRecord[], outputDirectory: s
   const assets = await Promise.all(
     pageFeatures.map(async (feature) => {
       const safeFeatureName = feature.feature.length > 0 ? feature.feature.replaceAll("/", "_") : "home";
-      const bundleName = `${safeFeatureName}.js`;
-      const bundleFile = path.join(outputDirectory, bundleName);
       const pageFile = feature.files["page.tsx"]!;
       const layoutFiles = resolveLayoutFiles(feature, pageFile);
       const signature = await createBuildSignature([pageFile, ...layoutFiles]);
-      const cacheKey = `${feature.route}:${bundleFile}`;
+      const signatureHash = createHash("sha1").update(signature).digest("hex").slice(0, 10);
+      const bundleName = `${safeFeatureName}.${signatureHash}.js`;
+      const bundleFile = path.join(outputDirectory, bundleName);
+      const cacheKey = feature.route;
       const publicPath = `/__fiyuu/client/${bundleName}`;
       const cached = buildCache.get(cacheKey);
 
-      if (cached && cached.signature === signature && existsSync(bundleFile)) {
+      if (cached && cached.signature === signature && existsSync(cached.asset.bundleFile)) {
         return {
           ...cached.asset,
           render: feature.render,
@@ -61,6 +63,14 @@ export async function bundleClient(features: FeatureRecord[], outputDirectory: s
         bundleFile,
         publicPath,
       } satisfies ClientAsset;
+
+      if (cached && cached.asset.bundleFile !== asset.bundleFile && existsSync(cached.asset.bundleFile)) {
+        try {
+          await fs.unlink(cached.asset.bundleFile);
+        } catch {
+          // ignore stale artifact cleanup failures
+        }
+      }
 
       buildCache.set(cacheKey, { signature, asset });
       return asset;

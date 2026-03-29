@@ -60,10 +60,14 @@ fiyuu build
 fiyuu start
 fiyuu sync
 fiyuu doctor
+fiyuu doctor --fix
+fiyuu graph stats
+fiyuu graph export --format markdown --out docs/graph.md
 fiyuu feat list
 fiyuu feat socket on
 fiyuu feat socket off
-fiyuu ai setup
+fiyuu skill list
+fiyuu skill run seo-baseline
 ```
 
 ## Render modları
@@ -73,6 +77,16 @@ Route içindeki `meta.ts` dosyasında belirlenir:
 - `ssr`: Her istekte server-side render
 - `csr`: Client-side render
 - `ssg`: Start modunda static benzeri cache render
+
+## Medya ve Responsive yardimcilari
+
+`fiyuu/client` artik performans odakli medya ve responsive yardimcilari sunar:
+
+- `optimizedImage(...)`: lazy loading, decoding ipuclari, fetch priority ve opsiyonel `<picture>` kaynaklari
+- `optimizedVideo(...)`: preload varsayilanlari, coklu source tanimi ve daha guvenli oynatim ozellikleri
+- `responsiveStyle(...)`, `mediaUp(...)`, `mediaDown(...)`, `mediaBetween(...)`, `fluid(...)`, `responsiveSizes(...)`
+
+Bu yardimcilar string-temelli oldugu icin runtime hafif kalirken modern ergonomi saglar.
 
 ## Dev Console (sadece development)
 
@@ -84,14 +98,13 @@ Dev modda tek panelde şu bilgiler bulunur:
 
 Production modda aktif değildir.
 
-## AI Inspector
+## AI icin Calisan Framework
 
-```bash
-fiyuu ai setup
-```
+Fiyuu runtime icinde entegre bir LLM calistirmaz.
 
-Bu komut `.fiyuu/ai/` altında local AI altyapısını hazırlar.
-Model varsa local AI, yoksa fallback mod çalışır.
+- `fiyuu sync` ile `.fiyuu/` altinda AI'nin okuyabilecegi deterministic dokumanlar uretilir
+- Insights panelde rule-based oneriler verilir
+- guvenli otomatik mudahaleler `fiyuu doctor --fix` ile uygulanir
 
 ## Tema
 
@@ -122,5 +135,16 @@ Sık kullanılan alanlar:
 ## Sorun giderme
 
 - Yapı ve uyumluluk kontrolü için `fiyuu doctor` çalıştır.
+- Güvenli otomatik düzeltmeler için `fiyuu doctor --fix` çalıştır.
 - Yeni route/feature ekledikten sonra `fiyuu sync` çalıştır.
 - Değişiklikler yansımıyorsa bağımlılıkları yeniden kur.
+
+Ek olarak `fiyuu doctor`, `page.tsx` dosyalarindaki ham `<img>` ve `<video>` kullanimlarini da uyarir.
+
+## Strateji ve Benchmark
+
+- Ürün yönü (TR): `docs/v2-product-spec.tr.md`
+- Benchmark metodolojisi: `docs/benchmark-matrix.md`
+- Benchmark logları ve release scorecard: `docs/benchmarks/README.md`
+- AI workflow walkthrough: `docs/ai-demo.md`
+- AI-for-framework rehberi: `docs/ai-for-framework.md`

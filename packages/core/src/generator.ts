@@ -2,7 +2,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 
 const PAGE_TEMPLATE = `import { Component } from "@geajs/core";
-import { definePage, html, type PageProps } from "fiyuu/client";
+import { definePage, html, optimizedImage, responsiveStyle, fluid, type PageProps } from "fiyuu/client";
 
 type {{Title}}Data = Record<string, unknown>;
 
@@ -14,9 +14,17 @@ export default class {{Title}}Page extends Component<PageProps<{{Title}}Data>> {
   template({ data, intent }: PageProps<{{Title}}Data> = this.props) {
     // Strings interpolated into html\`\` are auto-escaped — no need for escapeHtml().
     // For pre-rendered HTML fragments, use raw() to prevent double-escaping.
+    const responsive = responsiveStyle(".feature-shell", "padding:16px;max-width:100%;", {
+      md: "padding:24px;",
+      lg: "padding:32px;max-width:960px;margin-inline:auto;",
+    });
     return html\`<main style="padding:48px;font-family:ui-sans-serif,system-ui,sans-serif">
+      \${responsive}
+      <section class="feature-shell">
       <h1 style="margin:0;font-size:2.5rem">{{title}}</h1>
-      <p style="margin-top:12px;color:#4b5b4c">\${intent}</p>
+      <p style="margin-top:12px;color:#4b5b4c;font-size:\${fluid(16, 20)}">\${intent}</p>
+      \${optimizedImage({ src: "/assets/hero.jpg", alt: "{{title}}", width: 1280, height: 720, sizes: "(min-width: 1024px) 960px, 100vw" })}
+      </section>
     </main>\`;
   }
 }

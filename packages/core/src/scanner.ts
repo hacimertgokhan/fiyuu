@@ -215,6 +215,31 @@ async function scanFeature(appDirectory: string, featureDirectory: string): Prom
     ...extraFiles.map((fileName) => `Non-standard file in feature directory: ${fileName}`),
   ];
 
+  if (pageSource.length > 0) {
+    if (/<img\b/i.test(pageSource)) {
+      warnings.push("Raw <img> usage detected. Prefer optimizedImage() for lazy loading and responsive sources.");
+      if (countMatches(pageSource, /<img\b(?![^>]*\balt\s*=)[^>]*>/gi) > 0) {
+        warnings.push("Some <img> tags are missing alt attributes.");
+      }
+      if (countMatches(pageSource, /<img\b(?![^>]*\bloading\s*=)[^>]*>/gi) > 0) {
+        warnings.push("Some <img> tags are missing loading attribute (use loading=\"lazy\" when appropriate).");
+      }
+      if (countMatches(pageSource, /<img\b(?![^>]*\b(?:width|height)\s*=)[^>]*>/gi) > 0) {
+        warnings.push("Some <img> tags are missing intrinsic width/height which can cause layout shift.");
+      }
+    }
+
+    if (/<video\b/i.test(pageSource)) {
+      warnings.push("Raw <video> usage detected. Prefer optimizedVideo() for preload and source hints.");
+      if (countMatches(pageSource, /<video\b(?![^>]*\bpreload\s*=)[^>]*>/gi) > 0) {
+        warnings.push("Some <video> tags are missing preload strategy (recommended: preload=\"metadata\").");
+      }
+      if (countMatches(pageSource, /<video\b(?![^>]*\bposter\s*=)[^>]*>/gi) > 0) {
+        warnings.push("Some <video> tags are missing poster image, which hurts perceived loading performance.");
+      }
+    }
+  }
+
   const { params, isDynamic, routePattern } = parseRouteSegments(route);
 
   return {
@@ -245,6 +270,11 @@ function extractStringList(source: string, key: string): string[] {
 
 function normalizePath(filePath: string): string {
   return filePath.split(path.sep).join("/");
+}
+
+function countMatches(source: string, pattern: RegExp): number {
+  const matches = source.match(pattern);
+  return matches ? matches.length : 0;
 }
 
 function extractRenderMode(source: string): "ssr" | "csr" | "ssg" {

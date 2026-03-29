@@ -2,8 +2,8 @@
 
 ## What is a Skill?
 
-A skill is a focused instruction document used by Fiyuu AI flows.
-It helps AI produce more consistent, project-specific output.
+A skill is a project-aware TypeScript script under `skills/`.
+It runs with graph context and can be used by external AI agents or developers.
 
 ## Location
 
@@ -15,24 +15,16 @@ skills/
 
 Example files:
 
-- `skills/product-strategist.md`
-- `skills/support-triage.md`
-- `skills/seo-optimizer.md`
+- `skills/seo-baseline.ts`
+- `skills/perf-route-hotspots.ts`
+- `skills/contract-coverage.ts`
 
-## Skill selection in project setup
+## Run skills
 
-During `create-fiyuu-app`, skills are selected interactively (arrow keys + space + enter).
-
-## Config in fiyuu.config.ts
-
-```ts
-export default {
-  ai: {
-    enabled: true,
-    skillsDirectory: "./skills",
-    defaultSkills: ["product-strategist", "seo-optimizer"],
-  },
-} as const;
+```bash
+fiyuu skill list
+fiyuu skill run seo-baseline
+fiyuu skill run perf-route-hotspots
 ```
 
 ## Skill authoring guide
@@ -46,18 +38,16 @@ Keep each skill short and explicit:
 
 Example skeleton:
 
-```md
-# SEO Optimizer
+```ts
+export const skill = {
+  name: "custom-skill",
+  description: "Describe what this skill does",
+  tags: ["custom"],
+};
 
-## Usage
-- Improve route metadata
-
-## Rules
-- require seo.title
-- suggest seo.description
-
-## Output
-- short actionable bullets
+export async function run(context) {
+  console.log(context.graph.routes.length);
+}
 ```
 
 ## Tips

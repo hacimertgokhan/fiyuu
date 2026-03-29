@@ -2,8 +2,8 @@
 
 ## Skill nedir?
 
-Skill, AI Inspector ve AI akışlarında kullanılan görev odaklı bilgi paketidir.
-Amaç, AI çıktısını daha tutarlı ve proje yapısına uygun hale getirmektir.
+Skill, `skills/` klasorunde duran proje-baglamli TypeScript scriptidir.
+Harici AI ajanlari veya gelistiriciler tarafindan proje grafigi ile calistirilir.
 
 ## Nerede bulunur?
 
@@ -13,26 +13,18 @@ Varsayılan klasör:
 skills/
 ```
 
-Örnek dosyalar:
+Ornek dosyalar:
 
-- `skills/product-strategist.md`
-- `skills/support-triage.md`
-- `skills/seo-optimizer.md`
+- `skills/seo-baseline.ts`
+- `skills/perf-route-hotspots.ts`
+- `skills/contract-coverage.ts`
 
-## Setup sırasında skill seçimi
+## Skill calistirma
 
-`create-fiyuu-app` sırasında skill seçimi interaktiftir (yön tuşları + space + enter).
-
-## fiyuu.config.ts ayarı
-
-```ts
-export default {
-  ai: {
-    enabled: true,
-    skillsDirectory: "./skills",
-    defaultSkills: ["product-strategist", "seo-optimizer"],
-  },
-} as const;
+```bash
+fiyuu skill list
+fiyuu skill run seo-baseline
+fiyuu skill run perf-route-hotspots
 ```
 
 ## Skill yazım önerisi
@@ -44,20 +36,18 @@ Her skill dosyası kısa ve net olmalıdır:
 - Hangi kurallara uyması gerektiği
 - Projeye özel sınırlar
 
-Örnek iskelet:
+Ornek iskelet:
 
-```md
-# SEO Optimizer
+```ts
+export const skill = {
+  name: "custom-skill",
+  description: "Bu skill ne yapiyor",
+  tags: ["custom"],
+};
 
-## Kullanım
-- Route meta iyileştirme
-
-## Kurallar
-- seo.title zorunlu
-- seo.description önerisi
-
-## Çıktı
-- Kısa, uygulanabilir maddeler
+export async function run(context) {
+  console.log(context.graph.routes.length);
+}
 ```
 
 ## İpuçları

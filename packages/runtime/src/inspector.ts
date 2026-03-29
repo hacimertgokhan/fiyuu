@@ -1,10 +1,6 @@
 import { promises as fs, existsSync } from "node:fs";
 import path from "node:path";
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
 import type { FeatureRecord, FiyuuConfig } from "@fiyuu/core";
-
-const execFileAsync = promisify(execFile);
 
 type InsightCategory = "security" | "performance" | "design" | "architecture";
 type InsightSeverity = "low" | "medium" | "high";
@@ -31,8 +27,8 @@ export interface InsightsReport {
   };
   items: InsightItem[];
   assistant: {
-    mode: "rule-only" | "local-model";
-    status: "ready" | "fallback";
+    mode: "rule-only";
+    status: "ready";
     details: string;
     suggestions: string[];
   };
@@ -254,87 +250,20 @@ function collectGlobalRenderInsights(features: FeatureRecord[]): InsightItem[] {
 }
 
 async function buildAssistantOutput(options: BuildInsightsOptions, items: InsightItem[]): Promise<InsightsReport["assistant"]> {
-  const mode = resolveAssistantMode(options);
-  if (mode === "rule-only") {
-    return {
-      mode,
-      status: "ready",
-      details: "Using deterministic project checks.",
-      suggestions: createRuleBasedSuggestions(items),
-    };
-  }
-
-  try {
-    const suggestions = await runLocalModel(options, items);
-    return {
-      mode,
-      status: "ready",
-      details: "Local model generated actionable development guidance.",
-      suggestions,
-    };
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Local model unavailable";
-    return {
-      mode,
-      status: "fallback",
-      details: `${message}. Falling back to deterministic guidance.`,
-      suggestions: createRuleBasedSuggestions(items),
-    };
-  }
-}
-
-function resolveAssistantMode(options: BuildInsightsOptions): "rule-only" | "local-model" {
-  const command = options.config?.ai?.inspector?.localModelCommand;
-  return command ? "local-model" : "rule-only";
-}
-
-async function runLocalModel(options: BuildInsightsOptions, items: InsightItem[]): Promise<string[]> {
-  const command = options.config?.ai?.inspector?.localModelCommand;
-  if (!command) {
-    throw new Error("Missing `ai.inspector.localModelCommand` in fiyuu config");
-  }
-
-  const [binary, ...rawArgs] = command.split(" ").filter(Boolean);
-  if (!binary) {
-    throw new Error("Invalid local model command");
-  }
-
-  const timeoutMs = options.config?.ai?.inspector?.timeoutMs ?? 3000;
-  const prompt = JSON.stringify(
-    {
-      project: path.basename(options.rootDirectory),
-      hints: items.slice(0, 24),
-      instruction: "Return a JSON array of concise actionable suggestions.",
-    },
-    null,
-    2,
-  );
-
-  const args = rawArgs.some((arg) => arg.includes("{prompt}"))
-    ? rawArgs.map((arg) => arg.replaceAll("{prompt}", prompt))
-    : [...rawArgs, prompt];
-
-  const { stdout } = await execFileAsync(binary, args, {
-    cwd: options.rootDirectory,
-    timeout: timeoutMs,
-    maxBuffer: 1024 * 1024,
-    encoding: "utf8",
-    env: process.env,
-  } as never);
-
-  const output = typeof stdout === "string" ? stdout : stdout.toString("utf8");
-  const parsed = JSON.parse(output) as unknown;
-  if (!Array.isArray(parsed)) {
-    throw new Error("Local model must return a JSON array");
-  }
-
-  return parsed.filter((value): value is string => typeof value === "string").slice(0, 6);
+  void options;
+  return {
+    mode: "rule-only",
+    status: "ready",
+    details: "Using deterministic project checks (no integrated model).",
+    suggestions: createRuleBasedSuggestions(items),
+  };
 }
 
 function createRuleBasedSuggestions(items: InsightItem[]): string[] {
   if (items.length === 0) {
     return [
-      "No urgent risks detected. Keep route contracts complete and re-run checks after each major feature.",
+      "Run `fiyuu doctor --fix` after scaffolding new routes to keep contracts deterministic.",
+      "Keep SEO descriptions in 12-28 words and route-specific titles for stable search snippets.",
       "Add focused tests around auth, middleware, and API routes before release builds.",
     ];
   }
@@ -343,7 +272,10 @@ function createRuleBasedSuggestions(items: InsightItem[]): string[] {
     .slice()
     .sort((left, right) => severityScore(right.severity) - severityScore(left.severity))
     .slice(0, 4);
-  return topItems.map((item) => `${capitalize(item.category)}: ${item.recommendation}`);
+  return [
+    ...topItems.map((item) => `${capitalize(item.category)}: ${item.recommendation}`),
+    "Use `fiyuu doctor --fix` for safe auto-fixes (SEO fields, missing execute(), fallback pages, className->class).",
+  ].slice(0, 6);
 }
 
 function dedupeInsights(items: InsightItem[]): InsightItem[] {

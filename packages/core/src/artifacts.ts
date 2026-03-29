@@ -20,6 +20,8 @@ export async function syncProjectArtifacts(rootDirectory: string, appDirectory: 
     fs.writeFile(path.join(outputDirectory, "WARNINGS.md"), docs.warnings),
     fs.writeFile(path.join(outputDirectory, "SKILLS.md"), docs.skills),
     fs.writeFile(path.join(outputDirectory, "EXECUTION.md"), docs.execution),
+    fs.writeFile(path.join(outputDirectory, "INTERVENTIONS.md"), docs.interventions),
+    fs.writeFile(path.join(outputDirectory, "DOCTOR.md"), docs.doctor),
   ]);
 
   return graph;
@@ -65,7 +67,17 @@ export function createAiDocs(
   graph: ProjectGraph,
   rootDirectory: string,
   skills: SkillSummary[] = [],
-): { project: string; paths: string; states: string; features: string; warnings: string; skills: string; execution: string } {
+): {
+  project: string;
+  paths: string;
+  states: string;
+  features: string;
+  warnings: string;
+  skills: string;
+  execution: string;
+  interventions: string;
+  doctor: string;
+} {
   const project = `# Fiyuu Project Context
 
 This file is auto-generated for AI systems reading the project.
@@ -193,6 +205,8 @@ ${skills
 `;
 
   const execution = buildExecutionDoc(graph);
+  const interventions = buildInterventionsDoc();
+  const doctor = buildDoctorDoc();
 
   return {
     project: `${project.trim()}\n`,
@@ -202,6 +216,8 @@ ${skills
     warnings: `${warnings.trim()}\n`,
     skills: skillsDoc,
     execution,
+    interventions,
+    doctor,
   };
 }
 
@@ -257,4 +273,56 @@ Each request follows this deterministic order:
     .join("\n\n");
 
   return `${header}${routeSections}\n`;
+}
+
+function buildInterventionsDoc(): string {
+  return `# Fiyuu Interventions
+
+Safe framework interventions that can be applied automatically.
+
+## Supported via \`fiyuu doctor --fix\`
+
+- Replace \`className=\` with \`class=\` in route source files.
+- Add missing \`export async function execute()\` in \`action.ts\` and \`query.ts\`.
+- Create missing \`app/not-found.tsx\` and \`app/error.tsx\` fallback pages.
+- Add missing \`seo.title\` and \`seo.description\` fields in route \`meta.ts\`.
+
+## Not auto-fixed (manual review required)
+
+- \`dangerouslySetInnerHTML\` usage.
+- React imports or hook usage in GEA routes.
+- noJs violations where \`meta.ts\` sets \`noJs: true\` and page uses \`<script>\`.
+
+## SEO baseline
+
+- Use route-specific \`seo.title\`.
+- Keep \`seo.description\` around 12-28 words.
+`;
+}
+
+function buildDoctorDoc(): string {
+  return `# Fiyuu Doctor
+
+Command reference for deterministic checks and safe fixes.
+
+## Check only
+
+\`fiyuu doctor\`
+
+- Reports structure violations and quality warnings.
+
+## Check + safe fixes
+
+\`fiyuu doctor --fix\`
+
+- Applies only deterministic, low-risk fixes.
+- Prints each fixed item with \`(fixed)\` marker.
+
+## Typical workflow
+
+1. \`fiyuu sync\`
+2. \`fiyuu doctor --fix\`
+3. \`fiyuu doctor\`
+4. \`fiyuu build\`
+`;
 }

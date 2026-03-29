@@ -10,7 +10,9 @@
     "fiyuu": "./bin/fiyuu.mjs"
   },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "my-app",
+    "hacimertgokhan.me"
   ],
   "scripts": {
     "dev": "tsx packages/cli/src/index.ts dev",
@@ -19,6 +21,7 @@
     "start": "tsx packages/cli/src/index.ts start",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "benchmark:gea": "tsx scripts/benchmark-gea-runtime.ts",
+    "benchmark:scorecard": "tsx scripts/benchmark-scorecard.ts",
     "sync": "tsx packages/cli/src/index.ts sync",
     "generate:page": "tsx packages/cli/src/index.ts generate page",
     "generate:action": "tsx packages/cli/src/index.ts generate action"
