@@ -6,6 +6,8 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { WebSocket } from "ws";
 import type { createProjectGraph, FeatureRecord, FiyuuConfig, MetaDefinition, RenderMode } from "@fiyuu/core";
+import type { FiyuuDB } from "@fiyuu/db";
+import type { FiyuuRealtime } from "@fiyuu/realtime";
 import type { ClientAsset } from "./bundler.js";
 import type { InsightsReport } from "./inspector.js";
 
@@ -139,6 +141,9 @@ export interface RuntimeState {
   serverEvents: Array<{ at: string; level: "info" | "warn" | "error"; event: string; details?: string }>;
   version: number;
   warnings: string[];
+  db: FiyuuDB;
+  realtime: FiyuuRealtime;
+  serviceNames: string[];
 }
 
 // ── Tiny internal router ──────────────────────────────────────────────────────

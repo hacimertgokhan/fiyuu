@@ -1,0 +1,17 @@
+{
+  "name": "hacimertgokhan.me",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx ../packages/cli/src/index.ts dev",
+    "build": "tsx ../packages/cli/src/index.ts build",
+    "start": "tsx ../packages/cli/src/index.ts start"
+  },
+  "dependencies": {
+    "@fiyuu/core": "*",
+    "@geajs/core": "*",
+    "fiyuu": "file:../",
+    "tailwindcss": "^3.4.17",
+    "zod": "^3.24.2"
+  }
+}

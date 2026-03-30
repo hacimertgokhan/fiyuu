@@ -37,6 +37,79 @@ Fiyuu uses Node.js native HTTP server (no Express). Client assets are bundled wi
 
 For app-layer UI performance, `fiyuu/client` also provides `optimizedImage`, `optimizedVideo`, and responsive helpers (`responsiveStyle`, `mediaUp`, `fluid`, etc.) so teams can ship faster pages without adding heavy UI runtime dependencies.
 
+## Built-in Database (FiyuuDB)
+
+Fiyuu includes a lightweight, always-in-memory database with SQL-like query support:
+
+```typescript
+// In query.ts or action.ts
+import { db } from "@fiyuu/db";
+
+// SQL-like queries
+const users = await db.query("SELECT * FROM users WHERE age > ? AND status = ?", [18, "active"]);
+await db.query("INSERT INTO users (name, email) VALUES (?, ?)", ["Ali", "ali@test.com"]);
+await db.query("UPDATE users SET status = ? WHERE id = ?", ["inactive", "u_123"]);
+
+// Table API
+const table = db.table("users");
+const admins = table.find({ role: "admin" });
+const one = table.findOne({ email: "a@b.com" });
+table.insert({ name: "Ahmet", email: "ahmet@test.com" });
+```
+
+## Real-time Channels
+
+Fiyuu provides built-in real-time communication via WebSocket and NATS:
+
+```typescript
+// Server-side (app/services/realtime-sync.ts)
+import { defineService } from "@fiyuu/runtime";
+import { realtime } from "@fiyuu/realtime";
+
+export default defineService({
+  name: "realtime-sync",
+  start({ realtime, db }) {
+    const chat = realtime.channel("chat");
+    chat.on("message", async (data, socket) => {
+      chat.broadcast("new-message", { text: data.text, user: socket.userId });
+      await db.query("INSERT INTO messages (text, user) VALUES (?, ?)", [data.text, socket.userId]);
+    });
+  },
+});
+```
+
+```html
+<!-- Client-side -->
+<script>
+  const chat = fiyuu.channel("chat");
+  chat.on("new-message", (data) => console.log(data));
+  chat.emit("message", { text: "Hello!" });
+</script>
+```
+
+## Service-based Lifecycle (Always-Alive App)
+
+Unlike Next.js (request-driven), Fiyuu apps stay alive continuously with background services:
+
+```typescript
+// app/services/data-sync.ts
+import { defineService } from "@fiyuu/runtime";
+
+export default defineService({
+  name: "data-sync",
+  async start({ db, realtime, config, log }) {
+    // Runs on boot, continuously in background
+    setInterval(async () => {
+      const stats = await db.query("SELECT COUNT(*) as c FROM users WHERE active = 1");
+      realtime.channel("stats").emit("update", stats[0]);
+    }, 30000);
+  },
+  async stop({ log }) {
+    // Cleanup on shutdown
+  },
+});
+```
+
 Run benchmark:
 
 ```bash

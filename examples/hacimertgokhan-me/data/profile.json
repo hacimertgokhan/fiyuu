@@ -1,0 +1,177 @@
+{
+  "fullName": "Hacı Mert Gökhan",
+  "title": {
+    "tr": "Junior Yazılım Geliştirici",
+    "en": "Junior Software Developer"
+  },
+  "location": {
+    "tr": "Türkiye / İstanbul",
+    "en": "Turkey / Istanbul"
+  },
+  "about": {
+    "tr": [
+      "Türkiye'de yaşayan 20 yaşında bir geliştirici olarak, yazılım geliştirme ve akademik üretimi birlikte ilerletmeyi hedefliyorum.",
+      "Astronomi, gözlem ve teknik yazım başta olmak üzere; ürün geliştirme, yönetim sistemleri ve çok platformlu uygulamalar üzerinde çalışıyorum.",
+      "Odak noktam; sürdürülebilir mimari, performanslı sistemler ve kullanıcıya doğrudan değer üreten dijital ürünler inşa etmek."
+    ],
+    "en": [
+      "As a 20-year-old developer based in Turkey, I aim to advance software engineering and academic production together.",
+      "I work on product development, management systems, and cross-platform applications, with a strong interest in astronomy, observation, and technical writing.",
+      "My focus is building sustainable architectures and high-performance systems that deliver direct value to users."
+    ]
+  },
+  "experiences": [
+    {
+      "role": "Jr. Software Developer",
+      "company": "Yaska Oyun ve Yazılım Holding",
+      "startDate": "2023-11",
+      "endDate": "2025-10",
+      "techStack": ["TypeScript", "React", "NextJS", "JavaScript", "Node.js", "PostgreSQL"]
+    },
+    {
+      "role": "Team Lead Fullstack Developer",
+      "company": "Kırşehir Ahi Evran Üniversitesi BAUM",
+      "startDate": "2023-11",
+      "endDate": "2025-10",
+      "techStack": ["React", "TailwindCSS","NextJS", "Java", "Spring", "Redux","PostgreSQL", "Vite"]
+    },
+    {
+      "role": "Jr. Frontend Developer",
+      "company": "Kırşehir Ahi Evran Üniversitesi BAUM",
+      "startDate": "2023-11",
+      "endDate": "2025-10",
+      "techStack": ["React", "TailwindCSS","NextJS", "Redux", "Vite"]
+    },
+    {
+      "role": "Sr. Linux Server Administrator",
+      "company": "Netlack Bilişim & İnternet Teknolojileri",
+      "startDate": "2022-08",
+      "endDate": "2023-10",
+      "techStack": ["Linux", "Nginx", "Docker", "Bash"]
+    },
+    {
+      "role": "Jr. Server Administrator",
+      "company": "Keyubu Hosting Hizmetleri",
+      "startDate": "2020-09",
+      "endDate": "2021-06",
+      "techStack": ["Linux", "cPanel", "DNS", "Apache"]
+    }
+  ],
+  "projects": [
+    {
+      "name": "iyzis.com",
+      "summary": {
+        "tr": "İşverenler ile adayları güvenilir eşleştirme akışlarıyla buluşturan, uçtan uca işe alım ve iş gücü yönetimi platformu.",
+        "en": "An end-to-end recruitment and workforce management platform that connects employers and candidates through reliable matching flows."
+      },
+      "category": "B2B",
+      "stack": ["TypeScript", "Node.js", "PostgreSQL", "TailwindCSS"],
+      "liveUrl": "https://iyzis.com",
+      "githubUrl": "https://github.com/hacimertgokhan"
+    },
+    {
+      "name": "anatomylibrary.com",
+      "summary": {
+        "tr": "Tıp ve sağlık odaklı içeriklerin sınıflandırılmış biçimde sunulduğu, güçlü arama deneyimine sahip dijital anatomi kütüphanesi.",
+        "en": "A digital anatomy library with structured medical content and a strong search experience."
+      },
+      "category": "SaaS",
+      "stack": ["Next.js", "TypeScript", "Cloud Storage"],
+      "liveUrl": "https://anatomylibrary.com",
+      "githubUrl": "https://github.com/hacimertgokhan"
+    },
+    {
+      "name": "licensesentinel.net",
+      "summary": {
+        "tr": "Yazılım lisanslama, aktivasyon ve kötüye kullanım tespit süreçlerini merkezileştiren kurumsal lisans güvenliği çözümü.",
+        "en": "An enterprise license security solution that centralizes software licensing, activation, and abuse detection workflows."
+      },
+      "category": "B2B",
+      "stack": ["Node.js", "License API", "PostgreSQL"],
+      "liveUrl": "https://licensesentinel.net",
+      "githubUrl": "https://github.com/hacimertgokhan"
+    },
+    {
+      "name": "termissh.org",
+      "summary": {
+        "tr": "Self-host ve cloud altyapılarında SSH/SFTP operasyonlarını tek panelde birleştiren terminal uygulaması.",
+        "en": "A terminal application that unifies SSH/SFTP operations for self-hosted and cloud infrastructures in one panel."
+      },
+      "category": "IDE",
+      "stack": ["TypeScript", "Electron", "SSH", "SFTP"],
+      "liveUrl": "https://termissh.org",
+      "githubUrl": "https://github.com/hacimertgokhan"
+    },
+    {
+      "name": "StructUI.com",
+      "summary": {
+        "tr": "React, Next.js, Astro ve Vue ekosistemleri için ölçeklenebilir bileşenler sunan modern UI framework.",
+        "en": "A modern UI framework delivering scalable components for React, Next.js, Astro, and Vue ecosystems."
+      },
+      "category": "IDE",
+      "stack": ["TypeScript", "Design System", "NPM"],
+      "liveUrl": "https://structui.com",
+      "githubUrl": "https://github.com/hacimertgokhan"
+    },
+    {
+      "name": "Plexus Integrated Development Environment",
+      "summary": {
+        "tr": "Kod yazımı, derleme, hata ayıklama ve otomasyon süreçlerini tek çatı altında toplayan üretkenlik odaklı IDE.",
+        "en": "A productivity-focused IDE that brings coding, build, debugging, and automation workflows into one workspace."
+      },
+      "category": "IDE",
+      "stack": ["TypeScript", "Electron", "Monaco", "Node.js"],
+      "liveUrl": "https://hacimertgokhan.me",
+      "githubUrl": "https://github.com/hacimertgokhan"
+    },
+    {
+      "name": "LocAI Integrated Development Environment",
+      "summary": {
+        "tr": "Yerelde çalışan yapay zekâ asistanlarıyla geliştirme süreçlerini hızlandıran proje otomasyonu odaklı yeni nesil IDE.",
+        "en": "A next-generation IDE focused on project automation with locally running AI assistants."
+      },
+      "category": "IDE",
+      "stack": ["TypeScript", "Electron", "AI Agents", "Node.js"],
+      "liveUrl": "https://hacimertgokhan.me",
+      "githubUrl": "https://github.com/hacimertgokhan"
+    },
+    {
+      "name": "Datain.cc",
+      "summary": {
+        "tr": "Projeler için dakikalar içinde ölçeklenebilir veritabanı kiralama ve yönetim imkânı sunan bulut altyapı platformu.",
+        "en": "A cloud infrastructure platform that enables scalable database provisioning and management in minutes."
+      },
+      "category": "Database Engine",
+      "stack": ["PostgreSQL", "Redis", "Node.js", "Docker"],
+      "liveUrl": "https://datain.cc",
+      "githubUrl": "https://github.com/hacimertgokhan"
+    },
+    {
+      "name": "Quark Database Engine",
+      "summary": {
+        "tr": "Yüksek performans ve düşük gecikme hedefiyle geliştirilen, dağıtık senaryolara uyumlu veritabanı motoru girişimi.",
+        "en": "A database engine initiative designed for high performance, low latency, and distributed system compatibility."
+      },
+      "category": "Database Engine",
+      "stack": ["Rust", "Storage Engine", "Replication", "CLI"],
+      "liveUrl": "https://hacimertgokhan.me",
+      "githubUrl": "https://github.com/hacimertgokhan"
+    },
+    {
+      "name": "Denis Engine",
+      "summary": {
+        "tr": "Denis protokolü etrafında in-memory veri yapıları, önbellekleme ve yayın/abonelik akışlarını optimize eden motor çözümü.",
+        "en": "An engine solution built around the Denis protocol to optimize in-memory structures, caching, and pub/sub flows."
+      },
+      "category": "Database Engine",
+      "stack": ["Redis", "Java", "Protocol Buffers", "PicoCLI", "Rust", "Node.js", "Cache", "Pub/Sub"],
+      "liveUrl": "https://hacimertgokhan.me",
+      "githubUrl": "https://github.com/hacimertgokhan"
+    }
+  ],
+  "contacts": {
+    "email": "hacimertgokhan@gmail.com",
+    "github": "https://github.com/hacimertgokhan",
+    "linkedin": "https://www.linkedin.com/in/hacimertgokhan"
+  }
+}

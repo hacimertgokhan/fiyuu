@@ -1,0 +1,4 @@
+#!/bin/sh
+SCRIPT_DIR="$(cd "$(dirname "$(realpath "$0")")" && pwd)"
+FIYUU_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+exec "$FIYUU_ROOT/node_modules/.bin/tsx" "$SCRIPT_DIR/../src/index.ts" "$@"

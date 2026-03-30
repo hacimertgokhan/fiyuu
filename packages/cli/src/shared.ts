@@ -66,10 +66,10 @@ export async function listSourceFiles(directory: string): Promise<string[]> {
 
 export function resolveAppDirectory(rootDirectory: string): string {
   const rootApp = path.join(rootDirectory, "app");
-  const localApp = path.join(rootDirectory, "my-app", "app");
+  const localApp = path.join(rootDirectory, "examples", "my-app", "app");
   const exampleApp = path.join(rootDirectory, "examples", "basic-app", "app");
   if (existsSync(rootApp)) return rootApp;
   if (existsSync(localApp)) return localApp;
   if (existsSync(exampleApp)) return exampleApp;
-  throw new Error("No app directory found. Expected ./app, ./my-app/app, or ./examples/basic-app/app.");
+  throw new Error("No app directory found. Expected ./app, ./examples/my-app/app, or ./examples/basic-app/app.");
 }

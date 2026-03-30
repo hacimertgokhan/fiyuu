@@ -11,8 +11,8 @@
   },
   "workspaces": [
     "packages/*",
-    "my-app",
-    "hacimertgokhan.me"
+    "examples/my-app",
+    "examples/hacimertgokhan-me"
   ],
   "scripts": {
     "dev": "tsx packages/cli/src/index.ts dev",
@@ -24,7 +24,8 @@
     "benchmark:scorecard": "tsx scripts/benchmark-scorecard.ts",
     "sync": "tsx packages/cli/src/index.ts sync",
     "generate:page": "tsx packages/cli/src/index.ts generate page",
-    "generate:action": "tsx packages/cli/src/index.ts generate action"
+    "generate:action": "tsx packages/cli/src/index.ts generate action",
+    "postinstall": "node scripts/patch-gea.mjs"
   },
   "dependencies": {
     "chokidar": "^4.0.3",

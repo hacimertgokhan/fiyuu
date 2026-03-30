@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "type": "module",
   "bin": {
-    "fiyuu": "./src/index.ts"
+    "fiyuu": "./bin/fiyuu"
   },
   "dependencies": {
     "@fiyuu/core": "0.1.0",
     "@fiyuu/runtime": "0.1.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.8.2"
   }
 }

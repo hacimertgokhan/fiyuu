@@ -30,6 +30,9 @@ export interface FiyuuConfig {
   data?: {
     driver?: string;
     path?: string;
+    autosave?: boolean;
+    autosaveIntervalMs?: number;
+    tables?: string[];
   };
   security?: {
     requestEncryption?: boolean;
@@ -40,6 +43,24 @@ export interface FiyuuConfig {
     path?: string;
     heartbeatMs?: number;
     maxPayloadBytes?: number;
+  };
+  realtime?: {
+    enabled?: boolean;
+    transports?: ("websocket" | "nats")[];
+    websocket?: {
+      path?: string;
+      heartbeatMs?: number;
+      maxPayloadBytes?: number;
+    };
+    nats?: {
+      url?: string;
+      name?: string;
+    };
+  };
+  services?: {
+    enabled?: boolean;
+    directory?: string;
+    failFast?: boolean;
   };
   middleware?: {
     enabled?: boolean;

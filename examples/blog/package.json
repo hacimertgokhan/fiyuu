@@ -1,0 +1,10 @@
+{
+  "name": "fiyuu-blog",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "fiyuu dev",
+    "build": "fiyuu build",
+    "start": "fiyuu start"
+  }
+}

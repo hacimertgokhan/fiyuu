@@ -1,0 +1,16 @@
+{
+  "name": "my-app",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node ../bin/fiyuu.mjs dev",
+    "build": "node ../bin/fiyuu.mjs build",
+    "start": "node ../bin/fiyuu.mjs start"
+  },
+  "dependencies": {
+    "@fiyuu/core": "*",
+    "@geajs/core": "*",
+    "fiyuu": "file:../",
+    "zod": "^3.24.2"
+  }
+}

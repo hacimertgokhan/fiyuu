@@ -16,10 +16,14 @@ import { existsSync } from "node:fs";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import type { AddressInfo } from "node:net";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import chokidar from "chokidar";
 import { createProjectGraph, scanApp, syncProjectArtifacts, type MetaDefinition, type RenderMode } from "@fiyuu/core";
+import { FiyuuDB } from "@fiyuu/db";
+import { FiyuuRealtime } from "@fiyuu/realtime";
 import { bundleClient } from "./bundler.js";
 import { buildInsightsReport } from "./inspector.js";
+import { type FiyuuService, ServiceManager, createServiceManager } from "./service.js";
 
 // ── Re-export public types ────────────────────────────────────────────────────
 export type { StartServerOptions, StartedServer } from "./server-types.js";
@@ -247,16 +251,62 @@ export async function startServer(options: StartServerOptions): Promise<StartedS
   const websocketUrl = await attachWebsocketServer(server, options, websocketPath);
   const port = await listenWithFallback(server, options.port ?? 4050, options.maxPort ?? (options.port ?? 4050) + 20);
   const url = `http://localhost:${port}`;
+
+  // ── Initialize DB ──────────────────────────────────────────────────────────
+  await state.db.initialize();
+  console.log(`[fiyuu] DB initialized — tables: ${state.db.listTables().join(", ") || "none"}`);
+
+  // ── Initialize Realtime ────────────────────────────────────────────────────
+  await state.realtime.initialize(server);
+  console.log(`[fiyuu] Realtime initialized — transports: ${state.realtime.stats().transports}`);
+
+  // ── Discover and start services ────────────────────────────────────────────
+  const serviceManager = createServiceManager();
+  const servicesDir = path.join(options.appDirectory, "services");
+  if (existsSync(servicesDir)) {
+    const serviceFiles = await discoverServices(servicesDir);
+    for (const svcFile of serviceFiles) {
+      try {
+        const mod = await importService(svcFile);
+        const service = (mod.default || mod.service || mod) as Record<string, unknown>;
+        if (service && typeof service.start === "function") {
+          serviceManager.register(service as unknown as FiyuuService);
+        }
+      } catch (err) {
+        console.warn(`[fiyuu] Failed to load service from ${svcFile}:`, err);
+      }
+    }
+  }
+
+  serviceManager.setContext({
+    db: state.db,
+    realtime: state.realtime,
+    config: options.config || {},
+    log: (level, msg, data) => pushServerEvent(state, level, `service.${msg}`, data ? JSON.stringify(data) : undefined),
+  });
+
+  await serviceManager.startAll();
+  state.serviceNames = serviceManager.list();
+  console.log(`[fiyuu] Services started: ${state.serviceNames.length > 0 ? state.serviceNames.join(", ") : "none"}`);
+
   console.log(renderStartupMessage(options.mode, url, port, options.port ?? 4050, websocketUrl));
 
   return {
     port,
     url,
     websocketUrl,
-    close: () =>
-      new Promise<void>((resolve, reject) => {
+    close: async () => {
+      // Stop services first
+      await serviceManager.stopAll();
+      // Shutdown realtime
+      await state.realtime.shutdown();
+      // Persist DB
+      await state.db.shutdown();
+      // Close HTTP server
+      await new Promise<void>((resolve, reject) => {
         server.close((error) => (error ? reject(error) : resolve()));
-      }),
+      });
+    },
   };
 }
 
@@ -272,6 +322,27 @@ async function createRuntimeState(options: StartServerOptions): Promise<RuntimeS
     appDirectory: options.appDirectory,
     features,
     config: options.config,
+  });
+
+  const db = new FiyuuDB({
+    path: options.config?.data?.path || path.join(options.rootDirectory, ".fiyuu", "data"),
+    autosave: options.config?.data?.autosave !== false,
+    autosaveIntervalMs: options.config?.data?.autosaveIntervalMs || 5000,
+    tables: options.config?.data?.tables,
+  });
+
+  const realtime = new FiyuuRealtime({
+    enabled: options.config?.realtime?.enabled !== false,
+    transports: options.config?.realtime?.transports || ["websocket"],
+    websocket: {
+      path: options.config?.realtime?.websocket?.path || options.config?.websocket?.path || "/__fiyuu/ws",
+      heartbeatMs: options.config?.realtime?.websocket?.heartbeatMs || options.config?.websocket?.heartbeatMs || 30000,
+      maxPayloadBytes: options.config?.realtime?.websocket?.maxPayloadBytes || options.config?.websocket?.maxPayloadBytes || 65536,
+    },
+    nats: {
+      url: options.config?.realtime?.nats?.url,
+      name: options.config?.realtime?.nats?.name,
+    },
   });
 
   return {
@@ -291,6 +362,9 @@ async function createRuntimeState(options: StartServerOptions): Promise<RuntimeS
     serverEvents: [],
     version: Date.now(),
     warnings: features.flatMap((f) => f.warnings.map((w) => `${f.route}: ${w}`)),
+    db,
+    realtime,
+    serviceNames: [],
   };
 }
 
@@ -894,4 +968,26 @@ function matchesIfNoneMatch(header: string | string[] | undefined, etag: string)
     .split(",")
     .map((part) => part.trim())
     .some((candidate) => candidate === "*" || candidate === etag);
+}
+
+// ─── Service discovery helpers ──────────────────────────────────────────────────
+
+async function discoverServices(directory: string): Promise<string[]> {
+  const { promises: fs } = await import("node:fs");
+  const entries = await fs.readdir(directory, { withFileTypes: true });
+  const files: string[] = [];
+
+  for (const entry of entries) {
+    if (entry.isFile() && (entry.name.endsWith(".ts") || entry.name.endsWith(".js"))) {
+      if (entry.name.startsWith("_") || entry.name.startsWith(".")) continue;
+      files.push(path.join(directory, entry.name));
+    }
+  }
+
+  return files;
+}
+
+async function importService(filePath: string): Promise<Record<string, unknown>> {
+  const fileUrl = pathToFileURL(filePath).href;
+  return import(`${fileUrl}?t=${Date.now()}`);
 }

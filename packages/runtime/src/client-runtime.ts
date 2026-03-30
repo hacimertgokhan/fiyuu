@@ -443,6 +443,38 @@ window.fiyuu = {
       status: function() { return statusValue; },
       socket: socket
     };
+  },
+
+  // ── Channel (realtime) ─────────────────────────────────────────────────────
+  // fiyuu.channel('chat').on('new-message', (data) => { ... })
+  // fiyuu.channel('chat').emit('message', { text: 'hello' })
+  channel: function(name) {
+    var channelHandlers = {};
+    var ws = window.fiyuu.ws();
+
+    ws.onMessage = function(event) {
+      try {
+        var payload = JSON.parse(event.data || event);
+        if (payload && payload.channel === name && payload.event && channelHandlers[payload.event]) {
+          channelHandlers[payload.event](payload.data);
+        }
+      } catch(e) {}
+    };
+
+    return {
+      on: function(event, handler) {
+        channelHandlers[event] = handler;
+        return this;
+      },
+      emit: function(event, data) {
+        ws.send({ channel: name, event: event, data: data, ts: Date.now() });
+        return this;
+      },
+      off: function(event) {
+        delete channelHandlers[event];
+        return this;
+      }
+    };
   }
 
 };
