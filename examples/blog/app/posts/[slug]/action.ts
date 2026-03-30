@@ -11,11 +11,13 @@ export const action = defineAction({
   description: "Add a comment to a blog post",
 });
 
-export async function execute(input: Record<string, unknown>) {
+export async function execute(contextOrInput: any) {
   const { getDB } = await import("@fiyuu/db");
   const db = getDB();
   await db.initialize();
 
+  // Handle both context object and direct input
+  const input = contextOrInput?.input || contextOrInput;
   const { postSlug, author, text } = input as { postSlug: string; author: string; text: string };
 
   const commentsTable = db.table("comments");

@@ -324,7 +324,7 @@ export default class OnePage extends Component {
               });
             });
 
-            var notif = fiyuu.channel("onepage-notifs");
+            var notif = fiyuu.channel("responsive-wrapper-notifs");
             var toast = document.getElementById("notif-toast");
             var toastBody = document.getElementById("notif-toast-body");
             notif.on("welcome", function(data) {

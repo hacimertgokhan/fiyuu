@@ -100,10 +100,15 @@ export default class RootLayout extends Component<LayoutProps> {
             var toggle = document.getElementById("theme-toggle");
             if (toggle) {
               toggle.addEventListener("click", function() {
-                var current = document.documentElement.getAttribute("data-theme");
-                var next = current === "dark" ? "light" : "dark";
-                document.documentElement.setAttribute("data-theme", next);
-                localStorage.setItem("fiyuu-theme", next);
+                if (window.fiyuu && window.fiyuu.theme) {
+                  window.fiyuu.theme.toggle();
+                } else {
+                  var current = document.documentElement.getAttribute("data-theme");
+                  var next = current === "dark" ? "light" : "dark";
+                  document.documentElement.setAttribute("data-theme", next);
+                  document.documentElement.classList.toggle("dark", next === "dark");
+                  try { localStorage.setItem("fiyuu-theme", next); } catch(e) {}
+                }
               });
             }
           });

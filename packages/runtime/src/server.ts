@@ -248,7 +248,6 @@ export async function startServer(options: StartServerOptions): Promise<StartedS
     }
   });
 
-  const websocketUrl = await attachWebsocketServer(server, options, websocketPath);
   const port = await listenWithFallback(server, options.port ?? 4050, options.maxPort ?? (options.port ?? 4050) + 20);
   const url = `http://localhost:${port}`;
 
@@ -256,9 +255,12 @@ export async function startServer(options: StartServerOptions): Promise<StartedS
   await state.db.initialize();
   console.log(`[fiyuu] DB initialized — tables: ${state.db.listTables().join(", ") || "none"}`);
 
-  // ── Initialize Realtime ────────────────────────────────────────────────────
+  // ── Initialize Realtime (before standalone WS so it claims connections first) ──
   await state.realtime.initialize(server);
   console.log(`[fiyuu] Realtime initialized — transports: ${state.realtime.stats().transports}`);
+
+  // ── Standalone WebSocket (fallback for custom socket modules, skips if realtime owns the path) ──
+  const websocketUrl = await attachWebsocketServer(server, options, websocketPath);
 
   // ── Discover and start services ────────────────────────────────────────────
   const serviceManager = createServiceManager();

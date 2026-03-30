@@ -1,5 +1,6 @@
 import type { Transport, TransportOptions } from "./types.js";
 import { type Server, type IncomingMessage } from "node:http";
+import type { Socket } from "node:net";
 import { WebSocketServer, WebSocket, type RawData } from "ws";
 
 export class WebSocketTransport implements Transport {
@@ -12,6 +13,7 @@ export class WebSocketTransport implements Transport {
   private heartbeatMs: number;
   private maxPayloadBytes: number;
   private path: string;
+  private handledSockets = new WeakSet<Socket>();
 
   constructor(options: TransportOptions & { path?: string } = {}) {
     this.heartbeatMs = options.heartbeatMs || 30000;
@@ -27,15 +29,22 @@ export class WebSocketTransport implements Transport {
     this.server = server;
     this.wss = new WebSocketServer({ noServer: true });
 
-    server.on("upgrade", (request: IncomingMessage, socket, head) => {
+    server.on("upgrade", (request: IncomingMessage, socket: Socket, head) => {
       const url = new URL(request.url || "/", `http://${request.headers.host || "localhost"}`);
       if (url.pathname !== this.path) return;
 
       if (!this.wss) return;
 
-      this.wss.handleUpgrade(request, socket, head, (ws) => {
-        this.wss!.emit("connection", ws, request);
-      });
+      if (this.handledSockets.has(socket)) return;
+      this.handledSockets.add(socket);
+
+      try {
+        this.wss.handleUpgrade(request, socket, head, (ws) => {
+          this.wss!.emit("connection", ws, request);
+        });
+      } catch {
+        // Another WebSocket handler already processed this socket
+      }
     });
 
     this.wss.on("connection", (ws: WebSocket) => {

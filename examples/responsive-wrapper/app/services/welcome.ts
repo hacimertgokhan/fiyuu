@@ -8,7 +8,7 @@ export default defineService({
   name: "onepage-welcome",
 
   async start({ realtime, db, log }) {
-    const channel = realtime.channel("onepage-notifs");
+    const channel = realtime.channel("responsive-wrapper-notifs");
 
     // Check for new subscribers every 30 seconds and send welcome
     let lastChecked = Date.now();
@@ -29,10 +29,10 @@ export default defineService({
       }
     }, 30000);
 
-    log("info", "onepage-service-ready");
+    log("info", "responsive-wrapper-service-ready");
   },
 
   async stop({ log }) {
-    log("info", "onepage-service-stopped");
+    log("info", "responsive-wrapper-service-stopped");
   },
 });

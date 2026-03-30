@@ -452,14 +452,14 @@ window.fiyuu = {
     var channelHandlers = {};
     var ws = window.fiyuu.ws();
 
-    ws.onMessage = function(event) {
+    ws.socket.addEventListener("message", function(event) {
       try {
-        var payload = JSON.parse(event.data || event);
+        var payload = JSON.parse(event.data);
         if (payload && payload.channel === name && payload.event && channelHandlers[payload.event]) {
           channelHandlers[payload.event](payload.data);
         }
       } catch(e) {}
-    };
+    });
 
     return {
       on: function(event, handler) {

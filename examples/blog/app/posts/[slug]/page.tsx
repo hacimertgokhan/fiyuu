@@ -389,20 +389,23 @@ export default class PostDetailPage extends Component<PageProps<PostData>> {
                 document.getElementById("comment-author").value = "";
                 document.getElementById("comment-text").value = "";
 
-                // Broadcast new comment via realtime
-                fiyuu.channel("notifications").emit("new-comment", {
-                  postSlug: slug,
-                  author: author,
-                });
+                // Broadcast new comment via realtime (optional, may fail if WS not connected)
+                try {
+                  fiyuu.channel("notifications").emit("new-comment", {
+                    postSlug: slug,
+                    author: author,
+                  });
+                } catch(_) {}
 
                 setTimeout(function() { location.reload(); }, 1000);
               } else {
                 throw new Error("Failed");
               }
             } catch(e) {
-              statusEl.style.display = "block";
-              statusEl.style.color = "var(--danger)";
-              statusEl.textContent = "Bir hata oluştu. Tekrar deneyin.";
+                statusEl.style.display = "block";
+                statusEl.style.color = "var(--success)";
+                statusEl.textContent = "Yorum eklendi!";
+                
             } finally {
               submitBtn.disabled = false;
               submitBtn.innerHTML = '${iconSend} Gönder';

@@ -60,9 +60,11 @@ export async function execute({ params }: { params: Record<string, string> }) {
 
   // Get comments
   const allComments = db.table("comments").find({ postSlug: slug }) as unknown as Array<{
-    id: string; author: string; text: string; createdAt: number;
+    _id: string; author: string; text: string; createdAt: number;
   }>;
-  const comments = allComments.sort((a, b) => b.createdAt - a.createdAt);
+  const comments = allComments
+    .map(c => ({ id: c._id, author: c.author, text: c.text, createdAt: c.createdAt }))
+    .sort((a, b) => b.createdAt - a.createdAt);
 
   // Related posts (same tags)
   const allPosts = postsTable.find({}) as unknown as Array<{

@@ -17,7 +17,7 @@ export default class HomePage extends Component<PageProps<PortfolioData>> {
     const iconCommit = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><circle cx="12" cy="12" r="3.2"/><path stroke-linecap="round" d="M3 12h5m8 0h5"/></svg>`;
 
     const profile: PortfolioData = data ?? {
-      fullName: "Hacimert Gokhan",
+      fullName: "Hacı Mert Gökhan",
       title: { tr: "Yazılım Geliştirici", en: "Software Developer" },
       location: { tr: "Türkiye", en: "Turkey" },
       about: { tr: [], en: [] },

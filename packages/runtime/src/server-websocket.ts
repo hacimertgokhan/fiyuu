@@ -5,6 +5,7 @@
 
 import { existsSync } from "node:fs";
 import { createServer } from "node:http";
+import type { Socket } from "node:net";
 import path from "node:path";
 import { WebSocketServer } from "ws";
 import type { SocketModule, StartServerOptions } from "./server-types.js";
@@ -44,19 +45,26 @@ export async function attachWebsocketServer(
     });
   });
 
-  server.on("upgrade", (request, socket, head) => {
+  const handledSockets = new WeakSet<Socket>();
+
+  server.on("upgrade", (request, socket: Socket, head) => {
+    if (handledSockets.has(socket)) return;
+    handledSockets.add(socket);
+
     if (!request.url) {
       socket.destroy();
       return;
     }
     const url = new URL(request.url, "http://localhost");
-    if (url.pathname !== websocketPath) {
-      socket.destroy();
-      return;
+    if (url.pathname !== websocketPath) return;
+
+    try {
+      wss.handleUpgrade(request, socket, head, (client) => {
+        wss.emit("connection", client, request);
+      });
+    } catch {
+      // Another WebSocket handler already processed this socket
     }
-    wss.handleUpgrade(request, socket, head, (client) => {
-      wss.emit("connection", client, request);
-    });
   });
 
   return `ws://localhost:${options.port ?? 4050}${websocketPath}`;
