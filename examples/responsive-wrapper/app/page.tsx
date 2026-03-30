@@ -70,7 +70,7 @@ export default class OnePage extends Component {
           + '<h3 style="' + titleColor + '">' + escapeHtml(p.name) + '</h3>'
           + '<div class="plan-price"><span style="' + priceColor + '">' + escapeHtml(p.price) + '</span><span style="' + periodColor + '">' + escapeHtml(p.period) + '</span></div>'
           + '<div class="plan-features">' + feats + '</div>'
-          + '<button class="' + btnCls + '" style="width:100%;justify-content:center;' + btnStyle + '">' + (p.highlighted ? "Basla" : "Iletisime Gec") + '</button>'
+          + '<button class="' + btnCls + '" style="width:100%;justify-content:center;' + btnStyle + '">' + (p.highlighted ? "Get Started" : "Contact Us") + '</button>'
           + '</div>';
       }
       return h;
@@ -106,14 +106,15 @@ export default class OnePage extends Component {
 
     var featuresHtml = responsiveWrapper({
       preset: "dashboard",
+      padding: "none",
       previewEnabled: true,
       previewLabel: "Preview",
       id: "features-preview",
       content: '<section id="features" class="section" data-observe>'
         + '<div class="section-header">'
-        + '<div class="section-label">' + iconZap + ' Ozellikler</div>'
-        + '<h2 class="section-title">Fullstack, hafif ve guclu</h2>'
-        + '<p class="section-subtitle">Fiyuu ile modern web uygulamalari olusturmak hic bu kadar kolay olmamisti.</p>'
+        + '<div class="section-label">' + iconZap + ' Features</div>'
+        + '<h2 class="section-title">Fullstack, lightweight and powerful</h2>'
+        + '<p class="section-subtitle">Building modern web applications has never been easier than with Fiyuu.</p>'
         + '</div>'
         + '<div class="features-grid">' + buildFeaturesHtml(features) + '</div>'
         + '</section>',
@@ -121,13 +122,14 @@ export default class OnePage extends Component {
 
     var pricingHtml = responsiveWrapper({
       preset: "dashboard",
+      padding: "none",
       previewEnabled: true,
       previewLabel: "Preview",
       id: "pricing-preview",
       content: '<section id="pricing" class="section" data-observe>'
         + '<div class="section-header">'
-        + '<div class="section-label">' + iconDatabase + ' Fiyatlandirma</div>'
-        + '<h2 class="section-title">Basit ve seffaf fiyatlar</h2>'
+        + '<div class="section-label">' + iconDatabase + ' Pricing</div>'
+        + '<h2 class="section-title">Simple, transparent pricing</h2>'
         + '</div>'
         + '<div class="plans-grid">' + buildPlansHtml(plans) + '</div>'
         + '</section>',
@@ -135,13 +137,14 @@ export default class OnePage extends Component {
 
     var testimonialsHtml = responsiveWrapper({
       preset: "dashboard",
+      padding: "none",
       previewEnabled: true,
       previewLabel: "Preview",
       id: "testimonials-preview",
       content: '<section id="testimonials" class="section section-alt" data-observe>'
         + '<div class="section-header">'
-        + '<div class="section-label">' + iconStar + ' Yorumlar</div>'
-        + '<h2 class="section-title">Gelistiriciler ne diyor?</h2>'
+        + '<div class="section-label">' + iconStar + ' Testimonials</div>'
+        + '<h2 class="section-title">What developers are saying</h2>'
         + '</div>'
         + '<div class="testimonials-grid">' + buildTestimonialsHtml(testimonials) + '</div>'
         + '</section>',
@@ -149,29 +152,30 @@ export default class OnePage extends Component {
 
     var contactHtml = responsiveWrapper({
       preset: "dashboard",
+      padding: "none",
       previewEnabled: true,
       previewLabel: "Preview",
       id: "contact-preview",
       content: '<section id="contact" class="section" data-observe>'
         + '<div class="contact-grid">'
         + '<div>'
-        + '<div class="section-label">Iletisim</div>'
-        + '<h2 class="section-title">Haberdar olun</h2>'
-        + '<p class="section-subtitle" style="margin-bottom:1.5rem;">FiyuuUpdates abonesi olarak yeni ozelliklerden ilk siz haberdar olun.</p>'
-        + '<div class="subscriber-count">' + iconCheck + '<span>' + subscriberCount + '+ abone</span></div>'
+        + '<div class="section-label">Contact</div>'
+        + '<h2 class="section-title">Stay in the loop</h2>'
+        + '<p class="section-subtitle" style="margin-bottom:1.5rem;">Subscribe to FiyuuUpdates and be the first to hear about new features.</p>'
+        + '<div class="subscriber-count">' + iconCheck + '<span>' + subscriberCount + '+ subscribers</span></div>'
         + '</div>'
         + '<div class="contact-form">'
-        + '<h3>Newsletter Aboneligi</h3>'
+        + '<h3>Newsletter</h3>'
         + '<div class="form-row">'
         + '<input type="email" id="sub-email" placeholder="email@example.com" />'
-        + '<button type="button" id="sub-btn" class="btn-primary">Abone Ol</button>'
+        + '<button type="button" id="sub-btn" class="btn-primary">Subscribe</button>'
         + '</div>'
         + '<p id="sub-status" class="form-status"></p>'
         + '<div class="form-divider"></div>'
-        + '<h4>Veya mesaj gonderin</h4>'
-        + '<input type="text" id="contact-name" placeholder="Adiniz" />'
-        + '<textarea id="contact-message" placeholder="Mesajiniz..." rows="3"></textarea>'
-        + '<button type="button" id="contact-btn" class="btn-outline" style="width:100%;justify-content:center;">Gonder</button>'
+        + '<h4>Or send a message</h4>'
+        + '<input type="text" id="contact-name" placeholder="Your name" />'
+        + '<textarea id="contact-message" placeholder="Your message..." rows="3"></textarea>'
+        + '<button type="button" id="contact-btn" class="btn-outline" style="width:100%;justify-content:center;">Send</button>'
         + '<p id="contact-status" class="form-status"></p>'
         + '</div>'
         + '</div>'
@@ -180,8 +184,8 @@ export default class OnePage extends Component {
 
     return html`
       <style>
-        .section { padding: 5rem 1.5rem; max-width: 72rem; margin: 0 auto; }
-        .section-alt { background: var(--bg-secondary); max-width: 100%; padding-left: calc((100% - 72rem) / 2 + 1.5rem); padding-right: calc((100% - 72rem) / 2 + 1.5rem); }
+        .section { padding: 5rem max(1.5rem, calc((100% - 72rem) / 2)); width: 100%; box-sizing: border-box; }
+        .section-alt { padding: 5rem max(1.5rem, calc((100% - 72rem) / 2)); width: 100%; box-sizing: border-box; }
         @media (max-width: 768px) { .section, .section-alt { padding: 3rem 1rem; } }
         .section-header { text-align: center; margin-bottom: 3rem; }
         .section-label { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); margin-bottom: 0.75rem; font-family: var(--font-sans); }
@@ -257,18 +261,18 @@ export default class OnePage extends Component {
       </style>
 
       <!-- NAV -->
-      <nav style="position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);">
-        <div style="max-width:72rem;margin:0 auto;padding:0.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;">
+      <nav class="onepage-nav" style="position:fixed;top:0;left:0;right:0;z-index:1000;backdrop-filter:blur(12px);border-bottom:1px solid var(--border);">
+        <div style="max-width:72rem;margin:0 auto;padding:0.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;width:100%;box-sizing:border-box;">
           <a href="#" style="display:flex;align-items:center;gap:0.5rem;text-decoration:none;color:var(--text-primary);font-weight:800;font-size:1.25rem;">
             <span style="width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:0.75rem;font-weight:900;">Fi</span>
             ${escapeHtml(site.name)}
           </a>
           <div style="display:flex;align-items:center;gap:1.5rem;">
-            <a href="#features" style="color:var(--text-secondary);text-decoration:none;font-family:var(--font-sans);font-size:0.875rem;font-weight:500;">Ozellikler</a>
-            <a href="#pricing" style="color:var(--text-secondary);text-decoration:none;font-family:var(--font-sans);font-size:0.875rem;font-weight:500;">Fiyatlar</a>
-            <a href="#testimonials" style="color:var(--text-secondary);text-decoration:none;font-family:var(--font-sans);font-size:0.875rem;font-weight:500;">Yorumlar</a>
-            <a href="#contact" style="color:var(--text-secondary);text-decoration:none;font-family:var(--font-sans);font-size:0.875rem;font-weight:500;">Iletisim</a>
-            <button type="button" data-theme-toggle style="background:none;border:1px solid var(--border);border-radius:8px;padding:0.375rem;color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;">${iconMoon}</button>
+            <a href="#features" style="color:var(--text-secondary);text-decoration:none;font-family:var(--font-sans);font-size:0.875rem;font-weight:500;">Features</a>
+            <a href="#pricing" style="color:var(--text-secondary);text-decoration:none;font-family:var(--font-sans);font-size:0.875rem;font-weight:500;">Pricing</a>
+            <a href="#testimonials" style="color:var(--text-secondary);text-decoration:none;font-family:var(--font-sans);font-size:0.875rem;font-weight:500;">Testimonials</a>
+            <a href="#contact" style="color:var(--text-secondary);text-decoration:none;font-family:var(--font-sans);font-size:0.875rem;font-weight:500;">Contact</a>
+            <button type="button" data-theme-toggle style="background:none;border:1px solid var(--border);border-radius:8px;padding:0.375rem;color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;transition:all 0.2s ease;">${iconMoon}</button>
           </div>
         </div>
       </nav>
@@ -277,6 +281,7 @@ export default class OnePage extends Component {
       <!-- HERO -->
       ${responsiveWrapper({
         preset: "dashboard",
+        padding: "none",
         previewEnabled: true,
         previewLabel: "Preview",
         id: "hero-preview",
@@ -285,7 +290,7 @@ export default class OnePage extends Component {
           + '<h1 class="hero-title">' + escapeHtml(site.tagline) + '</h1>'
           + '<p class="hero-subtitle">' + escapeHtml(site.description) + '</p>'
           + '<div class="hero-actions">'
-          + '<a href="#contact" class="btn-primary" style="font-size:1rem;padding:0.875rem 2rem;">Hemen Basla ' + iconArrow + '</a>'
+          + '<a href="#contact" class="btn-primary" style="font-size:1rem;padding:0.875rem 2rem;">Get Started ' + iconArrow + '</a>'
           + '<a href="https://github.com/hacimertgokhan/fiyuu" class="btn-outline" style="font-size:1rem;padding:0.875rem 2rem;">' + iconGithub + ' GitHub</a>'
           + '</div>'
           + '<div class="hero-stats">' + buildStatsHtml(stats) + '</div>'
@@ -293,20 +298,19 @@ export default class OnePage extends Component {
       })}
 
       ${featuresHtml}
-      ${pricingHtml}
       ${testimonialsHtml}
       ${contactHtml}
 
       <!-- FOOTER -->
       <footer style="border-top:1px solid var(--border);padding:2rem 0;text-align:center;">
         <p style="font-family:var(--font-sans);font-size:0.875rem;color:var(--text-muted);">Built with <a href="https://github.com/hacimertgokhan/fiyuu" style="color:var(--accent);text-decoration:none;font-weight:600;">Fiyuu</a> - Always-live fullstack framework</p>
-        <p style="font-family:var(--font-sans);font-size:0.75rem;color:var(--text-muted);margin-top:0.5rem;opacity:0.6;">ResponsiveWrapper ile gelistirildi. Sag ustteki <span style="display:inline-flex;vertical-align:middle;">${iconEye}</span> ikonuna tiklayarak responsive onizlemeyi goruntuleyin.</p>
+        <p style="font-family:var(--font-sans);font-size:0.75rem;color:var(--text-muted);margin-top:0.5rem;opacity:0.6;">Built with ResponsiveWrapper. Click the <span style="display:inline-flex;vertical-align:middle;">${iconEye}</span> button to open the responsive preview.</p>
       </footer>
 
       <!-- NOTIFICATION TOAST -->
       <div id="notif-toast" class="notif-toast">
-        <div style="font-family:var(--font-sans);font-size:0.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent);margin-bottom:0.375rem;">Bildirim</div>
-        <div id="notif-toast-body" style="font-family:var(--font-sans);font-size:0.875rem;color:var(--text-primary);">Yeni bildirim</div>
+        <div style="font-family:var(--font-sans);font-size:0.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent);margin-bottom:0.375rem;">Notification</div>
+        <div id="notif-toast-body" style="font-family:var(--font-sans);font-size:0.875rem;color:var(--text-primary);">New notification</div>
       </div>
 
       <script>
@@ -324,7 +328,7 @@ export default class OnePage extends Component {
             var toast = document.getElementById("notif-toast");
             var toastBody = document.getElementById("notif-toast-body");
             notif.on("welcome", function(data) {
-              if (toastBody) toastBody.textContent = data.message || "Yeni bir bildirim var!";
+              if (toastBody) toastBody.textContent = data.message || "New notification!";
               if (toast) { toast.classList.add("show"); setTimeout(function() { toast.classList.remove("show"); }, 4000); }
             });
 
@@ -334,17 +338,17 @@ export default class OnePage extends Component {
             if (subBtn) {
               subBtn.addEventListener("click", async function() {
                 var email = subEmail.value.trim();
-                if (!email) { subStatus.style.display = "block"; subStatus.style.color = "var(--danger)"; subStatus.textContent = "Email gerekli."; return; }
+                if (!email) { subStatus.style.display = "block"; subStatus.style.color = "var(--danger)"; subStatus.textContent = "Email is required."; return; }
                 subBtn.disabled = true;
                 try {
                   var res = await fiyuu.action("/", { action: "subscribe", email: email });
                   if (res && res.success) {
                     subStatus.style.display = "block"; subStatus.style.color = "var(--accent)"; subStatus.textContent = res.message; subEmail.value = "";
                   } else {
-                    subStatus.style.display = "block"; subStatus.style.color = "var(--danger)"; subStatus.textContent = (res && res.message) || "Hata olustu.";
+                    subStatus.style.display = "block"; subStatus.style.color = "var(--danger)"; subStatus.textContent = (res && res.message) || "Something went wrong.";
                   }
                 } catch(e) {
-                  subStatus.style.display = "block"; subStatus.style.color = "var(--danger)"; subStatus.textContent = "Hata olustu.";
+                  subStatus.style.display = "block"; subStatus.style.color = "var(--danger)"; subStatus.textContent = "Something went wrong.";
                 } finally { subBtn.disabled = false; }
               });
             }
@@ -355,7 +359,7 @@ export default class OnePage extends Component {
                 var name = document.getElementById("contact-name").value.trim();
                 var message = document.getElementById("contact-message").value.trim();
                 var status = document.getElementById("contact-status");
-                if (!message) { status.style.display = "block"; status.style.color = "var(--danger)"; status.textContent = "Mesaj gerekli."; return; }
+                if (!message) { status.style.display = "block"; status.style.color = "var(--danger)"; status.textContent = "Message is required."; return; }
                 contactBtn.disabled = true;
                 try {
                   var res = await fiyuu.action("/", { action: "contact", name: name, message: message });
@@ -365,7 +369,7 @@ export default class OnePage extends Component {
                     document.getElementById("contact-message").value = "";
                   }
                 } catch(e) {
-                  status.style.display = "block"; status.style.color = "var(--danger)"; status.textContent = "Hata olustu.";
+                  status.style.display = "block"; status.style.color = "var(--danger)"; status.textContent = "Something went wrong.";
                 } finally { contactBtn.disabled = false; }
               });
             }
