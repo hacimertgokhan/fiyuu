@@ -6,7 +6,8 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const pkgPath = require.resolve("@geajs/core/package.json");
+const pkgEntry = require.resolve("@geajs/core");
+const pkgPath = pkgEntry.replace(/\/dist\/.*$/, "/package.json").replace(/\/src\/.*$/, "/package.json");
 const pkg = JSON.parse(readFileSync(pkgPath, "utf8"));
 
 let patched = false;

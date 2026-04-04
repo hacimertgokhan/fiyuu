@@ -1,5 +1,5 @@
 import { Component } from "@geajs/core";
-import { definePage, html, escapeHtml, type PageProps, type InferQueryOutput } from "@fiyuu/core/client";
+import { definePage, html, type PageProps, type InferQueryOutput } from "@fiyuu/core/client";
 import type { query } from "./query.js";
 
 type BlogData = InferQueryOutput<typeof query>;
@@ -30,24 +30,24 @@ export default class BlogHomePage extends Component<PageProps<BlogData>> {
             class="post-card animate-slide-up"
             style="animation-delay:${idx * 80}ms; animation-fill-mode:both;"
             data-post-card
-            data-title="${escapeHtml(post.title.toLowerCase())}"
-            data-tags="${post.tags.map((t) => escapeHtml(t.toLowerCase())).join(",")}"
+            data-title="${post.title.toLowerCase()}"
+            data-tags="${post.tags.map((t) => t.toLowerCase()).join(",")}"
           >
             <div class="post-cover" style="background: linear-gradient(135deg, ${post.coverColor}18, ${post.coverColor}08);">
               <div class="post-cover-stripe" style="background: ${post.coverColor};"></div>
             </div>
             <div class="post-body">
               <div class="post-tags">
-                ${post.tags.map((tag) => `<span class="post-tag">${escapeHtml(tag)}</span>`).join("")}
+                ${post.tags.map((tag) => `<span class="post-tag">${tag}</span>`).join("")}
               </div>
               <h2 class="post-title">
-                <a href="/posts/${escapeHtml(post.slug)}">${escapeHtml(post.title)}</a>
+                <a href="/posts/${post.slug}">${post.title}</a>
               </h2>
-              <p class="post-excerpt">${escapeHtml(post.excerpt)}</p>
+              <p class="post-excerpt">${post.excerpt}</p>
               <div class="post-meta">
-                <span class="post-author">${escapeHtml(post.author)}</span>
+                <span class="post-author">${post.author}</span>
                 <span class="meta-dot">&middot;</span>
-                <span class="post-date">${escapeHtml(post.date)}</span>
+                <span class="post-date">${post.date}</span>
                 <span class="meta-dot">&middot;</span>
                 <span>${icon.clock} ${post.readTime} dk</span>
               </div>

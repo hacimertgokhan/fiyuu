@@ -1,5 +1,5 @@
 import { Component } from "@geajs/core";
-import { definePage, html, escapeHtml, type PageProps, type InferQueryOutput } from "@fiyuu/core/client";
+import { definePage, html, type PageProps, type InferQueryOutput } from "@fiyuu/core/client";
 import type { query } from "./query.js";
 
 type PostData = InferQueryOutput<typeof query>;
@@ -46,10 +46,10 @@ export default class PostDetailPage extends Component<PageProps<PostData>> {
         (c: { id: string; author: string; text: string; createdAt: number }) => html`
           <div class="comment-item animate-slide-up">
             <div class="comment-header">
-              <span class="comment-author">${escapeHtml(c.author)}</span>
+              <span class="comment-author">${c.author}</span>
               <span class="comment-date">${new Date(c.createdAt).toLocaleDateString("tr-TR")}</span>
             </div>
-            <p class="comment-text">${escapeHtml(c.text)}</p>
+            <p class="comment-text">${c.text}</p>
           </div>
         `,
       )
@@ -58,11 +58,11 @@ export default class PostDetailPage extends Component<PageProps<PostData>> {
     const relatedHtml = relatedPosts
       .map(
         (r: { slug: string; title: string; excerpt: string; coverColor: string }) => html`
-          <a href="/posts/${escapeHtml(r.slug)}" class="related-card">
+          <a href="/posts/${r.slug}" class="related-card">
             <div class="related-accent" style="background:${r.coverColor};"></div>
             <div class="related-content">
-              <h4>${escapeHtml(r.title)}</h4>
-              <p>${escapeHtml(r.excerpt).slice(0, 80)}...</p>
+              <h4>${r.title}</h4>
+              <p>${r.excerpt.slice(0, 80)}...</p>
             </div>
           </a>
         `,
@@ -299,20 +299,20 @@ export default class PostDetailPage extends Component<PageProps<PostData>> {
       <header class="post-header">
         <div class="post-header-inner">
           <a href="/" class="back-btn">${iconBack} Yazılar</a>
-          <span class="post-header-title">${escapeHtml(post.title)}</span>
+          <span class="post-header-title">${post.title}</span>
         </div>
       </header>
 
       <!-- Post Content -->
       <article class="post-detail animate-fade-in">
         <div class="post-tags">
-          ${post.tags.map((tag: string) => `<span class="post-tag">${escapeHtml(tag)}</span>`).join("")}
+          ${post.tags.map((tag: string) => `<span class="post-tag">${tag}</span>`).join("")}
         </div>
-        <h1>${escapeHtml(post.title)}</h1>
+        <h1>${post.title}</h1>
         <div class="post-detail-meta">
-          <span>${escapeHtml(post.author)}</span>
+          <span>${post.author}</span>
           <span class="separator">·</span>
-          <span>${escapeHtml(post.date)}</span>
+          <span>${post.date}</span>
           <span class="separator">·</span>
           <span>${iconClock} ${post.readTime} dk okuma</span>
           <span class="separator">·</span>

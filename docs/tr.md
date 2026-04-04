@@ -131,6 +131,8 @@ Sık kullanılan alanlar:
 - `middleware`
 - `developerTools`
 - `featureFlags`
+- `deploy` (`fiyuu deploy` icin SSH + PM2 ayarlari)
+- `cloud` (`fiyuu cloud` icin control-plane endpoint/proje varsayilani)
 
 ## Sorun giderme
 

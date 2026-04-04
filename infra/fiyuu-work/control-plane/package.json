@@ -1,0 +1,9 @@
+{
+  "name": "@fiyuu/work-control-plane",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "start:worker": "node worker.mjs"
+  }
+}

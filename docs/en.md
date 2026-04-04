@@ -123,6 +123,8 @@ Common sections:
 - `middleware`
 - `developerTools`
 - `featureFlags`
+- `deploy` (SSH + PM2 settings for `fiyuu deploy`)
+- `cloud` (control-plane endpoint/default project for `fiyuu cloud`)
 
 ## Troubleshooting
 

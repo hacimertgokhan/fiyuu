@@ -1,5 +1,6 @@
 import { Component } from "@geajs/core";
 import { defineLayout, html, type LayoutProps } from "@fiyuu/core/client";
+import { humanDebugOverlay } from "../lib/pure-framework.js";
 
 export const layout = defineLayout({ name: "root" });
 
@@ -272,6 +273,8 @@ export default class RootLayout extends Component<LayoutProps> {
           });
         })();
       </script>
+
+      ${humanDebugOverlay()}
     `;
   }
 }

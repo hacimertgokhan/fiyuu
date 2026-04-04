@@ -1,5 +1,5 @@
 import { Component } from "@geajs/core";
-import { definePage, html, escapeHtml, type PageProps, type InferQueryOutput } from "@fiyuu/core/client";
+import { definePage, html, type PageProps, type InferQueryOutput } from "@fiyuu/core/client";
 import type { query } from "./query.js";
 
 type DocsData = InferQueryOutput<typeof query>;
@@ -32,7 +32,7 @@ export default class DocsPage extends Component<PageProps<DocsData>> {
     const filterChips = categories
       .map(
         (cat) =>
-          `<button type="button" class="fy-filter-chip" data-filter="${escapeHtml(cat.key)}">${escapeHtml(cat.label)} <span>${cat.docs.length}</span></button>`,
+          `<button type="button" class="fy-filter-chip" data-filter="${cat.key}">${cat.label} <span>${cat.docs.length}</span></button>`,
       )
       .join("");
 
@@ -44,19 +44,19 @@ export default class DocsPage extends Component<PageProps<DocsData>> {
         const docCards = cat.docs
           .map(
             (doc) => `
-              <a href="/docs/${escapeHtml(doc.slug)}"
+              <a href="/docs/${doc.slug}"
                 class="fy-doc-card"
-                data-title="${escapeHtml(doc.title)}"
-                data-excerpt="${escapeHtml(doc.excerpt)}"
-                data-category="${escapeHtml(doc.category)}"
+                data-title="${doc.title}"
+                data-excerpt="${doc.excerpt}"
+                data-category="${doc.category}"
                 style="display:block;border:1px solid #e4e4e7;padding:1.25rem 1.5rem;background:white;text-decoration:none;transition:border-color 0.12s,background 0.12s;position:relative;overflow:hidden"
                 onmouseover="this.style.borderColor='#a1a1aa';this.style.background='#fafafa'"
                 onmouseout="this.style.borderColor='#e4e4e7';this.style.background='white'">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem">
-                  <h3 style="font-size:0.9375rem;font-weight:600;color:#18181b;margin:0;letter-spacing:-0.02em">${escapeHtml(doc.title)}</h3>
+                  <h3 style="font-size:0.9375rem;font-weight:600;color:#18181b;margin:0;letter-spacing:-0.02em">${doc.title}</h3>
                   <svg width="14" height="14" fill="none" stroke="#a1a1aa" viewBox="0 0 24 24" style="flex-shrink:0"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
                 </div>
-                <p style="font-size:0.8125rem;color:#71717a;line-height:1.6;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${escapeHtml(doc.excerpt)}</p>
+                <p style="font-size:0.8125rem;color:#71717a;line-height:1.6;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${doc.excerpt}</p>
                 <div style="position:absolute;left:0;top:0;bottom:0;width:2px;background:${meta.accent}"></div>
               </a>
             `,
@@ -64,12 +64,12 @@ export default class DocsPage extends Component<PageProps<DocsData>> {
           .join("");
 
         return `
-          <section class="fy-doc-section" data-category="${escapeHtml(catKey)}" style="margin-bottom:4rem">
+          <section class="fy-doc-section" data-category="${catKey}" style="margin-bottom:4rem">
             <div style="display:flex;align-items:center;gap:0.875rem;margin-bottom:1.75rem;padding-bottom:1rem;border-bottom:1px solid #e4e4e7">
               <div style="width:8px;height:8px;background:${meta.accent};flex-shrink:0"></div>
               <div>
-                <h2 style="font-size:0.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:#71717a;margin:0 0 0.2rem">${escapeHtml(meta.label)}</h2>
-                <p style="font-size:0.8125rem;color:#a1a1aa;margin:0">${escapeHtml(meta.desc)}</p>
+                <h2 style="font-size:0.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:#71717a;margin:0 0 0.2rem">${meta.label}</h2>
+                <p style="font-size:0.8125rem;color:#a1a1aa;margin:0">${meta.desc}</p>
               </div>
               <span style="margin-left:auto;font-family:monospace;font-size:0.75rem;color:#a1a1aa">${cat.docs.length} article${cat.docs.length !== 1 ? "s" : ""}</span>
             </div>

@@ -1,5 +1,5 @@
 import { Component } from "@geajs/core";
-import { definePage, html, escapeHtml, responsiveWrapper } from "@fiyuu/core/client";
+import { definePage, html, responsiveWrapper } from "@fiyuu/core/client";
 
 export const page = definePage({ intent: "OnePage landing with ResponsiveWrapper demo" });
 
@@ -43,8 +43,8 @@ export default class OnePage extends Component {
         var f = items[i];
         h += '<div class="feature-card" style="animation-delay:' + (i * 80) + 'ms;">'
           + '<div class="feature-icon" style="background:' + f.color + '15;color:' + f.color + ';">' + (featureIcons[f.icon] || "") + '</div>'
-          + '<h3>' + escapeHtml(f.title) + '</h3>'
-          + '<p>' + escapeHtml(f.description) + '</p>'
+          + '<h3>' + f.title + '</h3>'
+          + '<p>' + f.description + '</p>'
           + '</div>';
       }
       return h;
@@ -63,12 +63,12 @@ export default class OnePage extends Component {
 
         var feats = "";
         for (var j = 0; j < p.features.length; j++) {
-          feats += '<div class="plan-feature">' + iconCheck + '<span>' + escapeHtml(p.features[j]) + '</span></div>';
+          feats += '<div class="plan-feature">' + iconCheck + '<span>' + p.features[j] + '</span></div>';
         }
 
         h += '<div class="' + cls + '" style="animation-delay:' + (i * 100) + 'ms;">'
-          + '<h3 style="' + titleColor + '">' + escapeHtml(p.name) + '</h3>'
-          + '<div class="plan-price"><span style="' + priceColor + '">' + escapeHtml(p.price) + '</span><span style="' + periodColor + '">' + escapeHtml(p.period) + '</span></div>'
+          + '<h3 style="' + titleColor + '">' + p.name + '</h3>'
+          + '<div class="plan-price"><span style="' + priceColor + '">' + p.price + '</span><span style="' + periodColor + '">' + p.period + '</span></div>'
           + '<div class="plan-features">' + feats + '</div>'
           + '<button class="' + btnCls + '" style="width:100%;justify-content:center;' + btnStyle + '">' + (p.highlighted ? "Get Started" : "Contact Us") + '</button>'
           + '</div>';
@@ -82,10 +82,10 @@ export default class OnePage extends Component {
         var t = items[i];
         h += '<div class="testimonial-card" style="animation-delay:' + (i * 100) + 'ms;">'
           + '<div class="testimonial-quote">' + iconQuote + '</div>'
-          + '<p class="testimonial-text">"' + escapeHtml(t.text) + '"</p>'
+          + '<p class="testimonial-text">"' + t.text + '"</p>'
           + '<div class="testimonial-author">'
-          + '<div class="testimonial-avatar">' + escapeHtml(t.avatar) + '</div>'
-          + '<div><div class="testimonial-name">' + escapeHtml(t.name) + '</div><div class="testimonial-role">' + escapeHtml(t.role) + '</div></div>'
+          + '<div class="testimonial-avatar">' + t.avatar + '</div>'
+          + '<div><div class="testimonial-name">' + t.name + '</div><div class="testimonial-role">' + t.role + '</div></div>'
           + '</div>'
           + '</div>';
       }
@@ -97,8 +97,8 @@ export default class OnePage extends Component {
       for (var i = 0; i < items.length; i++) {
         var s = items[i];
         h += '<div class="stat-item" style="animation-delay:' + (i * 100) + 'ms;">'
-          + '<div class="stat-value">' + escapeHtml(s.value) + '</div>'
-          + '<div class="stat-label">' + escapeHtml(s.label) + '</div>'
+          + '<div class="stat-value">' + s.value + '</div>'
+          + '<div class="stat-label">' + s.label + '</div>'
           + '</div>';
       }
       return h;
@@ -265,7 +265,7 @@ export default class OnePage extends Component {
         <div style="max-width:72rem;margin:0 auto;padding:0.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;width:100%;box-sizing:border-box;">
           <a href="#" style="display:flex;align-items:center;gap:0.5rem;text-decoration:none;color:var(--text-primary);font-weight:800;font-size:1.25rem;">
             <span style="width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-size:0.75rem;font-weight:900;">Fi</span>
-            ${escapeHtml(site.name)}
+            ${site.name}
           </a>
           <div style="display:flex;align-items:center;gap:1.5rem;">
             <a href="#features" style="color:var(--text-secondary);text-decoration:none;font-family:var(--font-sans);font-size:0.875rem;font-weight:500;">Features</a>
@@ -287,8 +287,8 @@ export default class OnePage extends Component {
         id: "hero-preview",
         content: '<section class="hero-section anim-up">'
           + '<div class="hero-badge">' + iconZap + ' Always-Live Framework</div>'
-          + '<h1 class="hero-title">' + escapeHtml(site.tagline) + '</h1>'
-          + '<p class="hero-subtitle">' + escapeHtml(site.description) + '</p>'
+          + '<h1 class="hero-title">' + site.tagline + '</h1>'
+          + '<p class="hero-subtitle">' + site.description + '</p>'
           + '<div class="hero-actions">'
           + '<a href="#contact" class="btn-primary" style="font-size:1rem;padding:0.875rem 2rem;">Get Started ' + iconArrow + '</a>'
           + '<a href="https://github.com/hacimertgokhan/fiyuu" class="btn-outline" style="font-size:1rem;padding:0.875rem 2rem;">' + iconGithub + ' GitHub</a>'

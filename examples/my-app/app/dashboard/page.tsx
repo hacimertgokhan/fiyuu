@@ -1,5 +1,5 @@
 import { Component } from "@geajs/core";
-import { definePage, html, escapeHtml, type PageProps, type InferQueryOutput } from "@fiyuu/core/client";
+import { definePage, html, type PageProps, type InferQueryOutput } from "@fiyuu/core/client";
 import { timeAgo } from "../../lib/ui.js";
 import type { query } from "./query.js";
 
@@ -26,12 +26,12 @@ export default class DashboardPage extends Component<PageProps<DashboardData>> {
     const stats = data?.stats ?? { total: 0, published: 0, drafts: 0, changelogEntries: 0 };
 
     const docRow = (doc: Doc) => `
-      <tr id="row-${escapeHtml(doc.id)}" style="border-bottom:1px solid #f4f4f5;transition:background 0.1s" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='white'">
+      <tr id="row-${doc.id}" style="border-bottom:1px solid #f4f4f5;transition:background 0.1s" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='white'">
         <td style="padding:0.875rem 1.25rem">
-          <div style="font-size:0.875rem;font-weight:500;color:#18181b;margin-bottom:0.125rem">${escapeHtml(doc.title)}</div>
-          <div style="font-size:0.75rem;color:#a1a1aa;font-family:monospace">/docs/${escapeHtml(doc.slug)}</div>
+          <div style="font-size:0.875rem;font-weight:500;color:#18181b;margin-bottom:0.125rem">${doc.title}</div>
+          <div style="font-size:0.75rem;color:#a1a1aa;font-family:monospace">/docs/${doc.slug}</div>
         </td>
-        <td style="padding:0.875rem 1rem;font-size:0.75rem;color:#71717a;white-space:nowrap">${escapeHtml(CATEGORY_LABELS[doc.category] ?? doc.category)}</td>
+        <td style="padding:0.875rem 1rem;font-size:0.75rem;color:#71717a;white-space:nowrap">${CATEGORY_LABELS[doc.category] ?? doc.category}</td>
         <td style="padding:0.875rem 1rem">
           <span style="font-size:0.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;padding:0.2em 0.625em;border:1px solid ${doc.published ? "#bbf7d0" : "#e4e4e7"};color:${doc.published ? "#16a34a" : "#71717a"};background:${doc.published ? "#f0fdf4" : "#fafafa"}">
             ${doc.published ? "Published" : "Draft"}
@@ -40,13 +40,13 @@ export default class DashboardPage extends Component<PageProps<DashboardData>> {
         <td style="padding:0.875rem 1rem;font-size:0.75rem;color:#a1a1aa;white-space:nowrap">${timeAgo(doc.updatedAt)}</td>
         <td style="padding:0.875rem 1.25rem;text-align:right">
           <div style="display:flex;align-items:center;justify-content:flex-end;gap:0.5rem">
-            <a href="/docs/${escapeHtml(doc.slug)}" target="_blank"
+            <a href="/docs/${doc.slug}" target="_blank"
               style="padding:0.3rem 0.625rem;font-size:0.75rem;font-weight:500;color:#52525b;border:1px solid #e4e4e7;text-decoration:none;transition:border-color 0.1s"
               onmouseover="this.style.borderColor='#a1a1aa'" onmouseout="this.style.borderColor='#e4e4e7'">View</a>
-            <button onclick="toggleDoc('${escapeHtml(doc.id)}')"
+            <button onclick="toggleDoc('${doc.id}')"
               style="padding:0.3rem 0.625rem;font-size:0.75rem;font-weight:500;color:#52525b;border:1px solid #e4e4e7;background:white;cursor:pointer;font-family:inherit;transition:border-color 0.1s"
               onmouseover="this.style.borderColor='#a1a1aa'" onmouseout="this.style.borderColor='#e4e4e7'">${doc.published ? "Unpublish" : "Publish"}</button>
-            <button onclick="deleteDoc('${escapeHtml(doc.id)}', '${escapeHtml(doc.title)}')"
+            <button onclick="deleteDoc('${doc.id}', '${doc.title}')"
               style="padding:0.3rem 0.625rem;font-size:0.75rem;font-weight:500;color:#dc2626;border:1px solid #fecaca;background:white;cursor:pointer;font-family:inherit;transition:border-color 0.1s"
               onmouseover="this.style.borderColor='#f87171'" onmouseout="this.style.borderColor='#fecaca'">Delete</button>
           </div>
@@ -55,14 +55,14 @@ export default class DashboardPage extends Component<PageProps<DashboardData>> {
     `;
 
     const clRow = (entry: ChangelogEntry) => `
-      <tr id="cl-row-${escapeHtml(entry.id)}" style="border-bottom:1px solid #f4f4f5;transition:background 0.1s" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='white'">
+      <tr id="cl-row-${entry.id}" style="border-bottom:1px solid #f4f4f5;transition:background 0.1s" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='white'">
         <td style="padding:0.875rem 1.25rem;display:flex;align-items:center;gap:0.75rem">
-          <span style="font-family:monospace;font-size:0.6875rem;font-weight:700;background:#09090b;color:white;padding:0.25rem 0.5rem;white-space:nowrap">v${escapeHtml(entry.version)}</span>
-          <span style="font-size:0.875rem;font-weight:500;color:#18181b">${escapeHtml(entry.title)}</span>
+          <span style="font-family:monospace;font-size:0.6875rem;font-weight:700;background:#09090b;color:white;padding:0.25rem 0.5rem;white-space:nowrap">v${entry.version}</span>
+          <span style="font-size:0.875rem;font-weight:500;color:#18181b">${entry.title}</span>
         </td>
         <td style="padding:0.875rem 1rem;font-size:0.75rem;color:#a1a1aa;white-space:nowrap">${timeAgo(entry.createdAt)}</td>
         <td style="padding:0.875rem 1.25rem;text-align:right">
-          <button onclick="deleteChangelog('${escapeHtml(entry.id)}', '${escapeHtml(entry.version)}')"
+          <button onclick="deleteChangelog('${entry.id}', '${entry.version}')"
             style="padding:0.3rem 0.625rem;font-size:0.75rem;font-weight:500;color:#dc2626;border:1px solid #fecaca;background:white;cursor:pointer;font-family:inherit;transition:border-color 0.1s"
             onmouseover="this.style.borderColor='#f87171'" onmouseout="this.style.borderColor='#fecaca'">Delete</button>
         </td>
@@ -83,8 +83,8 @@ export default class DashboardPage extends Component<PageProps<DashboardData>> {
             <div>
               <h1 style="font-size:1.25rem;font-weight:700;color:#18181b;letter-spacing:-0.025em;margin:0 0 0.25rem">Dashboard</h1>
               <p style="font-size:0.8125rem;color:#a1a1aa;margin:0">
-                ${escapeHtml(user?.name ?? "—")} · <span style="font-family:monospace">${escapeHtml(user?.email ?? "")}</span>
-                <span style="margin-left:0.5rem;font-size:0.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:${user?.role === "admin" ? "#16a34a" : "#71717a"};border:1px solid ${user?.role === "admin" ? "#bbf7d0" : "#e4e4e7"};padding:0.1em 0.4em">${escapeHtml(user?.role ?? "")}</span>
+                ${user?.name ?? "—"} · <span style="font-family:monospace">${user?.email ?? ""}</span>
+                <span style="margin-left:0.5rem;font-size:0.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:${user?.role === "admin" ? "#16a34a" : "#71717a"};border:1px solid ${user?.role === "admin" ? "#bbf7d0" : "#e4e4e7"};padding:0.1em 0.4em">${user?.role ?? ""}</span>
               </p>
             </div>
             <button onclick="document.getElementById('modal-new-doc').style.display='flex'"

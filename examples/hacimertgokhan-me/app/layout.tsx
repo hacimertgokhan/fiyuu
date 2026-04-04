@@ -1,5 +1,5 @@
 import { Component } from "@geajs/core";
-import { defineLayout, html, type LayoutProps } from "@fiyuu/core/client";
+import { defineLayout, html, raw, type LayoutProps } from "@fiyuu/core/client";
 
 export const layout = defineLayout({ name: "root" });
 
@@ -415,7 +415,7 @@ export default class RootLayout extends Component<LayoutProps> {
       </style>
 
       <div class="min-h-screen bg-[color:var(--bg-primary)] text-[color:var(--text-primary)]">
-        ${children}
+        ${raw(children)}
       </div>
 
       <script type="module">

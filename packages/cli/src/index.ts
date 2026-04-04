@@ -13,6 +13,7 @@ import { handleGraphCommand } from "./commands/graph.js";
 import { runDoctor } from "./commands/doctor.js";
 import { handleSkillCommand } from "./commands/skill.js";
 import { handleFeatureCommand } from "./commands/feat.js";
+import { deploy } from "./commands/deploy.js";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -30,6 +31,8 @@ ${c.bold}Dev & Deploy:${c.reset}
   ${c.cyan}dev${c.reset}                    Start development server with live reload
   ${c.cyan}build${c.reset}                  Build for production
   ${c.cyan}start${c.reset}                  Start production server (requires build)
+  ${c.cyan}deploy${c.reset}                 Build + upload + remote production restart over SSH
+  ${c.cyan}cloud${c.reset}                  Temporarily disabled (coming soon)
   ${c.cyan}sync${c.reset}                   Sync project graph and AI docs
 
 ${c.bold}Scaffold:${c.reset}
@@ -60,7 +63,8 @@ async function main(): Promise<void> {
   const [, , command, ...args] = process.argv;
   const rootDirectory = process.cwd();
   const appDirectory = resolveAppDirectory(rootDirectory);
-  const loaded = await loadFiyuuConfig(rootDirectory, command === "start" ? "start" : "dev");
+  const isProductionMode = command === "start" || command === "deploy";
+  const loaded = await loadFiyuuConfig(rootDirectory, isProductionMode ? "start" : "dev");
   const config = loaded.config;
   const configuredPort = config.app?.port ?? DEFAULT_PORT;
 
@@ -90,6 +94,13 @@ async function main(): Promise<void> {
     case "sync":
       await sync(rootDirectory, appDirectory);
       return;
+
+    case "deploy":
+      await deploy(rootDirectory, appDirectory, config, args);
+      return;
+
+    case "cloud":
+      throw new Error("Cloud deploy is not active yet. Use `fiyuu deploy` for now.");
 
     case "generate": {
       const [kind, featureName] = args;

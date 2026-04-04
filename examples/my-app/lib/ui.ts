@@ -1,9 +1,9 @@
 /**
  * shadcn/ui-inspired component builders for Fiyuu GEA templates.
- * Returns HTML strings to be interpolated into html`` tagged templates.
+ * Returns HTML strings — all interpolations are auto-escaped via html``.
  */
 
-import { escapeHtml } from "@fiyuu/core/client";
+import { html } from "@fiyuu/core/client";
 
 // ── Button ────────────────────────────────────────────────────────────────────
 
@@ -34,7 +34,7 @@ export function btn(
     lg: "px-6 py-2.5 text-base",
   };
 
-  return `<button type="${type}" class="${base} ${variants[variant]} ${sizes[size]}" ${attrs}>${escapeHtml(label)}</button>`;
+  return html`<button type="${type}" class="${base} ${variants[variant]} ${sizes[size]}" ${attrs}>${label}</button>`;
 }
 
 // ── Input ─────────────────────────────────────────────────────────────────────
@@ -50,17 +50,17 @@ export function input(opts: {
 }): string {
   const { id, name = id, type = "text", placeholder = "", value = "", required = false, label } = opts;
   const labelHtml = label
-    ? `<label for="${escapeHtml(id)}" class="block text-sm font-medium text-zinc-700 mb-1.5">${escapeHtml(label)}</label>`
+    ? html`<label for="${id}" class="block text-sm font-medium text-zinc-700 mb-1.5">${label}</label>`
     : "";
-  return `
+  return html`
     <div class="flex flex-col">
       ${labelHtml}
       <input
-        id="${escapeHtml(id)}"
-        name="${escapeHtml(name)}"
-        type="${escapeHtml(type)}"
-        placeholder="${escapeHtml(placeholder)}"
-        value="${escapeHtml(value)}"
+        id="${id}"
+        name="${name}"
+        type="${type}"
+        placeholder="${placeholder}"
+        value="${value}"
         ${required ? "required" : ""}
         class="w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 shadow-sm transition-colors focus:border-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-200"
       />
@@ -70,7 +70,7 @@ export function input(opts: {
 // ── Card ──────────────────────────────────────────────────────────────────────
 
 export function card(content: string, cls = ""): string {
-  return `<div class="rounded-xl border border-zinc-200 bg-white shadow-sm ${cls}">${content}</div>`;
+  return html`<div class="rounded-xl border border-zinc-200 bg-white shadow-sm ${cls}">${content}</div>`;
 }
 
 // ── Badge ─────────────────────────────────────────────────────────────────────
@@ -85,7 +85,7 @@ export function badge(
     success: "bg-emerald-100 text-emerald-700",
     warning: "bg-amber-100 text-amber-700",
   };
-  return `<span class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ${variants[variant]}">${escapeHtml(label)}</span>`;
+  return html`<span class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ${variants[variant]}">${label}</span>`;
 }
 
 // ── Alert ─────────────────────────────────────────────────────────────────────
@@ -97,12 +97,12 @@ export function alert(message: string, type: "error" | "success" | "info" = "inf
     success: "bg-emerald-50 border-emerald-200 text-emerald-700",
     info: "bg-blue-50 border-blue-200 text-blue-700",
   };
-  return `<div class="rounded-lg border px-4 py-3 text-sm ${styles[type]}">${escapeHtml(message)}</div>`;
+  return html`<div class="rounded-lg border px-4 py-3 text-sm ${styles[type]}">${message}</div>`;
 }
 
 // ── Divider ───────────────────────────────────────────────────────────────────
 
-export const divider = `<div class="border-t border-zinc-100 my-6"></div>`;
+export const divider = html`<div class="border-t border-zinc-100 my-6"></div>`;
 
 // ── Format helpers ────────────────────────────────────────────────────────────
 

@@ -214,11 +214,11 @@ if (result.success) window.location.reload();
 
 \`\`\`typescript
 import { Component } from "@geajs/core";
-import { html, escapeHtml } from "@fiyuu/core/client";
+import { html } from "@fiyuu/core/client";
 
 export default class Greeting extends Component<{ name: string }> {
   template({ name } = this.props) {
-    return html\`<h1>Hello, \${escapeHtml(name)}!</h1>\`;
+    return html\`<h1>Hello, \${name}!</h1>\`;
   }
 }
 \`\`\`
@@ -238,7 +238,7 @@ export default class PostsPage extends Component<PageProps<PageData>> {
   template({ data } = this.props) {
     const posts = data?.posts ?? [];
     return html\`
-      <ul>\${posts.map(p => html\`<li>\${escapeHtml(p.title)}</li>\`).join("")}</ul>
+      <ul>\${posts.map(p => html\`<li>\${p.title}</li>\`)}</ul>
     \`;
   }
 }
@@ -246,7 +246,7 @@ export default class PostsPage extends Component<PageProps<PageData>> {
 
 ## The html tag
 
-The html tagged template literal is a pass-through that signals to your IDE this is safe HTML. Always use escapeHtml() for user content.`,
+The html tagged template literal auto-escapes all interpolations by default. User content is always safe — no manual escaping needed.`,
         category: "core-concepts",
         order: 2,
         published: true,

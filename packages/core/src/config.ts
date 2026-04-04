@@ -97,6 +97,81 @@ export interface FiyuuConfig {
      */
     expose?: boolean;
   };
+  deploy?: {
+    /**
+     * Enables `fiyuu deploy` workflow.
+     * If undefined, deploy command still works when `deploy.ssh` is configured.
+     */
+    enabled?: boolean;
+    /**
+     * Build locally before upload. Defaults to true.
+     */
+    localBuild?: boolean;
+    /**
+     * Extra archive exclude patterns for `tar`.
+     */
+    excludes?: string[];
+    ssh?: {
+      host: string;
+      user: string;
+      port?: number;
+      privateKeyPath?: string;
+      /**
+       * Absolute path on remote server (for example: /var/www/my-app)
+       */
+      destinationPath: string;
+      /**
+       * Number of old releases to keep on the server.
+       */
+      keepReleases?: number;
+    };
+    remote?: {
+      /**
+       * Command executed on remote server in release directory.
+       */
+      installCommand?: string;
+      /**
+       * Command executed on remote server after install.
+       */
+      buildCommand?: string;
+      /**
+       * Command executed on remote server to start/reload the app.
+       */
+      startCommand?: string;
+      /**
+       * Optional validation command after start.
+       */
+      healthcheckCommand?: string;
+    };
+    pm2?: {
+      enabled?: boolean;
+      /**
+       * Auto-generate ecosystem file in project root if missing.
+       */
+      autoCreate?: boolean;
+      ecosystemFile?: string;
+      appName?: string;
+      instances?: number | "max";
+      execMode?: "fork" | "cluster";
+      maxMemoryRestart?: string;
+      env?: Record<string, string>;
+    };
+  };
+  cloud?: {
+    /**
+     * Control-plane API endpoint for `fiyuu cloud`.
+     * Example: https://api.fiyuu.work
+     */
+    endpoint?: string;
+    /**
+     * Default project slug used by `fiyuu cloud deploy`.
+     */
+    project?: string;
+    /**
+     * Extra archive exclude patterns used by cloud deploy packaging.
+     */
+    excludes?: string[];
+  };
 }
 
 export interface LoadedFiyuuConfig {

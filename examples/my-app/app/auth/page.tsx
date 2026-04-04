@@ -1,5 +1,5 @@
 import { Component } from "@geajs/core";
-import { definePage, html, escapeHtml, type PageProps } from "@fiyuu/core/client";
+import { definePage, html, type PageProps } from "@fiyuu/core/client";
 
 export const page = definePage({ intent: "Sign in or create a new account" });
 

@@ -156,6 +156,11 @@ npm run dev
 fiyuu dev
 fiyuu build
 fiyuu start
+fiyuu deploy
+fiyuu cloud help
+fiyuu cloud login <token> --endpoint https://api.fiyuu.work
+fiyuu cloud project create mysite
+fiyuu cloud deploy mysite
 fiyuu sync
 fiyuu doctor
 fiyuu doctor --fix

@@ -17,7 +17,7 @@ async function main() {
   await rm(releaseDirectory, { force: true, recursive: true });
   await mkdir(releaseDirectory, { recursive: true });
 
-  await execFileAsync(process.execPath, [tscCli, "-p", "tsconfig.json"], { cwd: rootDirectory });
+  await execFileAsync(process.execPath, [tscCli, "-p", "tsconfig.packages.json"], { cwd: rootDirectory });
 
   const packageEntries = await readdir(packagesDirectory, { withFileTypes: true });
 

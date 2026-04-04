@@ -1,0 +1,37 @@
+# Example cert-manager setup for *.fiyuu.work wildcard certificate.
+#
+# 1) Create DNS provider credentials secret in cert-manager namespace.
+# 2) Update email + solver fields.
+# 3) Apply this file.
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-wildcard
+spec:
+  acme:
+    email: ops@fiyuu.work
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-wildcard
+    solvers:
+      - dns01:
+          # Replace this with your DNS provider config.
+          cloudflare:
+            email: ops@fiyuu.work
+            apiTokenSecretRef:
+              name: cloudflare-api-token
+              key: api-token
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: fiyuu-work-wildcard
+  namespace: ingress-nginx
+spec:
+  secretName: fiyuu-work-wildcard-tls
+  issuerRef:
+    name: letsencrypt-wildcard
+    kind: ClusterIssuer
+  dnsNames:
+    - fiyuu.work
+    - '*.fiyuu.work'

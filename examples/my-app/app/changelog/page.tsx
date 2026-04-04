@@ -1,5 +1,5 @@
 import { Component } from "@geajs/core";
-import { definePage, html, escapeHtml, type PageProps, type InferQueryOutput } from "@fiyuu/core/client";
+import { definePage, html, type PageProps, type InferQueryOutput } from "@fiyuu/core/client";
 import { formatDate } from "../../lib/ui.js";
 import type { query } from "./query.js";
 
@@ -15,10 +15,10 @@ function renderContent(raw: string): string {
       if (line.startsWith("- ") || line.startsWith("* ")) {
         return `<div style="display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.375rem">
           <span style="width:3px;height:3px;background:#71717a;flex-shrink:0;display:inline-block;margin-top:0.5rem"></span>
-          <span style="font-size:0.875rem;color:#52525b;line-height:1.7">${escapeHtml(line.slice(2))}</span>
+          <span style="font-size:0.875rem;color:#52525b;line-height:1.7">${line.slice(2)}</span>
         </div>`;
       }
-      return `<p style="font-size:0.875rem;color:#52525b;line-height:1.7;margin:0 0 0.375rem">${escapeHtml(line)}</p>`;
+      return `<p style="font-size:0.875rem;color:#52525b;line-height:1.7;margin:0 0 0.375rem">${line}</p>`;
     })
     .join("");
 }
@@ -35,14 +35,14 @@ export default class ChangelogPage extends Component<PageProps<ChangelogData>> {
             <!-- Left: version + date -->
             <div style="padding-top:0.25rem">
               <div style="font-family:monospace;font-size:0.6875rem;font-weight:700;letter-spacing:0.06em;background:#09090b;color:white;display:inline-block;padding:0.25rem 0.625rem;margin-bottom:0.75rem">
-                v${escapeHtml(entry.version)}
+                v${entry.version}
               </div>
               <p style="font-size:0.75rem;color:#a1a1aa;font-family:monospace">${formatDate(entry.createdAt)}</p>
             </div>
 
             <!-- Right: title + content -->
             <div>
-              <h2 style="font-size:1.125rem;font-weight:700;color:#18181b;letter-spacing:-0.025em;margin:0 0 1.25rem">${escapeHtml(entry.title)}</h2>
+              <h2 style="font-size:1.125rem;font-weight:700;color:#18181b;letter-spacing:-0.025em;margin:0 0 1.25rem">${entry.title}</h2>
               <div>${renderContent(entry.content)}</div>
             </div>
 

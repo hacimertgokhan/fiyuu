@@ -1,5 +1,5 @@
 import { Component } from "@geajs/core";
-import { definePage, html, escapeHtml, type PageProps, type InferQueryOutput } from "@fiyuu/core/client";
+import { definePage, html, type PageProps, type InferQueryOutput } from "@fiyuu/core/client";
 import type { query } from "./query.js";
 
 type HomeData = InferQueryOutput<typeof query>;
@@ -57,21 +57,21 @@ export default class LandingPage extends Component<PageProps<HomeData>> {
       .map(item => `
         <span style="display:inline-flex;align-items:center;gap:0.75rem;flex-shrink:0;padding:0 1.5rem">
           <span style="width:3px;height:3px;background:#d4d4d8;display:inline-block;flex-shrink:0"></span>
-          <span style="font-size:0.75rem;font-weight:500;color:#71717a;white-space:nowrap;letter-spacing:0.02em;text-transform:uppercase">${escapeHtml(item)}</span>
+          <span style="font-size:0.75rem;font-weight:500;color:#71717a;white-space:nowrap;letter-spacing:0.02em;text-transform:uppercase">${item}</span>
         </span>
       `).join("");
 
     /* ── Comparison table ── */
     const tableRows = comparisonRows.map((row, i) => `
       <tr style="border-bottom:1px solid #f4f4f5;background:${i % 2 === 0 ? "white" : "#fafafa"}">
-        <td style="padding:0.6rem 1rem;font-size:0.8rem;color:#52525b;font-weight:500;white-space:nowrap;border-right:1px solid #f4f4f5">${escapeHtml(row.feature)}</td>
-        <td style="padding:0.6rem 0.875rem;font-size:0.8rem;text-align:center;font-weight:700;color:#18181b;background:rgba(0,0,0,0.02);border-right:1px solid #f4f4f5">${escapeHtml(row.fiyuu)}</td>
-        <td style="padding:0.6rem 0.875rem;font-size:0.8rem;text-align:center;color:#a1a1aa;border-right:1px solid #f4f4f5">${escapeHtml(row.react)}</td>
-        <td style="padding:0.6rem 0.875rem;font-size:0.8rem;text-align:center;color:#a1a1aa;border-right:1px solid #f4f4f5">${escapeHtml(row.next)}</td>
-        <td style="padding:0.6rem 0.875rem;font-size:0.8rem;text-align:center;color:#a1a1aa;border-right:1px solid #f4f4f5">${escapeHtml(row.vue)}</td>
-        <td style="padding:0.6rem 0.875rem;font-size:0.8rem;text-align:center;color:#a1a1aa;border-right:1px solid #f4f4f5">${escapeHtml(row.nuxt)}</td>
-        <td style="padding:0.6rem 0.875rem;font-size:0.8rem;text-align:center;color:#a1a1aa;border-right:1px solid #f4f4f5">${escapeHtml(row.astro)}</td>
-        <td style="padding:0.6rem 0.875rem;font-size:0.8rem;text-align:center;color:#a1a1aa">${escapeHtml(row.svelte)}</td>
+        <td style="padding:0.6rem 1rem;font-size:0.8rem;color:#52525b;font-weight:500;white-space:nowrap;border-right:1px solid #f4f4f5">${row.feature}</td>
+        <td style="padding:0.6rem 0.875rem;font-size:0.8rem;text-align:center;font-weight:700;color:#18181b;background:rgba(0,0,0,0.02);border-right:1px solid #f4f4f5">${row.fiyuu}</td>
+        <td style="padding:0.6rem 0.875rem;font-size:0.8rem;text-align:center;color:#a1a1aa;border-right:1px solid #f4f4f5">${row.react}</td>
+        <td style="padding:0.6rem 0.875rem;font-size:0.8rem;text-align:center;color:#a1a1aa;border-right:1px solid #f4f4f5">${row.next}</td>
+        <td style="padding:0.6rem 0.875rem;font-size:0.8rem;text-align:center;color:#a1a1aa;border-right:1px solid #f4f4f5">${row.vue}</td>
+        <td style="padding:0.6rem 0.875rem;font-size:0.8rem;text-align:center;color:#a1a1aa;border-right:1px solid #f4f4f5">${row.nuxt}</td>
+        <td style="padding:0.6rem 0.875rem;font-size:0.8rem;text-align:center;color:#a1a1aa;border-right:1px solid #f4f4f5">${row.astro}</td>
+        <td style="padding:0.6rem 0.875rem;font-size:0.8rem;text-align:center;color:#a1a1aa">${row.svelte}</td>
       </tr>
     `).join("");
 
@@ -147,7 +147,7 @@ export default class LandingPage extends Component<PageProps<HomeData>> {
           <div style="position:relative;max-width:72rem;margin:0 auto;padding:7rem 1.5rem 6rem">
             <div class="fy-fade" style="--fd:0ms;display:inline-flex;align-items:center;gap:0.5rem;border:1px solid #2a2a2e;padding:0.25rem 0.75rem;margin-bottom:3rem;font-family:monospace;font-size:0.6875rem;color:#71717a;letter-spacing:0.04em">
               <span class="fy-pulse" style="width:6px;height:6px;background:#22c55e;display:inline-block;flex-shrink:0"></span>
-              v${escapeHtml(version)} — stable release
+              v${version} — stable release
             </div>
 
             <div style="margin-bottom:1.5rem;line-height:1;overflow:visible">
@@ -181,7 +181,7 @@ export default class LandingPage extends Component<PageProps<HomeData>> {
               </div>
               <div style="width:1px;height:2.5rem;background:#1c1c1f"></div>
               <div>
-                <p style="font-size:clamp(1.5rem,3vw,2rem);font-weight:800;color:white;letter-spacing:-0.04em;margin:0">v${escapeHtml(version)}</p>
+                <p style="font-size:clamp(1.5rem,3vw,2rem);font-weight:800;color:white;letter-spacing:-0.04em;margin:0">v${version}</p>
                 <p style="font-size:0.6875rem;color:#52525b;margin-top:0.25rem;text-transform:uppercase;letter-spacing:0.07em">Latest stable</p>
               </div>
               <div style="width:1px;height:2.5rem;background:#1c1c1f"></div>
@@ -464,7 +464,7 @@ export default class LandingPage extends Component<PageProps<HomeData>> {
                 </table>
               </div>
             </div>
-            <p style="margin-top:0.75rem;font-size:0.75rem;color:#a1a1aa">Partial = achievable without framework enforcement. Comparison based on Fiyuu v${escapeHtml(version)}.</p>
+            <p style="margin-top:0.75rem;font-size:0.75rem;color:#a1a1aa">Partial = achievable without framework enforcement. Comparison based on Fiyuu v${version}.</p>
           </div>
         </section>
 

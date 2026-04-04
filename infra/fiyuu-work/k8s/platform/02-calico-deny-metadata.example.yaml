@@ -1,0 +1,16 @@
+# Apply only if you use Calico.
+# Blocks workload access to cloud metadata IP from all tenant namespaces.
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: deny-cloud-metadata
+spec:
+  selector: has(fiyuu.work/tenant)
+  types:
+    - Egress
+  egress:
+    - action: Deny
+      destination:
+        nets:
+          - 169.254.169.254/32
+    - action: Allow
