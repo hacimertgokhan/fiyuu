@@ -1,10 +1,10 @@
 import { defineMeta } from "@fiyuu/core/client";
 
 export default defineMeta({
-  intent: "Fiyuu framework tanitim sitesi",
+  intent: "Fiyuu framework landing page — modern deterministic design",
   title: "Fiyuu",
   seo: {
-    title: "Fiyuu — AI-Native Fullstack Framework",
-    description: "Deterministic project structure. Machine-readable artifacts. Built for teams that ship with AI.",
+    title: "Fiyuu — The Framework AI Can Actually Read",
+    description: "Deterministic file contracts. Machine-readable project structures. Built for teams that ship with AI.",
   },
 });
