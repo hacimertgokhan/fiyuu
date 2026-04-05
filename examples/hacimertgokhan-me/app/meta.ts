@@ -5,6 +5,6 @@ export default defineMeta({
   title: "Hacı Mert Gökhan",
   seo: {
     title: "Hacı Mert Gökhan | Yazılım Geliştirici",
-    description: "Ad Soyad, Hakkımda, Tecrübelerim ve Projelerim bölümlerini içeren kişisel portfolyo sitesi.",
+    description: "Software developer portfolio showcasing experience, products, technical skills, and selected projects by Haci Mert Gokhan.",
   },
 });

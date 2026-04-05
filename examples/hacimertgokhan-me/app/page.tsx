@@ -45,7 +45,8 @@ export default class HomePage extends Component<PageProps<PortfolioData>> {
           <article class="experience-row ${idx % 2 === 0 ? "is-left" : "is-right"} animate-slide-up" style="animation-delay:${idx * 110}ms; animation-fill-mode: both;">
             <div class="experience-card experience-text rounded-2xl p-5 md:p-6">
               <h3 class="text-lg md:text-xl font-bold text-[color:var(--text-primary)]">${exp.role}</h3>
-              <p class="experience-company mt-1 text-sm md:text-base">${exp.company}</p>
+              <p class="mt-2 text-[11px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">${exp.startDate} - ${exp.endDate}</p>
+              <p class="experience-company mt-2 text-sm md:text-base">${exp.company}</p>
               <div class="experience-stack mt-3">
                 ${raw(exp.techStack.map((item) => `<span class="experience-chip">${item}</span>`).join(""))}
               </div>
@@ -131,47 +132,66 @@ export default class HomePage extends Component<PageProps<PortfolioData>> {
         <a id="nav-projects" href="#projects" class="float-item" data-target="projects" data-active="false" aria-label="Projelerim">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><rect x="3" y="4" width="18" height="14" rx="2"/><path stroke-linecap="round" d="M8 20h8"/></svg>
         </a>
-        <button id="theme-toggle" class="float-item" type="button" aria-label="Temayı değiştir">
+        <button id="theme-toggle" class="float-item" type="button" aria-label="Temayı değiştir" data-theme-toggle="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
-          <span id="theme-label" class="hidden">Dark</span>
+          <span id="theme-label" class="hidden" data-theme-label="true">Dark</span>
         </button>
-        <button id="locale-toggle" class="float-item" type="button" aria-label="Dili değiştir">
+        <button id="locale-toggle" class="float-item" type="button" aria-label="Dili değiştir" data-locale-toggle="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
-          <span id="locale-label" class="hidden">TR</span>
+          <span id="locale-label" class="hidden" data-locale-label="true">TR</span>
         </button>
       </aside>
 
+      <nav class="mobile-toolbar xl:hidden" aria-label="Hizli erisim">
+        <div class="mobile-toolbar-scroll">
+          <a href="#hero" class="mobile-toolbar-link" data-i18n-tr="Ana Sayfa" data-i18n-en="Home">Ana Sayfa</a>
+          <a href="#about" class="mobile-toolbar-link" data-i18n-tr="Hakkımda" data-i18n-en="About">Hakkımda</a>
+          <a href="#experience" class="mobile-toolbar-link" data-i18n-tr="Deneyim" data-i18n-en="Experience">Deneyim</a>
+          <a href="#projects" class="mobile-toolbar-link" data-i18n-tr="Projeler" data-i18n-en="Projects">Projeler</a>
+        </div>
+        <div class="mobile-toolbar-actions">
+          <button class="toolbar-toggle" type="button" aria-label="Temayi degistir" data-theme-toggle="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+            <span data-theme-label="true">Dark</span>
+          </button>
+          <button class="toolbar-toggle" type="button" aria-label="Dili degistir" data-locale-toggle="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
+            <span data-locale-label="true">TR</span>
+          </button>
+        </div>
+      </nav>
+
       <main class="animate-fade-in">
-        <section id="hero" class="mx-auto max-w-5xl px-5 pt-10 pb-6 sm:px-8 md:pt-16">
+        <section id="hero" class="mx-auto max-w-5xl px-5 pt-6 pb-6 sm:px-8 md:pt-16">
           <div class="relative rounded-3xl border border-[color:var(--border)] bg-[radial-gradient(circle_at_top_left,_rgba(217,119,87,0.14),_transparent_45%),linear-gradient(180deg,var(--bg-secondary)_0%,var(--bg-primary)_100%)] p-6 md:p-10 md:pr-72">
-            <p id="hero-tags" class="text-xs tracking-[0.22em] text-[color:var(--text-muted)]">fiyuu / denis / quark / plexus / locai</p>
+            <p id="hero-tags" class="text-xs leading-6 tracking-[0.22em] text-[color:var(--text-muted)]">fiyuu / denis / quark / plexus / locai</p>
             <h1 class="mt-4 text-3xl sm:text-4xl md:text-5xl font-black leading-tight text-[color:var(--text-primary)]">${profile.fullName}</h1>
             <p id="hero-title" data-i18n-tr="${profile.title.tr}" data-i18n-en="${profile.title.en}" class="mt-3 text-base sm:text-lg md:text-xl text-[color:var(--accent)]">${profile.title.tr}</p>
             <p id="hero-location" data-i18n-tr="${profile.location.tr}" data-i18n-en="${profile.location.en}" class="mt-2 text-sm md:text-base text-[color:var(--text-muted)]">${profile.location.tr}</p>
 
             <div class="mt-6 flex flex-wrap gap-3">
-              <a href="mailto:${profile.contacts.email}" class="inline-flex items-center gap-2 rounded-xl border border-[color:var(--border)] bg-[color:var(--bg-primary)] px-4 py-2 text-sm text-[color:var(--text-primary)] hover:border-[color:var(--accent)] hover:text-[color:var(--accent)]">
+              <a href="mailto:${profile.contacts.email}" class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[color:var(--border)] bg-[color:var(--bg-primary)] px-4 py-2 text-sm text-[color:var(--text-primary)] hover:border-[color:var(--accent)] hover:text-[color:var(--accent)] sm:w-auto sm:justify-start">
                 ${iconMail}
                 <span id="email-label">E-posta</span>
               </a>
-              <a href="${profile.contacts.github}" target="_blank" rel="noreferrer" class="inline-flex items-center gap-2 rounded-xl border border-[color:var(--border)] bg-[color:var(--bg-primary)] px-4 py-2 text-sm text-[color:var(--text-primary)] hover:border-[color:var(--accent)] hover:text-[color:var(--accent)]">
+              <a href="${profile.contacts.github}" target="_blank" rel="noreferrer" class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[color:var(--border)] bg-[color:var(--bg-primary)] px-4 py-2 text-sm text-[color:var(--text-primary)] hover:border-[color:var(--accent)] hover:text-[color:var(--accent)] sm:w-auto sm:justify-start">
                 ${iconGithub}
                 GitHub
               </a>
-              <a href="${profile.contacts.linkedin}" target="_blank" rel="noreferrer" class="inline-flex items-center gap-2 rounded-xl border border-[color:var(--border)] bg-[color:var(--bg-primary)] px-4 py-2 text-sm text-[color:var(--text-primary)] hover:border-[color:var(--accent)] hover:text-[color:var(--accent)]">
+              <a href="${profile.contacts.linkedin}" target="_blank" rel="noreferrer" class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[color:var(--border)] bg-[color:var(--bg-primary)] px-4 py-2 text-sm text-[color:var(--text-primary)] hover:border-[color:var(--accent)] hover:text-[color:var(--accent)] sm:w-auto sm:justify-start">
                 ${iconLinkedIn}
                 LinkedIn
               </a>
             </div>
 
-            <div class="mt-6 grid grid-cols-3 gap-2.5 md:absolute md:bottom-8 md:right-8 md:mt-0 md:w-56 md:grid-cols-1">${statsHtml}</div>
+            <div class="mt-6 grid grid-cols-1 gap-2.5 sm:grid-cols-3 md:absolute md:bottom-8 md:right-8 md:mt-0 md:w-56 md:grid-cols-1">${statsHtml}</div>
           </div>
         </section>
 
         <section id="about" class="mx-auto max-w-5xl px-5 py-5 sm:px-8 md:py-7">
           <div class="space-y-4">
             <h2 id="heading-about" class="text-sm font-bold tracking-[0.18em] uppercase text-[color:var(--text-muted)] animate-slide-in-left">Hakkımda</h2>
-            <div class="space-y-4 rounded-2xl bg-[color:var(--bg-secondary)]/45">${aboutHtml}</div>
+            <div class="space-y-4 rounded-3xl border border-[color:var(--border)] bg-[color:var(--bg-secondary)]/55 p-5 sm:p-6">${aboutHtml}</div>
           </div>
         </section>
 
@@ -193,8 +213,8 @@ export default class HomePage extends Component<PageProps<PortfolioData>> {
         </section>
       </main>
       
-      <footer class="w-full py-4 items-center justify-center flex gap-1">
-        this website made with <a class="text-orange-400" href="http://fiyuu.work">fiyuu</a>
+      <footer class="flex w-full items-center justify-center gap-1 px-5 py-6 text-center text-sm text-[color:var(--text-muted)]">
+        built with <a class="text-[color:var(--accent)]" href="https://fiyuu.work">fiyuu</a>
       </footer>
 
       <script type="module">
@@ -238,8 +258,8 @@ export default class HomePage extends Component<PageProps<PortfolioData>> {
 
           const tabs = [...document.querySelectorAll(".project-tab")];
           const cards = [...document.querySelectorAll("[data-project-card='true']")];
-          const localeToggle = document.getElementById("locale-toggle");
-          const localeLabel = document.getElementById("locale-label");
+          const localeToggles = [...document.querySelectorAll("[data-locale-toggle='true']")];
+          const localeLabels = [...document.querySelectorAll("[data-locale-label='true']")];
 
           const i18n = {
             tr: {
@@ -324,7 +344,9 @@ export default class HomePage extends Component<PageProps<PortfolioData>> {
               tab.textContent = dict.categories[key] || key;
             });
 
-            if (localeLabel) localeLabel.textContent = dict.locale;
+            localeLabels.forEach((label) => {
+              label.textContent = dict.locale;
+            });
             localStorage.setItem(localeStorageKey, locale);
           };
 
@@ -347,10 +369,12 @@ export default class HomePage extends Component<PageProps<PortfolioData>> {
             });
           });
 
-          localeToggle?.addEventListener("click", () => {
-            const current = localStorage.getItem(localeStorageKey) === "en" ? "en" : "tr";
-            const next = current === "tr" ? "en" : "tr";
-            applyLocale(next);
+          localeToggles.forEach((toggle) => {
+            toggle.addEventListener("click", () => {
+              const current = localStorage.getItem(localeStorageKey) === "en" ? "en" : "tr";
+              const next = current === "tr" ? "en" : "tr";
+              applyLocale(next);
+            });
           });
 
           applyLocale(localStorage.getItem(localeStorageKey) === "en" ? "en" : "tr");

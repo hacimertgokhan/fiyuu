@@ -229,6 +229,60 @@ export default class RootLayout extends Component<LayoutProps> {
           transform: translateX(4px);
         }
 
+        .mobile-toolbar {
+          position: sticky;
+          top: 0;
+          z-index: 35;
+          border-bottom: 1px solid var(--border);
+          background: color-mix(in srgb, var(--bg-primary) 82%, transparent);
+          backdrop-filter: blur(18px);
+        }
+
+        .mobile-toolbar-scroll {
+          display: flex;
+          gap: 0.5rem;
+          overflow-x: auto;
+          padding: 0.9rem 1rem 0.45rem;
+          scrollbar-width: none;
+        }
+
+        .mobile-toolbar-scroll::-webkit-scrollbar {
+          display: none;
+        }
+
+        .mobile-toolbar-link,
+        .toolbar-toggle {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 2.5rem;
+          border-radius: 9999px;
+          border: 1px solid var(--border);
+          background: color-mix(in srgb, var(--bg-primary) 90%, var(--bg-secondary) 10%);
+          color: var(--text-secondary);
+          font-size: 0.78rem;
+          font-weight: 700;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+          white-space: nowrap;
+        }
+
+        .mobile-toolbar-link {
+          padding: 0 0.95rem;
+        }
+
+        .mobile-toolbar-actions {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 0.6rem;
+          padding: 0 1rem 0.9rem;
+        }
+
+        .toolbar-toggle {
+          gap: 0.45rem;
+          padding: 0 0.9rem;
+        }
+
         .experience-card {
           position: relative;
           box-shadow: 0 10px 30px color-mix(in srgb, var(--bg-primary) 70%, #000 30% / 10%);
@@ -408,8 +462,30 @@ export default class RootLayout extends Component<LayoutProps> {
         }
 
         @media (max-width: 767px) {
+          .mobile-toolbar {
+            display: block;
+          }
+
+          .project-tabs {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            padding-bottom: 0.35rem;
+            scrollbar-width: none;
+          }
+
+          .project-tabs::-webkit-scrollbar {
+            display: none;
+          }
+
+          .project-tab {
+            flex: 0 0 auto;
+            white-space: nowrap;
+          }
+
           .projects-stage {
-            height: 28rem;
+            height: auto;
+            overflow: visible;
+            padding-right: 0;
           }
         }
       </style>
@@ -421,29 +497,35 @@ export default class RootLayout extends Component<LayoutProps> {
       <script type="module">
         (() => {
           const root = document.documentElement;
-          const toggle = document.getElementById("theme-toggle");
-          const label = document.getElementById("theme-label");
+          const toggles = [...document.querySelectorAll("[data-theme-toggle='true']")];
+          const labels = [...document.querySelectorAll("[data-theme-label='true']")];
           const storageKey = "portfolio-theme";
 
           const applyTheme = (theme) => {
             if (theme === "dark") {
               root.setAttribute("data-theme", "dark");
-              if (label) label.textContent = "Light";
+              labels.forEach((label) => {
+                label.textContent = "Light";
+              });
               return;
             }
 
             root.removeAttribute("data-theme");
-            if (label) label.textContent = "Dark";
+            labels.forEach((label) => {
+              label.textContent = "Dark";
+            });
           };
 
           const initial = localStorage.getItem(storageKey) === "dark" ? "dark" : "light";
           applyTheme(initial);
 
-          toggle?.addEventListener("click", () => {
-            const current = root.getAttribute("data-theme") === "dark" ? "dark" : "light";
-            const next = current === "dark" ? "light" : "dark";
-            localStorage.setItem(storageKey, next);
-            applyTheme(next);
+          toggles.forEach((toggle) => {
+            toggle.addEventListener("click", () => {
+              const current = root.getAttribute("data-theme") === "dark" ? "dark" : "light";
+              const next = current === "dark" ? "light" : "dark";
+              localStorage.setItem(storageKey, next);
+              applyTheme(next);
+            });
           });
         })();
       </script>
