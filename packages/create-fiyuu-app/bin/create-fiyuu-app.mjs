@@ -39,11 +39,11 @@ if (existsSync(targetDirectory)) {
 }
 
 const frameworkRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
-const dependencyVersion = resolveFrameworkDependency(frameworkRoot, useLocal);
+const dependencyStrategy = resolveDependencyStrategy(frameworkRoot, useLocal);
 const answers = await collectAnswers(useDefaults);
 
 await mkdir(targetDirectory, { recursive: true });
-await createProject(targetDirectory, packageName, dependencyVersion, answers);
+await createProject(targetDirectory, packageName, dependencyStrategy, answers);
 
 renderSuccess(packageName, targetDirectory, answers);
 
@@ -258,20 +258,25 @@ function color(...codes) {
   return useColor ? `\u001b[${codes.join(";")}m` : "";
 }
 
-function resolveFrameworkDependency(frameworkRoot, useLocalFlag) {
-  const packageJsonPath = path.join(frameworkRoot, "package.json");
-  const canUseLocal = useLocalFlag || existsSync(packageJsonPath);
-
-  if (!canUseLocal) {
-    return "latest";
+function resolveDependencyStrategy(frameworkRoot, useLocalFlag) {
+  if (useLocalFlag) {
+    return {
+      usesLocalFramework: true,
+      frameworkDependency: `file:${realpathSync(frameworkRoot).split(path.sep).join("/")}`,
+      clientImportModule: "fiyuu/client",
+    };
   }
 
-  return `file:${realpathSync(frameworkRoot).split(path.sep).join("/")}`;
+  return {
+    usesLocalFramework: false,
+    frameworkDependency: null,
+    clientImportModule: "@fiyuu/core/client",
+  };
 }
 
-async function createProject(targetDirectory, packageName, dependencyVersion, answers) {
+async function createProject(targetDirectory, packageName, dependencyStrategy, answers) {
   const files = new Map([
-    ["package.json", createPackageJson(packageName, dependencyVersion)],
+    ["package.json", createPackageJson(packageName, dependencyStrategy)],
     ["tsconfig.json", createTsConfig()],
     [".gitignore", "node_modules/\n.fiyuu/\ndist/\n"],
     ["README.md", createReadme(packageName, answers)],
@@ -335,15 +340,16 @@ async function createProject(targetDirectory, packageName, dependencyVersion, an
     files.set("lib/client-crypto.ts", createClientCrypto());
   }
 
-  for (const [relativePath, content] of files) {
+  for (const [relativePath, rawContent] of files) {
     const absolutePath = path.join(targetDirectory, relativePath);
     await mkdir(path.dirname(absolutePath), { recursive: true });
+    const content = rawContent.replaceAll('"fiyuu/client"', `"${dependencyStrategy.clientImportModule}"`);
     await writeFile(absolutePath, content);
   }
 }
 
-function createPackageJson(projectName, dependencyVersion) {
-  const usesLocalFramework = dependencyVersion.startsWith("file:");
+function createPackageJson(projectName, dependencyStrategy) {
+  const { usesLocalFramework, frameworkDependency } = dependencyStrategy;
   const includeSockets = false;
 
   return `${JSON.stringify(
@@ -353,14 +359,26 @@ function createPackageJson(projectName, dependencyVersion) {
       private: true,
       type: "module",
       scripts: {
-        dev: usesLocalFramework ? "node ./node_modules/fiyuu/bin/fiyuu.mjs dev" : "fiyuu dev",
-        build: usesLocalFramework ? "node ./node_modules/fiyuu/bin/fiyuu.mjs build" : "fiyuu build",
-        start: usesLocalFramework ? "node ./node_modules/fiyuu/bin/fiyuu.mjs start" : "fiyuu start",
+        dev: usesLocalFramework
+          ? "node ./node_modules/fiyuu/bin/fiyuu.mjs dev"
+          : "node --import tsx/esm ./node_modules/@fiyuu/cli/src/index.js dev",
+        build: usesLocalFramework
+          ? "node ./node_modules/fiyuu/bin/fiyuu.mjs build"
+          : "node --import tsx/esm ./node_modules/@fiyuu/cli/src/index.js build",
+        start: usesLocalFramework
+          ? "node ./node_modules/fiyuu/bin/fiyuu.mjs start"
+          : "node --import tsx/esm ./node_modules/@fiyuu/cli/src/index.js start",
       },
       dependencies: {
-        fiyuu: dependencyVersion,
-        "@geajs/core": "^1.0.12",
+        ...(usesLocalFramework
+          ? { fiyuu: frameworkDependency }
+          : {
+              "@fiyuu/cli": "^0.1.0",
+              "@fiyuu/core": "^0.1.0",
+            }),
+        "@geajs/core": "^1.1.3",
         ...(includeSockets ? { ws: "^8.18.1" } : {}),
+        ...(usesLocalFramework ? {} : { tsx: "^4.21.0" }),
         zod: "^3.24.2",
       },
       devDependencies: {
