@@ -172,6 +172,23 @@ export interface FiyuuConfig {
      */
     excludes?: string[];
   };
+  seo?: {
+    /**
+     * Base URL used in sitemap.xml and canonical links.
+     * Example: https://hacimertgokhan.me
+     */
+    baseUrl?: string;
+    /**
+     * Enable automatic sitemap.xml generation from scanned routes.
+     * Defaults to false.
+     */
+    sitemap?: boolean;
+    /**
+     * Enable automatic robots.txt generation.
+     * Defaults to false.
+     */
+    robots?: boolean;
+  };
 }
 
 export interface LoadedFiyuuConfig {

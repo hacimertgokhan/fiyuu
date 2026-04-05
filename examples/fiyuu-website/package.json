@@ -1,0 +1,20 @@
+{
+  "name": "fiyuu-website",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node --import tsx/esm ./node_modules/@fiyuu/cli/src/index.js dev",
+    "build": "node --import tsx/esm ./node_modules/@fiyuu/cli/src/index.js build",
+    "start": "node --import tsx/esm ./node_modules/@fiyuu/cli/src/index.js start"
+  },
+  "dependencies": {
+    "@fiyuu/cli": "file:../../packages/cli",
+    "@fiyuu/core": "file:../../packages/core",
+    "@fiyuu/runtime": "file:../../packages/runtime",
+    "@fiyuu/db": "file:../../packages/db",
+    "@fiyuu/realtime": "file:../../packages/realtime",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.21.0",
+    "zod": "^3.24.2"
+  }
+}

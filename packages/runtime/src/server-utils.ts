@@ -58,6 +58,12 @@ export function sendText(response: ServerResponse, statusCode: number, message: 
   response.end(message);
 }
 
+export function sendXml(response: ServerResponse, statusCode: number, xml: string): void {
+  response.statusCode = statusCode;
+  response.setHeader("content-type", "application/xml; charset=utf-8");
+  response.end(xml);
+}
+
 export function createWeakEtag(value: string): string {
   const digest = createHash("sha1").update(value).digest("base64url");
   return `W/\"${digest}\"`;

@@ -6,3 +6,6 @@ dist/
 ./.idea
 ./note.md
 note.md
+.claude
+./.claude
+/.claude

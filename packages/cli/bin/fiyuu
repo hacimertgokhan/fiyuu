@@ -1,7 +1,12 @@
 #!/bin/sh
 set -e
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SCRIPT_PATH="$0"
+if command -v realpath >/dev/null 2>&1; then
+  SCRIPT_PATH="$(realpath "$0")"
+fi
+
+SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
 ENTRY_JS="$SCRIPT_DIR/../src/index.js"
 ENTRY_TS="$SCRIPT_DIR/../src/index.ts"
 

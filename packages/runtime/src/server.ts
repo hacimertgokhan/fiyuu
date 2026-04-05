@@ -50,6 +50,7 @@ import {
   pushServerEvent,
   sendJson,
   sendText,
+  sendXml,
 } from "./server-utils.js";
 
 // ── Router ────────────────────────────────────────────────────────────────────
@@ -209,6 +210,26 @@ export async function startServer(options: StartServerOptions): Promise<StartedS
           return;
         }
         sendText(response, middleware.response.status ?? 200, middleware.response.body ?? "");
+        return;
+      }
+
+      if (url.pathname === "/sitemap.xml") {
+        await handleSitemap(request, response, options, state, url);
+        return;
+      }
+
+      if (url.pathname === "/robots.txt") {
+        await handleRobots(request, response, options);
+        return;
+      }
+
+      if (url.pathname === "/sitemap.xml") {
+        await handleSitemap(request, response, options, state, url);
+        return;
+      }
+
+      if (url.pathname === "/robots.txt") {
+        await handleRobots(request, response, options);
         return;
       }
 
@@ -809,6 +830,79 @@ async function handleActionRequest(
   if (requestId) response.setHeader("x-fiyuu-request-id", requestId);
   for (const [key, value] of Object.entries(middlewareHeaders)) response.setHeader(key, value);
   response.end(`${JSON.stringify(result ?? null)}\n`);
+}
+
+// ─── Sitemap & Robots handlers ────────────────────────────────────────────────
+
+async function handleSitemap(
+  request: IncomingMessage,
+  response: ServerResponse,
+  options: StartServerOptions,
+  state: RuntimeState,
+  url: URL,
+): Promise<void> {
+  if (request.method !== "GET") {
+    sendText(response, 405, "Method not allowed");
+    return;
+  }
+
+  const baseUrl = options.config?.seo?.baseUrl;
+  if (!baseUrl) {
+    sendText(response, 404, "Sitemap not configured. Set seo.baseUrl in fiyuu.config.ts");
+    return;
+  }
+
+  const cleanBaseUrl = baseUrl.replace(/\/$/, "");
+  const features = state.features.filter((f) => f.files["page.tsx"] && !f.isDynamic);
+
+  let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+  xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
+
+  for (const feature of features) {
+    const loc = `${cleanBaseUrl}${feature.route}`;
+    xml += `  <url>\n`;
+    xml += `    <loc>${escapeXml(loc)}</loc>\n`;
+    xml += `    <changefreq>weekly</changefreq>\n`;
+    xml += `    <priority>${feature.route === "/" ? "1.0" : "0.8"}</priority>\n`;
+    xml += `  </url>\n`;
+  }
+
+  xml += `</urlset>\n`;
+
+  sendXml(response, 200, xml);
+}
+
+function escapeXml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&apos;");
+}
+
+async function handleRobots(
+  request: IncomingMessage,
+  response: ServerResponse,
+  options: StartServerOptions,
+): Promise<void> {
+  if (request.method !== "GET") {
+    sendText(response, 405, "Method not allowed");
+    return;
+  }
+
+  const baseUrl = options.config?.seo?.baseUrl;
+  const sitemapEnabled = options.config?.seo?.sitemap === true;
+  const sitemapUrl = baseUrl ? `${baseUrl.replace(/\/$/, "")}/sitemap.xml` : null;
+
+  let text = `User-agent: *\nAllow: /\n`;
+  if (sitemapUrl && sitemapEnabled) {
+    text += `Sitemap: ${sitemapUrl}\n`;
+  }
+
+  response.statusCode = 200;
+  response.setHeader("content-type", "text/plain; charset=utf-8");
+  response.end(text);
 }
 
 // ─── API route handler ────────────────────────────────────────────────────────

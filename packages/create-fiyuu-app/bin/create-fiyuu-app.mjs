@@ -359,26 +359,14 @@ function createPackageJson(projectName, dependencyStrategy) {
       private: true,
       type: "module",
       scripts: {
-        dev: usesLocalFramework
-          ? "node ./node_modules/fiyuu/bin/fiyuu.mjs dev"
-          : "node --import tsx/esm ./node_modules/@fiyuu/cli/src/index.js dev",
-        build: usesLocalFramework
-          ? "node ./node_modules/fiyuu/bin/fiyuu.mjs build"
-          : "node --import tsx/esm ./node_modules/@fiyuu/cli/src/index.js build",
-        start: usesLocalFramework
-          ? "node ./node_modules/fiyuu/bin/fiyuu.mjs start"
-          : "node --import tsx/esm ./node_modules/@fiyuu/cli/src/index.js start",
+        dev: "npx fiyuu dev",
+        build: "npx fiyuu build",
+        start: "npx fiyuu start",
       },
       dependencies: {
-        ...(usesLocalFramework
-          ? { fiyuu: frameworkDependency }
-          : {
-              "@fiyuu/cli": "^0.1.0",
-              "@fiyuu/core": "^0.1.0",
-            }),
+        fiyuu: usesLocalFramework ? frameworkDependency : "^0.2.0",
         "@geajs/core": "^1.1.3",
         ...(includeSockets ? { ws: "^8.18.1" } : {}),
-        ...(usesLocalFramework ? {} : { tsx: "^4.21.0" }),
         zod: "^3.24.2",
       },
       devDependencies: {
