@@ -2,6 +2,7 @@
 
 import { existsSync, realpathSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
+import { execSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import readline from "node:readline/promises";
@@ -20,6 +21,17 @@ const ui = {
   bold: color(1),
 };
 
+async function linkFramework(targetDirectory, frameworkRoot) {
+  try {
+    execSync("npm link", { cwd: frameworkRoot, stdio: "inherit" });
+    execSync("npm link fiyuu", { cwd: targetDirectory, stdio: "inherit" });
+  } catch (error) {
+    console.error("Failed to link fiyuu framework. You may need to run:");
+    console.error(`  cd ${frameworkRoot} && npm link`);
+    console.error(`  cd ${targetDirectory} && npm link fiyuu`);
+  }
+}
+
 const [, , projectName, ...flags] = process.argv;
 
 if (!projectName) {
@@ -27,7 +39,7 @@ if (!projectName) {
   process.exit(1);
 }
 
-const useLocal = flags.includes("--local");
+const useLocal = true;
 const useDefaults = flags.includes("--yes");
 const currentDirectory = process.cwd();
 const targetDirectory = path.resolve(currentDirectory, projectName);
@@ -44,6 +56,8 @@ const answers = await collectAnswers(useDefaults);
 
 await mkdir(targetDirectory, { recursive: true });
 await createProject(targetDirectory, packageName, dependencyStrategy, answers);
+
+await linkFramework(targetDirectory, frameworkRoot);
 
 renderSuccess(packageName, targetDirectory, answers);
 
@@ -259,18 +273,10 @@ function color(...codes) {
 }
 
 function resolveDependencyStrategy(frameworkRoot, useLocalFlag) {
-  if (useLocalFlag) {
-    return {
-      usesLocalFramework: true,
-      frameworkDependency: `file:${realpathSync(frameworkRoot).split(path.sep).join("/")}`,
-      clientImportModule: "fiyuu/client",
-    };
-  }
-
   return {
-    usesLocalFramework: false,
-    frameworkDependency: null,
-    clientImportModule: "@fiyuu/core/client",
+    usesLocalFramework: true,
+    frameworkDependency: "^0.2.0",
+    clientImportModule: "fiyuu/client",
   };
 }
 
@@ -359,12 +365,12 @@ function createPackageJson(projectName, dependencyStrategy) {
       private: true,
       type: "module",
       scripts: {
-        dev: "npx fiyuu dev",
-        build: "npx fiyuu build",
-        start: "npx fiyuu start",
+        dev: "node node_modules/fiyuu/bin/fiyuu.mjs dev",
+        build: "node node_modules/fiyuu/bin/fiyuu.mjs build",
+        start: "node node_modules/fiyuu/bin/fiyuu.mjs start",
       },
       dependencies: {
-        fiyuu: usesLocalFramework ? frameworkDependency : "^0.2.0",
+        ...(usesLocalFramework ? {} : { fiyuu: frameworkDependency }),
         "@geajs/core": "^1.1.3",
         ...(includeSockets ? { ws: "^8.18.1" } : {}),
         zod: "^3.24.2",
@@ -424,8 +430,8 @@ Generated with create-fiyuu-app.
 - npm run dev
 - npm run build
 - npm run start
-- npx fiyuu feat list
-- npx fiyuu feat socket on|off
+- node node_modules/fiyuu/bin/fiyuu.mjs feat list
+- node node_modules/fiyuu/bin/fiyuu.mjs feat socket on|off
 
 ## Starter Routes
 

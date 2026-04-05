@@ -27,12 +27,3 @@ try {
 } catch {
   // @geajs/core not installed or exports not resolvable — skip patch
 }
-  }
-
-  if (patched) {
-    writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
-    console.log("[fiyuu] Patched @geajs/core exports (added default conditions)");
-  }
-} catch {
-  // @geajs/core not installed or exports not resolvable — skip patch
-}
