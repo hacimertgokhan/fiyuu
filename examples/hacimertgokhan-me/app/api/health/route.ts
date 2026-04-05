@@ -1,7 +1,7 @@
 export async function GET() {
   return {
     ok: true,
-    service: "hacimertgokhan.me",
+    service: "hacimertgokhan.com",
     timestamp: new Date().toISOString(),
   };
 }
