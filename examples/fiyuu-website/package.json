@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "node --import tsx/esm ./node_modules/@fiyuu/cli/src/index.js dev",
-    "build": "node --import tsx/esm ./node_modules/@fiyuu/cli/src/index.js build",
-    "start": "node --import tsx/esm ./node_modules/@fiyuu/cli/src/index.js start"
+    "dev": "node --import tsx/esm ./node_modules/@fiyuu/cli/src/index.ts dev",
+    "build": "node --import tsx/esm ./node_modules/@fiyuu/cli/src/index.ts build",
+    "start": "node --import tsx/esm ./node_modules/@fiyuu/cli/src/index.ts start"
   },
   "dependencies": {
     "@fiyuu/cli": "file:../../packages/cli",
