@@ -4,13 +4,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node ../../bin/fiyuu.mjs dev",
-    "build": "node ../../bin/fiyuu.mjs build",
-    "start": "node ../../bin/fiyuu.mjs start",
-    "sync": "node ../../bin/fiyuu.mjs sync",
-    "doctor": "node ../../bin/fiyuu.mjs doctor"
+    "dev": "fiyuu dev",
+    "build": "fiyuu build",
+    "start": "fiyuu start",
+    "sync": "fiyuu sync",
+    "doctor": "fiyuu doctor"
   },
   "dependencies": {
+    "@fiyuu/cli": "0.2.0",
     "@fiyuu/core": "0.2.0",
     "@geajs/core": "1.1.3",
     "zod": "^3.24.2"
