@@ -49,7 +49,7 @@ const config = {
     },
   },
   seo: {
-    baseUrl: "https://hacimertgokhan.me",
+    baseUrl: "https://hacimertgokhan.com",
     sitemap: true,
     robots: true,
   },

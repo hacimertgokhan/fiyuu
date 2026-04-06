@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 
-import { existsSync, realpathSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
-import { execSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import readline from "node:readline/promises";
@@ -21,17 +20,6 @@ const ui = {
   bold: color(1),
 };
 
-async function linkFramework(targetDirectory, frameworkRoot) {
-  try {
-    execSync("npm link", { cwd: frameworkRoot, stdio: "inherit" });
-    execSync("npm link fiyuu", { cwd: targetDirectory, stdio: "inherit" });
-  } catch (error) {
-    console.error("Failed to link fiyuu framework. You may need to run:");
-    console.error(`  cd ${frameworkRoot} && npm link`);
-    console.error(`  cd ${targetDirectory} && npm link fiyuu`);
-  }
-}
-
 const [, , projectName, ...flags] = process.argv;
 
 if (!projectName) {
@@ -39,7 +27,9 @@ if (!projectName) {
   process.exit(1);
 }
 
-const useLocal = true;
+const frameworkRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
+const localFrameworkCheckout = isLocalFrameworkCheckout(frameworkRoot);
+const useLocal = flags.includes("--local") || localFrameworkCheckout;
 const useDefaults = flags.includes("--yes");
 const currentDirectory = process.cwd();
 const targetDirectory = path.resolve(currentDirectory, projectName);
@@ -50,14 +40,15 @@ if (existsSync(targetDirectory)) {
   process.exit(1);
 }
 
-const frameworkRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
+if (flags.includes("--local") && !localFrameworkCheckout) {
+  console.warn("Local Fiyuu checkout not found next to create-fiyuu-app. Falling back to the published package.");
+}
+
 const dependencyStrategy = resolveDependencyStrategy(frameworkRoot, useLocal);
 const answers = await collectAnswers(useDefaults);
 
 await mkdir(targetDirectory, { recursive: true });
 await createProject(targetDirectory, packageName, dependencyStrategy, answers);
-
-await linkFramework(targetDirectory, frameworkRoot);
 
 renderSuccess(packageName, targetDirectory, answers);
 
@@ -272,10 +263,14 @@ function color(...codes) {
   return useColor ? `\u001b[${codes.join(";")}m` : "";
 }
 
+function isLocalFrameworkCheckout(frameworkRoot) {
+  return existsSync(path.join(frameworkRoot, "bin", "fiyuu.mjs"))
+    && existsSync(path.join(frameworkRoot, "client.ts"));
+}
+
 function resolveDependencyStrategy(frameworkRoot, useLocalFlag) {
   return {
-    usesLocalFramework: true,
-    frameworkDependency: "^0.2.0",
+    frameworkDependency: useLocalFlag ? `file:${frameworkRoot}` : "^0.2.0",
     clientImportModule: "fiyuu/client",
   };
 }
@@ -355,7 +350,7 @@ async function createProject(targetDirectory, packageName, dependencyStrategy, a
 }
 
 function createPackageJson(projectName, dependencyStrategy) {
-  const { usesLocalFramework, frameworkDependency } = dependencyStrategy;
+  const { frameworkDependency } = dependencyStrategy;
   const includeSockets = false;
 
   return `${JSON.stringify(
@@ -365,12 +360,12 @@ function createPackageJson(projectName, dependencyStrategy) {
       private: true,
       type: "module",
       scripts: {
-        dev: "node node_modules/fiyuu/bin/fiyuu.mjs dev",
-        build: "node node_modules/fiyuu/bin/fiyuu.mjs build",
-        start: "node node_modules/fiyuu/bin/fiyuu.mjs start",
+        dev: "fiyuu dev",
+        build: "fiyuu build",
+        start: "fiyuu start",
       },
       dependencies: {
-        ...(usesLocalFramework ? {} : { fiyuu: frameworkDependency }),
+        fiyuu: frameworkDependency,
         "@geajs/core": "^1.1.3",
         ...(includeSockets ? { ws: "^8.18.1" } : {}),
         zod: "^3.24.2",
@@ -430,8 +425,8 @@ Generated with create-fiyuu-app.
 - npm run dev
 - npm run build
 - npm run start
-- node node_modules/fiyuu/bin/fiyuu.mjs feat list
-- node node_modules/fiyuu/bin/fiyuu.mjs feat socket on|off
+- npx fiyuu feat list
+- npx fiyuu feat socket on|off
 
 ## Starter Routes
 
