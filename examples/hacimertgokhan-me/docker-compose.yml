@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  hacimertgokhan-me:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hacimertgokhan-me
+    ports:
+      - "4060:4060"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
