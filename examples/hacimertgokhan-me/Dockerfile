@@ -10,11 +10,15 @@ ENV NODE_ENV=${NODE_ENV}
 COPY package*.json ./
 RUN npm install --include=dev
 
+# Debug: Check if fiyuu is installed
+RUN ls -la node_modules/.bin/ | grep fiyuu || echo "fiyuu not in .bin"
+RUN cat package.json | grep -A5 dependencies
+
 # Copy source
 COPY . .
 
-# Build with npx (more reliable than direct path)
-RUN npx fiyuu build
+# Build with npx
+RUN npx --yes fiyuu build
 
 # Runtime env
 ENV NODE_ENV=production
