@@ -10,11 +10,13 @@ ENV NODE_ENV=${NODE_ENV}
 COPY package*.json ./
 RUN npm install --include=dev
 
-# Copy source and build
+# Copy source
 COPY . .
-RUN ./node_modules/.bin/fiyuu build
+
+# Build with npx (more reliable than direct path)
+RUN npx fiyuu build
 
 # Runtime env
 ENV NODE_ENV=production
 EXPOSE 4070
-CMD ["./node_modules/.bin/fiyuu", "start"]
+CMD ["npx", "fiyuu", "start"]
