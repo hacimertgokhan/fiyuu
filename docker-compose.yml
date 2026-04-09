@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  hacimertgokhan-me:
+    build:
+      context: ./examples/hacimertgokhan-me
+      dockerfile: Dockerfile
+    container_name: hacimertgokhan-me
+    ports:
+      - "4060:4060"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - fiyuu-network
+
+  fiyuu-website:
+    build:
+      context: ./examples/fiyuu-website
+      dockerfile: Dockerfile
+    container_name: fiyuu-website
+    ports:
+      - "4070:4070"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - fiyuu-network
+
+networks:
+  fiyuu-network:
+    driver: bridge
