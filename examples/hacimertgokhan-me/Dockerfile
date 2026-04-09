@@ -3,20 +3,20 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# Install build dependencies
-RUN apk add --no-cache python3 make g++
+# Override NODE_ENV for build
+ENV NODE_ENV=development
 
 # Copy package files
 COPY package*.json ./
 
-# Install all dependencies (including devDependencies) for build
+# Install all dependencies
 RUN npm install
 
 # Copy source code
 COPY . .
 
-# Build with verbose output
-RUN ./node_modules/.bin/fiyuu build || (echo "Build failed! Checking node_modules..." && ls -la node_modules/.bin/ && exit 1)
+# Build the application
+RUN npx fiyuu build
 
 # Production stage
 FROM node:22-alpine AS runner
@@ -30,8 +30,11 @@ COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/fiyuu.config.ts ./fiyuu.config.ts
 COPY --from=builder /app/.fiyuu ./.fiyuu
 
+# Production environment
+ENV NODE_ENV=production
+
 # Expose port
 EXPOSE 4060
 
 # Start the application
-CMD ["./node_modules/.bin/fiyuu", "start"]
+CMD ["npx", "fiyuu", "start"]
