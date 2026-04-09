@@ -1,29 +1,20 @@
-# Single stage build - simpler approach
 FROM node:22-alpine
 
 WORKDIR /app
 
-# Install dependencies
+# Override NODE_ENV for npm install
+ARG NODE_ENV=development
+ENV NODE_ENV=${NODE_ENV}
+
+# Copy and install
 COPY package*.json ./
+RUN npm install --include=dev
 
-# Show what's in package.json
-RUN cat package.json && echo "--- Installing deps ---"
-
-# Install dependencies
-RUN npm install
-
-# Verify fiyuu is installed
-RUN ls -la node_modules/.bin/ | grep fiyuu || echo "fiyuu not found in .bin"
-RUN ls -la node_modules/@fiyuu/ 2>/dev/null || echo "@fiyuu folder not found"
-
-# Copy source
+# Copy source and build
 COPY . .
+RUN ./node_modules/.bin/fiyuu build
 
-# Build
-RUN npx fiyuu build
-
-# Expose port
+# Runtime env
+ENV NODE_ENV=production
 EXPOSE 4060
-
-# Start
-CMD ["npx", "fiyuu", "start"]
+CMD ["./node_modules/.bin/fiyuu", "start"]
