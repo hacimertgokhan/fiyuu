@@ -4,11 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "fiyuu dev",
-    "build": "fiyuu build",
-    "start": "fiyuu start",
-    "sync": "fiyuu sync",
-    "doctor": "fiyuu doctor"
+    "dev": "npx fiyuu dev",
+    "build": "npx fiyuu build",
+    "start": "npx fiyuu start",
+    "sync": "npx fiyuu sync",
+    "doctor": "npx fiyuu doctor"
   },
   "dependencies": {
     "@fiyuu/cli": "^0.4.1",
