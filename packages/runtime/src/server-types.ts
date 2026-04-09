@@ -94,6 +94,7 @@ export interface StartServerOptions {
   mode: "dev" | "start";
   rootDirectory: string;
   appDirectory: string;
+  serverDirectory?: string;
   config?: FiyuuConfig;
   port?: number;
   maxPort?: number;
@@ -144,6 +145,7 @@ export interface RuntimeState {
   db: FiyuuDB;
   realtime: FiyuuRealtime;
   serviceNames: string[];
+  serverDirectory?: string;
 }
 
 // ── Tiny internal router ──────────────────────────────────────────────────────

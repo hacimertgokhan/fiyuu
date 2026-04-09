@@ -4,6 +4,8 @@ import { bundleClient, startServer } from "@fiyuu/runtime";
 import type { FiyuuConfig } from "@fiyuu/core";
 import { c, existsSync, fs, log } from "../shared.js";
 import { sync } from "./sync.js";
+import { build as esbuild } from "esbuild";
+import { glob } from "node:fs/promises";
 
 const DEFAULT_PORT = 4050;
 
@@ -12,19 +14,23 @@ export async function build(rootDirectory: string, appDirectory: string, config:
 
   console.log(`\n${c.bold}${c.cyan}Fiyuu Build${c.reset}`);
   log("app", appDirectory);
-  log("step 1/3", "syncing project graph");
+  log("step 1/4", "syncing project graph");
   await sync(rootDirectory, appDirectory);
 
-  log("step 2/3", "bundling client assets");
+  log("step 2/4", "bundling client assets");
   const features = await scanApp(appDirectory);
   await bundleClient(features, path.join(rootDirectory, ".fiyuu", "client"));
 
-  log("step 3/3", "writing runtime manifest");
+  log("step 3/4", "compiling server assets");
+  await bundleServer(appDirectory, path.join(rootDirectory, ".fiyuu", "server"));
+
+  log("step 4/4", "writing runtime manifest");
   const manifestPath = path.join(rootDirectory, ".fiyuu", "build.json");
   const manifest = {
     rootDirectory,
     appDirectory,
     clientDirectory: path.join(rootDirectory, ".fiyuu", "client"),
+    serverDirectory: path.join(rootDirectory, ".fiyuu", "server"),
     port: configuredPort,
     config,
     builtAt: new Date().toISOString(),
@@ -47,6 +53,7 @@ export async function start(rootDirectory: string, fallbackConfig: FiyuuConfig):
     rootDirectory: string;
     appDirectory: string;
     clientDirectory: string;
+    serverDirectory?: string;
     port: number;
     config?: FiyuuConfig;
   };
@@ -57,10 +64,48 @@ export async function start(rootDirectory: string, fallbackConfig: FiyuuConfig):
     mode: "start",
     rootDirectory: manifest.rootDirectory,
     appDirectory: manifest.appDirectory,
+    serverDirectory: manifest.serverDirectory,
     config,
     port: manifest.port,
     maxPort: manifest.port + 10,
     clientOutputDirectory: manifest.clientDirectory,
     staticClientRoot: manifest.clientDirectory,
   });
+}
+
+async function bundleServer(appDirectory: string, outputDirectory: string): Promise<void> {
+  // Find all .ts and .tsx files in app directory
+  const entries: string[] = [];
+  for await (const file of glob("**/*.{ts,tsx}", { cwd: appDirectory })) {
+    entries.push(path.join(appDirectory, file));
+  }
+
+  if (entries.length === 0) {
+    return;
+  }
+
+  await fs.mkdir(outputDirectory, { recursive: true });
+
+  // Build each file individually to preserve structure
+  await Promise.all(
+    entries.map(async (entry) => {
+      const relativePath = path.relative(appDirectory, entry);
+      const outFile = path.join(outputDirectory, relativePath.replace(/\.tsx?$/, ".js"));
+      
+      await fs.mkdir(path.dirname(outFile), { recursive: true });
+      
+      await esbuild({
+        entryPoints: [entry],
+        bundle: true,
+        format: "esm",
+        platform: "node",
+        target: ["node20"],
+        outfile: outFile,
+        jsx: "automatic",
+        jsxImportSource: "@geajs/core",
+        sourcemap: false,
+        packages: "external", // Don't bundle node_modules
+      });
+    })
+  );
 }

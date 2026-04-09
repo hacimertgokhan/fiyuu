@@ -22,6 +22,7 @@ export async function runMiddleware(
   mode: "dev" | "start",
   stateWarnings: string[] = [],
   requestId = "",
+  serverDirectory?: string,
 ): Promise<MiddlewareResult | undefined> {
   if (options.config?.middleware?.enabled === false) {
     return undefined;
@@ -32,7 +33,7 @@ export async function runMiddleware(
     return undefined;
   }
 
-  const module = (await importModule(middlewarePath, mode)) as MiddlewareModule;
+  const module = (await importModule(middlewarePath, mode, serverDirectory)) as MiddlewareModule;
   const handlers: MiddlewareHandler[] = Array.isArray(module.middleware)
     ? module.middleware
     : module.middleware

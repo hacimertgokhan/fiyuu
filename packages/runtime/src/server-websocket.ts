@@ -15,6 +15,7 @@ export async function attachWebsocketServer(
   server: ReturnType<typeof createServer>,
   options: StartServerOptions,
   websocketPath: string,
+  serverDirectory?: string,
 ): Promise<string | undefined> {
   if (!options.config?.websocket?.enabled) {
     return undefined;
@@ -22,7 +23,7 @@ export async function attachWebsocketServer(
 
   const socketModulePath = path.join(options.rootDirectory, "server", "socket.ts");
   const socketModule = existsSync(socketModulePath)
-    ? ((await importModule(socketModulePath, options.mode)) as SocketModule)
+    ? ((await importModule(socketModulePath, options.mode, serverDirectory)) as SocketModule)
     : null;
   const registration = socketModule?.registerSocketServer?.() ?? {};
 

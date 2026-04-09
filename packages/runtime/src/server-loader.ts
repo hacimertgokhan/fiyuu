@@ -12,8 +12,23 @@ import { QUERY_CACHE_MAX_ENTRIES, QUERY_CACHE_SWEEP_INTERVAL_MS } from "./server
 
 // ── Dynamic module import ─────────────────────────────────────────────────────
 
-export async function importModule(modulePath: string, mode: "dev" | "start"): Promise<unknown> {
-  const fileUrl = pathToFileURL(modulePath).href;
+export async function importModule(
+  modulePath: string, 
+  mode: "dev" | "start",
+  serverDirectory?: string,
+): Promise<unknown> {
+  // In production mode, use compiled .js files from server directory
+  let resolvedPath = modulePath;
+  if (mode === "start" && serverDirectory) {
+    // Convert .ts/.tsx to .js and map to server directory
+    const relativePath = path.relative(process.cwd(), modulePath);
+    if (relativePath.startsWith("app/")) {
+      const jsPath = relativePath.replace(/\.tsx?$/, ".js");
+      resolvedPath = path.join(serverDirectory, jsPath.replace(/^app\//, ""));
+    }
+  }
+  
+  const fileUrl = pathToFileURL(resolvedPath).href;
   try {
     return await import(mode === "dev" ? `${fileUrl}?t=${Date.now()}` : fileUrl);
   } catch (err: unknown) {
@@ -56,16 +71,16 @@ export function resolveApiRouteModule(appDirectory: string, pathname: string): s
 
 // ── Meta loading & merging ────────────────────────────────────────────────────
 
-export async function loadMetaFile(filePath: string, mode: "dev" | "start"): Promise<MetaDefinition> {
+export async function loadMetaFile(filePath: string, mode: "dev" | "start", serverDirectory?: string): Promise<MetaDefinition> {
   if (!existsSync(filePath)) {
     return { intent: "" };
   }
-  const module = (await importModule(filePath, mode)) as { default?: MetaDefinition };
+  const module = (await importModule(filePath, mode, serverDirectory)) as { default?: MetaDefinition };
   return module.default ?? { intent: "" };
 }
 
-export async function loadLayoutMeta(directory: string, mode: "dev" | "start"): Promise<MetaDefinition> {
-  return loadMetaFile(path.join(directory, "layout.meta.ts"), mode);
+export async function loadLayoutMeta(directory: string, mode: "dev" | "start", serverDirectory?: string): Promise<MetaDefinition> {
+  return loadMetaFile(path.join(directory, "layout.meta.ts"), mode, serverDirectory);
 }
 
 export function mergeMetaDefinitions(...definitions: MetaDefinition[]): MetaDefinition {
@@ -88,6 +103,7 @@ export async function loadLayoutStack(
   appDirectory: string,
   feature: FeatureRecord,
   mode: "dev" | "start",
+  serverDirectory?: string,
 ): Promise<Array<{ component: unknown; meta: MetaDefinition }>> {
   const parts = feature.feature ? feature.feature.split("/") : [];
   const directories = [appDirectory];
@@ -100,18 +116,18 @@ export async function loadLayoutStack(
     const layoutFile = path.join(directory, "layout.tsx");
     const metaFile = path.join(directory, "layout.meta.ts");
     if (existsSync(layoutFile)) {
-      const module = (await importModule(layoutFile, mode)) as LayoutModule;
+      const module = (await importModule(layoutFile, mode, serverDirectory)) as LayoutModule;
       if (module.default) {
-        stack.push({ component: module.default, meta: await loadMetaFile(metaFile, mode) });
+        stack.push({ component: module.default, meta: await loadMetaFile(metaFile, mode, serverDirectory) });
       }
     }
   }
   return stack;
 }
 
-export async function loadFeatureMeta(feature: FeatureRecord, mode: "dev" | "start"): Promise<MetaDefinition> {
+export async function loadFeatureMeta(feature: FeatureRecord, mode: "dev" | "start", serverDirectory?: string): Promise<MetaDefinition> {
   return feature.files["meta.ts"]
-    ? loadMetaFile(feature.files["meta.ts"], mode)
+    ? loadMetaFile(feature.files["meta.ts"], mode, serverDirectory)
     : { intent: feature.intent ?? "" };
 }
 
@@ -126,7 +142,7 @@ export async function getCachedLayoutStack(
   const cached = state.layoutStackCache.get(feature.route);
   if (cached) return cached;
 
-  const layoutStack = await loadLayoutStack(appDirectory, feature, mode);
+  const layoutStack = await loadLayoutStack(appDirectory, feature, mode, state.serverDirectory);
   state.layoutStackCache.set(feature.route, layoutStack);
   return layoutStack;
 }
@@ -142,7 +158,7 @@ export async function getCachedMergedMeta(
 
   let featureMeta = state.featureMetaCache.get(feature.route);
   if (!featureMeta) {
-    featureMeta = await loadFeatureMeta(feature, mode);
+    featureMeta = await loadFeatureMeta(feature, mode, state.serverDirectory);
     state.featureMetaCache.set(feature.route, featureMeta);
   }
 

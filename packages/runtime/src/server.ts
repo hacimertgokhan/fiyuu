@@ -198,7 +198,7 @@ export async function startServer(options: StartServerOptions): Promise<StartedS
       const requestId = options.config?.observability?.requestId === false ? "" : createRequestId();
       pushServerEvent(state, "info", "request.start", `${request.method ?? "GET"} ${url.pathname}`);
 
-      const middleware = await runMiddleware(options, url, request, options.mode, state.warnings, requestId);
+      const middleware = await runMiddleware(options, url, request, options.mode, state.warnings, requestId, state.serverDirectory);
       if (middleware?.response) {
         pushServerEvent(state, "info", "middleware.short-circuit", `${url.pathname} → ${middleware.response.status ?? 200}`);
         if (requestId) response.setHeader("x-fiyuu-request-id", requestId);
@@ -234,7 +234,7 @@ export async function startServer(options: StartServerOptions): Promise<StartedS
       }
 
       if (url.pathname.startsWith("/api")) {
-        await handleApiRoute(request, response, options, url.pathname, middleware?.headers ?? {}, requestId, options.mode);
+        await handleApiRoute(request, response, options, url.pathname, middleware?.headers ?? {}, requestId, options.mode, state.serverDirectory);
         pushServerEvent(state, "info", "request.api", `${request.method ?? "GET"} ${url.pathname}`);
         return;
       }
@@ -265,7 +265,7 @@ export async function startServer(options: StartServerOptions): Promise<StartedS
           // custom error handler must not throw
         }
       }
-      await sendRuntimeError(response, error, options, request);
+      await sendRuntimeError(response, error, options, request, state.serverDirectory);
     }
   });
 
@@ -281,7 +281,7 @@ export async function startServer(options: StartServerOptions): Promise<StartedS
   console.log(`[fiyuu] Realtime initialized — transports: ${state.realtime.stats().transports}`);
 
   // ── Standalone WebSocket (fallback for custom socket modules, skips if realtime owns the path) ──
-  const websocketUrl = await attachWebsocketServer(server, options, websocketPath);
+  const websocketUrl = await attachWebsocketServer(server, options, websocketPath, state.serverDirectory);
 
   // ── Discover and start services ────────────────────────────────────────────
   const serviceManager = createServiceManager();
@@ -388,6 +388,7 @@ async function createRuntimeState(options: StartServerOptions): Promise<RuntimeS
     db,
     realtime,
     serviceNames: [],
+    serverDirectory: options.serverDirectory,
   };
 }
 
@@ -514,6 +515,7 @@ async function handleRoute(
       data: { route: pathname, method: request.method ?? "GET", title: "Page not found" },
       metaFallback: { intent: "Fallback not found page", title: "Page not found" },
       websocketPath,
+      serverDirectory: state.serverDirectory,
     });
     if (customNotFound) {
       response.statusCode = 404;
@@ -537,7 +539,7 @@ async function handleRoute(
   }
 
   if (request.method === "POST") {
-    await handleActionRequest(request, response, feature, mode, middlewareHeaders, requestId);
+    await handleActionRequest(request, response, feature, mode, middlewareHeaders, requestId, state.serverDirectory);
     return;
   }
 
@@ -584,9 +586,9 @@ async function handleRoute(
     }
   }
 
-  const pageModule = (await importModule(feature.files["page.tsx"]!, mode)) as ModuleShape;
+  const pageModule = (await importModule(feature.files["page.tsx"]!, mode, state.serverDirectory)) as ModuleShape;
   const queryModule = feature.files["query.ts"]
-    ? ((await importModule(feature.files["query.ts"]!, mode)) as ModuleShape)
+    ? ((await importModule(feature.files["query.ts"]!, mode, state.serverDirectory)) as ModuleShape)
     : null;
   const asset = state.assetsByRoute.get(feature.route);
   const Page = pageModule.default;
@@ -646,12 +648,12 @@ async function handleRoute(
   const layoutStack =
     mode === "start"
       ? await getCachedLayoutStack(state, appDirectory, feature, mode)
-      : await loadLayoutStack(appDirectory, feature, mode);
+      : await loadLayoutStack(appDirectory, feature, mode, state.serverDirectory);
 
   const mergedMeta =
     mode === "start"
       ? await getCachedMergedMeta(state, feature, layoutStack, mode)
-      : mergeMetaDefinitions(...layoutStack.map((item) => item.meta), await loadFeatureMeta(feature, mode));
+      : mergeMetaDefinitions(...layoutStack.map((item) => item.meta), await loadFeatureMeta(feature, mode, state.serverDirectory));
 
   // SSR body
   let body = "";
@@ -749,6 +751,7 @@ async function tryRenderSystemPage(input: {
   data: unknown;
   metaFallback: MetaDefinition;
   websocketPath: string;
+  serverDirectory?: string;
 }): Promise<string | null> {
   const filePath = path.join(
     input.appDirectory,
@@ -756,7 +759,7 @@ async function tryRenderSystemPage(input: {
   );
   if (!existsSync(filePath)) return null;
 
-  const module = (await importModule(filePath, input.mode)) as ModuleShape;
+  const module = (await importModule(filePath, input.mode, input.serverDirectory)) as ModuleShape;
   if (!module.default) return null;
 
   let body = renderGeaComponent(module.default, {
@@ -768,13 +771,13 @@ async function tryRenderSystemPage(input: {
 
   const rootLayoutPath = path.join(input.appDirectory, "layout.tsx");
   if (existsSync(rootLayoutPath)) {
-    const rootLayoutModule = (await importModule(rootLayoutPath, input.mode)) as LayoutModule;
+    const rootLayoutModule = (await importModule(rootLayoutPath, input.mode, input.serverDirectory)) as LayoutModule;
     if (rootLayoutModule.default) {
       body = renderGeaComponent(rootLayoutModule.default, { route: input.route, children: body });
     }
   }
 
-  const rootMeta = await loadLayoutMeta(input.appDirectory, input.mode);
+  const rootMeta = await loadLayoutMeta(input.appDirectory, input.mode, input.serverDirectory);
   return renderDocument({
     body, data: input.data,
     route: input.route,
@@ -799,13 +802,14 @@ async function handleActionRequest(
   mode: "dev" | "start",
   middlewareHeaders: Record<string, string>,
   requestId: string,
+  serverDirectory?: string,
 ): Promise<void> {
   if (!feature.files["action.ts"]) {
     sendText(response, 405, `No action available for ${feature.route}`);
     return;
   }
 
-  const actionModule = (await importModule(feature.files["action.ts"]!, mode)) as ModuleShape;
+  const actionModule = (await importModule(feature.files["action.ts"]!, mode, serverDirectory)) as ModuleShape;
   if (!actionModule.execute) {
     sendText(response, 500, `Missing execute export in ${feature.files["action.ts"]}`);
     return;
@@ -915,6 +919,7 @@ async function handleApiRoute(
   middlewareHeaders: Record<string, string>,
   requestId: string,
   mode: "dev" | "start",
+  serverDirectory?: string,
 ): Promise<void> {
   const modulePath = resolveApiRouteModule(options.appDirectory, pathname);
   if (!modulePath) {
@@ -922,7 +927,7 @@ async function handleApiRoute(
     return;
   }
 
-  const routeModule = (await importModule(modulePath, mode)) as ApiRouteModule;
+  const routeModule = (await importModule(modulePath, mode, serverDirectory)) as ApiRouteModule;
   const method = (request.method ?? "GET").toUpperCase() as keyof ApiRouteModule;
   const handler = routeModule[method];
   if (!handler) {
@@ -946,6 +951,7 @@ async function sendRuntimeError(
   error: unknown,
   options: StartServerOptions,
   request?: IncomingMessage,
+  serverDirectory?: string,
 ): Promise<void> {
   const mode = options.mode;
   const message = error instanceof Error ? error.message : "Unknown runtime error";
@@ -975,6 +981,7 @@ async function sendRuntimeError(
       title: mode === "dev" ? "Runtime error" : "Application error",
     },
     websocketPath: options.config?.websocket?.path ?? "/__fiyuu/ws",
+    serverDirectory,
   });
 
   if (customErrorPage) {
