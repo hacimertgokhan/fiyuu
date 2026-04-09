@@ -403,13 +403,69 @@ export default class RootLayout extends Component<LayoutProps> {
         }
       </style>
 
+      <!-- Navigation -->
+      <nav class="fixed top-0 left-0 right-0 z-50 border-b" style="border-color: var(--border-subtle); background: rgba(9,9,11,0.85); backdrop-filter: blur(16px);">
+        <div style="max-width:1200px; margin:0 auto; padding:0 24px; display:flex; align-items:center; justify-content:space-between; height:56px;">
+          <a href="/" style="text-decoration:none; display:flex; align-items:center; gap:8px;">
+            <span style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:800; color:var(--text); letter-spacing:-0.03em;">fiyuu</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--text-muted); letter-spacing:0.1em; text-transform:uppercase; padding:2px 6px; border:1px solid var(--border); border-radius:2px;">v0.4.1</span>
+          </a>
+          <div class="hidden md:flex" style="display:none; align-items:center; gap:32px;">
+            <a href="/docs" class="nav-link">Docs</a>
+            <a href="/architecture" class="nav-link">Architecture</a>
+            <a href="/structure" class="nav-link">Structure</a>
+            <a href="/" class="nav-link">Home</a>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <a href="https://github.com/hacimertgokhan/fiyuu" target="_blank" rel="noreferrer" class="btn-ghost" style="padding:8px 14px; font-size:11px;">
+              GitHub
+            </a>
+          </div>
+        </div>
+      </nav>
+
+      <style>
+        @media (min-width: 768px) {
+          .md\\:flex { display: flex !important; }
+        }
+      </style>
+
       <div class="relative min-h-screen">
         <div class="grid-bg"></div>
         <div class="noise-overlay"></div>
-        <div class="relative z-10">
+        <div class="relative z-10" style="padding-top:56px;">
           ${raw(children)}
         </div>
       </div>
+
+      <!-- Footer -->
+      <footer style="border-top:1px solid var(--border-subtle); background:var(--bg-elevated); padding:80px 24px;">
+        <div style="max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:60px; margin-bottom:60px;">
+          <div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif; font-size:18px; font-weight:800; color:var(--text); margin-bottom:16px;">fiyuu</div>
+            <p style="font-size:13px; color:var(--text-secondary); line-height:1.8;">The framework AI can actually read. Deterministic contracts. Machine-readable. Built for teams that ship with AI.</p>
+          </div>
+          <div>
+            <h4 style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-muted); margin-bottom:16px; text-transform:uppercase; letter-spacing:0.1em;">Docs</h4>
+            <ul style="list-style:none; padding:0;">
+              <li><a href="/docs" class="nav-link" style="display:block; margin-bottom:12px;">Documentation</a></li>
+              <li><a href="/architecture" class="nav-link" style="display:block; margin-bottom:12px;">Architecture</a></li>
+              <li><a href="/structure" class="nav-link" style="display:block; margin-bottom:12px;">Structure</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-muted); margin-bottom:16px; text-transform:uppercase; letter-spacing:0.1em;">Community</h4>
+            <ul style="list-style:none; padding:0;">
+              <li><a href="https://github.com/hacimertgokhan/fiyuu" target="_blank" class="nav-link" style="display:block; margin-bottom:12px;">GitHub</a></li>
+              <li><a href="https://github.com/hacimertgokhan/fiyuu/issues" target="_blank" class="nav-link" style="display:block; margin-bottom:12px;">Issues</a></li>
+              <li><a href="https://github.com/hacimertgokhan/fiyuu/discussions" target="_blank" class="nav-link" style="display:block;">Discussions</a></li>
+            </ul>
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--border-subtle); padding-top:40px; text-align:center; color:var(--text-muted); font-size:12px;">
+          <p style="margin:0;">© 2026 Fiyuu. Built with ❤️ for AI-native development.</p>
+        </div>
+      </footer>
     `;
   }
 }

@@ -70,6 +70,24 @@ export default class DocsPage extends Component<PageProps> {
               <p style="font-size:13px; color:var(--text-secondary); line-height:1.6;">fiyuu dev, build, start, sync, doctor, and more.</p>
             </div>
           </a>
+
+          <!-- Architecture -->
+          <a href="/architecture" style="text-decoration:none;">
+            <div class="bp-card" style="padding:32px; cursor:pointer;">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:24px; color:var(--accent); margin-bottom:12px;">◰</div>
+              <h3 style="font-size:16px; font-weight:600; color:var(--text); margin-bottom:8px;">Architecture</h3>
+              <p style="font-size:13px; color:var(--text-secondary); line-height:1.6;">Design system, styling, and component patterns.</p>
+            </div>
+          </a>
+
+          <!-- Structure -->
+          <a href="/structure" style="text-decoration:none;">
+            <div class="bp-card" style="padding:32px; cursor:pointer;">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:24px; color:var(--accent); margin-bottom:12px;">⊞</div>
+              <h3 style="font-size:16px; font-weight:600; color:var(--text); margin-bottom:8px;">Structure Guide</h3>
+              <p style="font-size:13px; color:var(--text-secondary); line-height:1.6;">File organization, layouts, pages, and best practices.</p>
+            </div>
+          </a>
         </div>
 
         <!-- Getting Started Section -->
