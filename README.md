@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/version-0.2.0-3a624b?style=flat-square" alt="Version" />
+  <img src="https://img.shields.io/badge/version-0.3.0-3a624b?style=flat-square" alt="Version" />
   <img src="https://img.shields.io/badge/license-MIT-3a624b?style=flat-square" alt="License" />
   <img src="https://img.shields.io/badge/runtime-Node.js-3a624b?style=flat-square" alt="Runtime" />
   <img src="https://img.shields.io/badge/bundler-esbuild-3a624b?style=flat-square" alt="Bundler" />
@@ -273,6 +273,84 @@ export default defineMeta({
 
 Each route picks its own rendering strategy. Mix SSR, SSG, and CSR in the same app.
 
+### 9. Spring Boot Style Decorators (New in v0.3.0)
+
+Enterprise-like patterns with less boilerplate. Controllers, Services, Repositories, Guards, and Dependency Injection.
+
+```typescript
+// src/api/user.controller.ts
+import { Controller, Get, Post, Body, Param } from "@fiyuu/core";
+import { UserService } from "./user.service.js";
+
+@Controller("/api/users")
+class UserController {
+  constructor(private userService: UserService) {}
+
+  @Get()
+  async list() {
+    return await this.userService.findAll();
+  }
+
+  @Get("/:id")
+  async getById(@Param("id") id: string) {
+    return await this.userService.findById(id);
+  }
+
+  @Post()
+  async create(@Body() dto: CreateUserDTO) {
+    return await this.userService.create(dto);
+  }
+}
+```
+
+Automatic dependency injection, type safety, and request routing.
+
+### 10. Advanced F1 Database (New in v0.3.0)
+
+Indexing, transactions, migrations, and relations — zero external packages.
+
+```typescript
+import { db } from "@fiyuu/db";
+
+// Transactions with automatic rollback
+await db.transaction(async (tx) => {
+  const user = await tx.table("users").insert({ name: "Ali" });
+  await tx.table("profiles").insert({ userId: user._id, bio: "Hello" });
+  // If anything fails, both operations are rolled back
+});
+
+// Indexes for fast queries
+await db.table("users").createIndex("email", { unique: true });
+
+// Migrations for schema versioning
+await db.migrator().up();
+```
+
+### 11. Integrated Components (New in v0.3.0)
+
+Optimized, production-ready components for common needs: images, video, links, and SEO.
+
+```typescript
+import { FiyuuImage, FiyuuVideo, FiyuuLink, FiyuuHead } from "@fiyuu/core/components";
+
+// Automatic lazy loading, responsive srcset, CLS prevention
+const img = FiyuuImage({ src: "/hero.jpg", alt: "Hero", width: 1200, height: 600 });
+
+// Video with auto poster, lazy loading
+const video = FiyuuVideo({ src: "/video.mp4", poster: "/poster.jpg", lazy: true });
+
+// Client-side navigation with prefetch
+const link = FiyuuLink({ href: "/about", children: "About" });
+
+// SEO meta tags and structured data
+const head = FiyuuHead({
+  title: "My Site",
+  description: "The best site",
+  image: "/og.jpg",
+  structuredData: { "@type": "WebSite" }
+});
+```
+
 ## Project Structure
 
 A complete Fiyuu project looks like this:
@@ -391,6 +469,24 @@ my-app/
 
 ## Documentation
 
+### Official Guides
+| Resource | Purpose |
+|---|---|
+| [Website & Docs](examples/fiyuu-website) | Live documentation with examples |
+| [PUBLISHING.md](PUBLISHING.md) | How to publish Fiyuu packages to npm |
+| [examples/fiyuu-website/README.md](examples/fiyuu-website/README.md) | Website structure and design system |
+
+### Package Documentation
+| Package | README |
+|---|---|
+| [@fiyuu/core](packages/core/README.md) | Core framework, decorators, components |
+| [@fiyuu/runtime](packages/runtime/README.md) | Server runtime and routing |
+| [@fiyuu/db](packages/db/README.md) | F1 Database, queries, transactions |
+| [@fiyuu/realtime](packages/realtime/README.md) | WebSocket, NATS, real-time |
+| [@fiyuu/cli](packages/cli/README.md) | CLI commands and project management |
+| [create-fiyuu-app](packages/create-fiyuu-app/README.md) | App scaffolding and templates |
+
+### Legacy Docs (v0.2.0)
 | Resource | Link |
 |---|---|
 | English docs | [docs/en.md](docs/en.md) |

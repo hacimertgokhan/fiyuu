@@ -1,13 +1,47 @@
 {
   "name": "@fiyuu/core",
-  "version": "0.2.0",
+  "version": "0.4.1",
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./client": "./src/client.ts"
+    "./client": "./src/client.ts",
+    "./decorators": "./src/decorators/index.ts",
+    "./components": "./src/components/index.ts",
+    "./di": "./src/di/container.ts"
   },
+  "publishConfig": {
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "import": "./dist/index.js",
+        "types": "./dist/index.d.ts"
+      },
+      "./client": {
+        "import": "./dist/client.js",
+        "types": "./dist/client.d.ts"
+      },
+      "./decorators": {
+        "import": "./dist/decorators/index.js",
+        "types": "./dist/decorators/index.d.ts"
+      },
+      "./components": {
+        "import": "./dist/components/index.js",
+        "types": "./dist/components/index.d.ts"
+      },
+      "./di": {
+        "import": "./dist/di/container.js",
+        "types": "./dist/di/container.d.ts"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": false,
   "dependencies": {
     "zod": "^3.24.2"
   },

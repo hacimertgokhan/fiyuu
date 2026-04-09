@@ -92,6 +92,8 @@ export function getStatusTone(statusCode: number): {
   border: string;
   accent: string;
   accentSoft: string;
+  emoji: string;
+  label: string;
 } {
   if (statusCode >= 500) {
     return {
@@ -99,6 +101,8 @@ export function getStatusTone(statusCode: number): {
       border: "rgba(151, 73, 45, .22)",
       accent: "#97492d",
       accentSoft: "rgba(151, 73, 45, .20)",
+      emoji: "!",
+      label: "Server Error",
     };
   }
   if (statusCode === 404) {
@@ -107,6 +111,28 @@ export function getStatusTone(statusCode: number): {
       border: "rgba(58, 98, 75, .22)",
       accent: "#3a624b",
       accentSoft: "rgba(58, 98, 75, .18)",
+      emoji: "?",
+      label: "Not Found",
+    };
+  }
+  if (statusCode === 403) {
+    return {
+      background: "#e4dde8",
+      border: "rgba(98, 58, 120, .22)",
+      accent: "#6b3e82",
+      accentSoft: "rgba(98, 58, 120, .18)",
+      emoji: "x",
+      label: "Forbidden",
+    };
+  }
+  if (statusCode === 401) {
+    return {
+      background: "#e0e4eb",
+      border: "rgba(58, 75, 120, .22)",
+      accent: "#3a4b78",
+      accentSoft: "rgba(58, 75, 120, .18)",
+      emoji: "o",
+      label: "Unauthorized",
     };
   }
   return {
@@ -114,6 +140,8 @@ export function getStatusTone(statusCode: number): {
     border: "rgba(105, 88, 52, .22)",
     accent: "#695834",
     accentSoft: "rgba(105, 88, 52, .18)",
+    emoji: "~",
+    label: "Error",
   };
 }
 
@@ -198,28 +226,48 @@ export function renderStartupMessage(
   actualPort: number,
   preferredPort: number,
   websocketUrl?: string,
+  features?: { db?: boolean; realtime?: boolean; services?: string[]; routes?: number },
 ): string {
+  const isDev = mode === "dev";
+  const modeLabel = isDev ? "Development" : "Production";
+
   const lines = [
     "",
-    `Fiyuu ${mode === "dev" ? "Development Server" : "Production Server"}`,
-    `- URL: ${url}`,
-    `- Mode: ${mode.toUpperCase()}`,
+    `  Fiyuu v0.3.0 - ${modeLabel} Server`,
+    "",
+    `  URL:        ${url}`,
   ];
 
   if (actualPort !== preferredPort) {
-    lines.push(`- Port: ${preferredPort} was busy, using ${actualPort}`);
-  } else {
-    lines.push(`- Port: ${actualPort}`);
+    lines.push(`  Port:       ${actualPort} (${preferredPort} was busy)`);
   }
 
-  if (mode === "dev") {
-    lines.push("- Live Reload: enabled");
-    lines.push("- Rendering: per-route SSR/CSR");
+  if (isDev) {
+    lines.push(`  Live Reload: active`);
   }
 
   if (websocketUrl) {
-    lines.push(`- WebSocket: ${websocketUrl.replace(`:${preferredPort}`, `:${actualPort}`)}`);
+    lines.push(`  WebSocket:  ${websocketUrl.replace(`:${preferredPort}`, `:${actualPort}`)}`);
   }
+
+  if (features) {
+    if (features.routes !== undefined) {
+      lines.push(`  Routes:     ${features.routes} registered`);
+    }
+    if (features.db) {
+      lines.push(`  Database:   F1 DB (active)`);
+    }
+    if (features.realtime) {
+      lines.push(`  Realtime:   enabled`);
+    }
+    if (features.services?.length) {
+      lines.push(`  Services:   ${features.services.join(", ")}`);
+    }
+  }
+
+  lines.push("");
+  lines.push(`  Ready in ${isDev ? "dev" : "production"} mode.`);
+  lines.push("");
 
   return lines.join("\n");
 }

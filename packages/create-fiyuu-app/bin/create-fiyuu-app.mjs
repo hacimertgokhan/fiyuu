@@ -269,9 +269,23 @@ function isLocalFrameworkCheckout(frameworkRoot) {
 }
 
 function resolveDependencyStrategy(frameworkRoot, useLocalFlag) {
+  if (useLocalFlag) {
+    return {
+      cliDependency: `file:${path.join(frameworkRoot, "packages/cli")}`,
+      coreDependency: `file:${path.join(frameworkRoot, "packages/core")}`,
+      runtimeDependency: `file:${path.join(frameworkRoot, "packages/runtime")}`,
+      dbDependency: `file:${path.join(frameworkRoot, "packages/db")}`,
+      realtimeDependency: `file:${path.join(frameworkRoot, "packages/realtime")}`,
+      clientImportModule: "@fiyuu/core/client",
+    };
+  }
   return {
-    frameworkDependency: useLocalFlag ? `file:${frameworkRoot}` : "^0.2.0",
-    clientImportModule: "fiyuu/client",
+    cliDependency: "^0.4.1",
+    coreDependency: "^0.4.1",
+    runtimeDependency: "^0.4.1",
+    dbDependency: "^0.4.1",
+    realtimeDependency: "^0.4.1",
+    clientImportModule: "@fiyuu/core/client",
   };
 }
 
@@ -350,8 +364,7 @@ async function createProject(targetDirectory, packageName, dependencyStrategy, a
 }
 
 function createPackageJson(projectName, dependencyStrategy) {
-  const { frameworkDependency } = dependencyStrategy;
-  const includeSockets = false;
+  const { cliDependency, coreDependency, runtimeDependency, dbDependency, realtimeDependency } = dependencyStrategy;
 
   return `${JSON.stringify(
     {
@@ -365,14 +378,17 @@ function createPackageJson(projectName, dependencyStrategy) {
         start: "fiyuu start",
       },
       dependencies: {
-        fiyuu: frameworkDependency,
+        "@fiyuu/cli": cliDependency,
+        "@fiyuu/core": coreDependency,
+        "@fiyuu/runtime": runtimeDependency,
+        "@fiyuu/db": dbDependency,
+        "@fiyuu/realtime": realtimeDependency,
         "@geajs/core": "^1.1.3",
-        ...(includeSockets ? { ws: "^8.18.1" } : {}),
         zod: "^3.24.2",
       },
       devDependencies: {
         "@types/node": "^22.13.10",
-        ...(includeSockets ? { "@types/ws": "^8.5.14" } : {}),
+        typescript: "^5.8.2",
       },
     },
     null,

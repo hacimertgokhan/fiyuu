@@ -1,7 +1,19 @@
 {
   "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "dist/packages",
+    "rootDir": "packages",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
   "include": [
-    "packages/**/*.ts",
-    "packages/**/*.tsx"
+    "packages/*/src/**/*.ts",
+    "packages/*/src/**/*.tsx"
+  ],
+  "exclude": [
+    "packages/create-fiyuu-app/**"
   ]
 }

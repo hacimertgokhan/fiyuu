@@ -14,10 +14,15 @@ const rootReadmePath = path.join(rootDirectory, "README.md");
 const rootLicensePath = path.join(rootDirectory, "LICENSE");
 
 async function main() {
+  console.log("Building packages...\n");
+
   await rm(releaseDirectory, { force: true, recursive: true });
   await mkdir(releaseDirectory, { recursive: true });
 
+  // Compile TypeScript
+  console.log("  Compiling TypeScript...");
   await execFileAsync(process.execPath, [tscCli, "-p", "tsconfig.packages.json"], { cwd: rootDirectory });
+  console.log("  TypeScript compiled.\n");
 
   const packageEntries = await readdir(packagesDirectory, { withFileTypes: true });
 
@@ -32,6 +37,8 @@ async function main() {
     const compiledDirectory = path.join(compiledPackagesDirectory, entry.name);
     const outputDirectory = path.join(releaseDirectory, entry.name);
 
+    console.log(`  Packaging ${manifest.name}@${manifest.version}...`);
+
     await mkdir(outputDirectory, { recursive: true });
     await copyPackageAssets(packageDirectory, outputDirectory);
     await copyCompiledSource(compiledDirectory, outputDirectory);
@@ -41,6 +48,8 @@ async function main() {
     const packagedManifest = normalizeManifest(manifest);
     await writeFile(path.join(outputDirectory, "package.json"), `${JSON.stringify(packagedManifest, null, 2)}\n`);
   }
+
+  console.log("\nAll packages built successfully.");
 }
 
 async function copyPackageAssets(sourceDirectory, targetDirectory) {
@@ -62,10 +71,24 @@ async function copyCompiledSource(sourceDirectory, targetDirectory) {
     return;
   }
 
-  const entries = await readdir(sourceDirectory, { withFileTypes: true });
+  const distDir = path.join(targetDirectory, "dist");
+  await mkdir(distDir, { recursive: true });
 
-  for (const entry of entries) {
-    await cp(path.join(sourceDirectory, entry.name), path.join(targetDirectory, entry.name), { recursive: true });
+  // Copy compiled src/ contents into dist/
+  const srcDir = path.join(sourceDirectory, "src");
+  const srcStats = await safeStat(srcDir);
+
+  if (srcStats?.isDirectory()) {
+    const entries = await readdir(srcDir, { withFileTypes: true });
+    for (const entry of entries) {
+      await cp(path.join(srcDir, entry.name), path.join(distDir, entry.name), { recursive: true });
+    }
+  } else {
+    // Fallback: copy everything from compiled directory
+    const entries = await readdir(sourceDirectory, { withFileTypes: true });
+    for (const entry of entries) {
+      await cp(path.join(sourceDirectory, entry.name), path.join(distDir, entry.name), { recursive: true });
+    }
   }
 }
 
@@ -90,22 +113,30 @@ function normalizeManifest(manifest) {
 
   delete nextManifest.private;
 
-  if (nextManifest.main) {
-    nextManifest.main = toRuntimePath(nextManifest.main);
-  }
+  // Apply publishConfig overrides
+  if (nextManifest.publishConfig) {
+    const publishConfig = { ...nextManifest.publishConfig };
+    delete nextManifest.publishConfig;
+    Object.assign(nextManifest, publishConfig);
+  } else {
+    // Fallback: rewrite .ts paths to .js
+    if (nextManifest.main) {
+      nextManifest.main = toRuntimePath(nextManifest.main);
+    }
 
-  if (nextManifest.types) {
-    nextManifest.types = toTypesPath(nextManifest.types);
-  }
+    if (nextManifest.types) {
+      nextManifest.types = toTypesPath(nextManifest.types);
+    }
 
-  if (nextManifest.bin) {
-    nextManifest.bin = Object.fromEntries(
-      Object.entries(nextManifest.bin).map(([name, value]) => [name, toRuntimePath(value)]),
-    );
-  }
+    if (nextManifest.bin) {
+      nextManifest.bin = Object.fromEntries(
+        Object.entries(nextManifest.bin).map(([name, value]) => [name, toRuntimePath(value)]),
+      );
+    }
 
-  if (nextManifest.exports) {
-    nextManifest.exports = rewriteExports(nextManifest.exports);
+    if (nextManifest.exports) {
+      nextManifest.exports = rewriteExports(nextManifest.exports);
+    }
   }
 
   return nextManifest;

@@ -1,6 +1,6 @@
 {
   "name": "fiyuu",
-  "version": "0.2.0",
+  "version": "0.4.1",
   "type": "module",
   "exports": {
     "./client": "./client.ts"
@@ -11,7 +11,11 @@
   "workspaces": [
     "packages/*",
     "examples/my-app",
-    "examples/hacimertgokhan-me"
+    "examples/hacimertgokhan-me",
+    "examples/blog",
+    "examples/inventory",
+    "examples/responsive-wrapper",
+    "examples/fiyuu-website"
   ],
   "scripts": {
     "dev": "tsx packages/cli/src/index.ts dev",

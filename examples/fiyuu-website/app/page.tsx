@@ -23,12 +23,12 @@ export default class HomePage extends Component<PageProps> {
     const features = [
       { icon: iconBrain.value, title: "AI-Native Project Context", desc: "Auto-generate project graphs and AI docs with fiyuu sync. Copilot, Cursor, and every LLM understands your structure." },
       { icon: iconFile.value, title: "Deterministic Contracts", desc: "Fixed file conventions: page.tsx, query.ts, action.ts, schema.ts, meta.ts. Every route follows the same rules. No hidden behavior." },
-      { icon: iconZap.value, title: "GEA-First Runtime", desc: "React-free framework layer. Clean, readable, testable UI code with the GEA component model." },
-      { icon: iconDatabase.value, title: "Built-In Database", desc: "Zero-setup FiyuuDB with SQL-like queries and automatic persistence. Ready for prototypes and internal tools." },
-      { icon: iconSignal.value, title: "Real-Time Channels", desc: "WebSocket and NATS support built into the framework. Chat, notifications, live updates — no external packages." },
-      { icon: iconSearch.value, title: "Built-In Diagnostics", desc: "Validate project structure with fiyuu doctor. Detect anti-patterns and auto-fix common issues." },
-      { icon: iconShield.value, title: "Type-Safe Contracts", desc: "Zod input/output validation. Define your schema once, get type inference everywhere." },
-      { icon: iconRocket.value, title: "Background Services", desc: "Always-alive architecture, not request-driven. Cron jobs, data sync, real-time processing — all native." },
+      { icon: iconZap.value, title: "Spring Boot Style Decorators", desc: "@Controller, @Service, @Repository, @Guard, @Scheduled — enterprise patterns made simple. Dependency injection included." },
+      { icon: iconDatabase.value, title: "Advanced F1 DB", desc: "Indexing, transactions, migrations, relations. SQL-like API with zero setup. Perfect for prototypes and data-heavy apps." },
+      { icon: iconSignal.value, title: "Real-Time Channels", desc: "WebSocket rooms, NATS integration. Auth on upgrade, message routing, reconnection — all built-in." },
+      { icon: iconSearch.value, title: "Integrated Components", desc: "FiyuuImage, FiyuuVideo, FiyuuLink, FiyuuHead — lazy loading, responsive, CLS-free. Zero external packages." },
+      { icon: iconShield.value, title: "Type-Safe Everything", desc: "Zod schemas, DTO validation, automatic HTTP exceptions. Input validation, output typing — all in one schema." },
+      { icon: iconRocket.value, title: "Always-Alive Services", desc: "Background jobs, schedulers, listeners. Not request-driven. Cron jobs, file sync, message processing — native." },
     ];
 
     return html`

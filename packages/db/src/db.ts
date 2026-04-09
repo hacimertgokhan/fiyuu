@@ -3,6 +3,8 @@ import { Table } from "./table.js";
 import { StorageEngine } from "./storage.js";
 import { defineTable, getTableSchema, getAllSchemas, clearSchemaRegistry } from "./schema.js";
 import { parseSQL, executeSelect, executeUpdate, executeDelete } from "./query-engine.js";
+import { executeTransaction, type TransactionContext } from "./transaction.js";
+import { MigrationRunner, type Migration, type MigrationRecord } from "./migration.js";
 
 export interface FiyuuDBOptions {
   path?: string;
@@ -122,6 +124,51 @@ export class FiyuuDB {
       count++;
     }
     return count;
+  }
+
+  /**
+   * Execute operations within a transaction.
+   * If any operation throws, all changes are rolled back.
+   *
+   * @example
+   * ```ts
+   * await db.transaction(async (tx) => {
+   *   const user = tx.table("users").insert({ name: "Ali" });
+   *   tx.table("profiles").insert({ userId: user._id });
+   *   // Throws? All changes rolled back automatically.
+   * });
+   * ```
+   */
+  async transaction(fn: (ctx: TransactionContext) => Promise<void> | void): Promise<void> {
+    await executeTransaction(
+      this.tables,
+      (name) => this.table(name),
+      fn,
+    );
+  }
+
+  /**
+   * Get a migration runner for this database.
+   *
+   * @example
+   * ```ts
+   * const runner = db.migrator();
+   * runner.register({ name: "001_create_users", version: 1, up: ... });
+   * await runner.up(); // Apply pending migrations
+   * ```
+   */
+  migrator(): MigrationRunner {
+    const migrationsTable = this.table<MigrationRecord>("_migrations");
+
+    return new MigrationRunner(
+      this as unknown as import("./migration.js").MigrationDB,
+      () => migrationsTable.find(),
+      (record) => migrationsTable.insert(record as Omit<MigrationRecord, "_id" | "_createdAt" | "_updatedAt">),
+      (name) => {
+        const existing = migrationsTable.findOne({ name } as Partial<MigrationRecord>);
+        if (existing) migrationsTable.delete(existing._id);
+      },
+    );
   }
 
   stats(): { tables: number; totalRows: number; details: Array<{ name: string; rows: number }> } {

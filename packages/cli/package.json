@@ -1,13 +1,25 @@
 {
   "name": "@fiyuu/cli",
-  "version": "0.2.0",
+  "version": "0.4.1",
   "type": "module",
+  "main": "./src/index.ts",
   "bin": {
     "fiyuu": "./bin/fiyuu"
   },
+  "publishConfig": {
+    "main": "./dist/index.js",
+    "bin": {
+      "fiyuu": "./bin/fiyuu"
+    }
+  },
+  "files": [
+    "dist",
+    "bin",
+    "README.md"
+  ],
   "dependencies": {
-    "@fiyuu/core": "0.2.0",
-    "@fiyuu/runtime": "0.2.0",
+    "@fiyuu/core": "^0.4.1",
+    "@fiyuu/runtime": "^0.4.1",
     "tsx": "^4.21.0",
     "typescript": "^5.8.2"
   }

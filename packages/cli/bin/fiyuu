@@ -1,28 +1,53 @@
-#!/bin/sh
-set -e
+#!/usr/bin/env node
 
-SCRIPT_PATH="$0"
-if command -v realpath >/dev/null 2>&1; then
-  SCRIPT_PATH="$(realpath "$0")"
-fi
+import { fileURLToPath } from "node:url";
+import { dirname, resolve } from "node:path";
+import { existsSync } from "node:fs";
 
-SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
-ENTRY_JS="$SCRIPT_DIR/../src/index.js"
-ENTRY_TS="$SCRIPT_DIR/../src/index.ts"
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-if [ -f "$ENTRY_JS" ]; then
-  exec node "$ENTRY_JS" "$@"
-fi
+// Try compiled JS first (npm published version)
+const compiledEntry = resolve(__dirname, "../dist/index.js");
+if (existsSync(compiledEntry)) {
+  await import(compiledEntry);
+} else {
+  // Development mode: use tsx to run TypeScript directly
+  const tsEntry = resolve(__dirname, "../src/index.ts");
+  if (existsSync(tsEntry)) {
+    // Re-exec with tsx
+    const { execFileSync } = await import("node:child_process");
+    const tsxPaths = [
+      resolve(__dirname, "../node_modules/.bin/tsx"),
+      resolve(__dirname, "../../../node_modules/.bin/tsx"),
+    ];
 
-if [ -f "$ENTRY_TS" ]; then
-  if command -v tsx >/dev/null 2>&1; then
-    exec tsx "$ENTRY_TS" "$@"
-  fi
+    let tsxBin = null;
+    for (const p of tsxPaths) {
+      if (existsSync(p)) { tsxBin = p; break; }
+    }
 
-  if [ -x "$SCRIPT_DIR/../../../node_modules/.bin/tsx" ]; then
-    exec "$SCRIPT_DIR/../../../node_modules/.bin/tsx" "$ENTRY_TS" "$@"
-  fi
-fi
+    if (!tsxBin) {
+      // Try global tsx
+      try {
+        execFileSync("tsx", ["--version"], { stdio: "ignore" });
+        tsxBin = "tsx";
+      } catch {
+        console.error("fiyuu: tsx not found. Install it: npm install -g tsx");
+        process.exit(1);
+      }
+    }
 
-echo "fiyuu CLI entry not found. Reinstall @fiyuu/cli." >&2
-exit 1
+    try {
+      execFileSync(tsxBin, [tsEntry, ...process.argv.slice(2)], {
+        stdio: "inherit",
+        cwd: process.cwd(),
+      });
+    } catch (err) {
+      process.exit(err.status ?? 1);
+    }
+  } else {
+    console.error("fiyuu CLI entry not found. Reinstall @fiyuu/cli.");
+    process.exit(1);
+  }
+}

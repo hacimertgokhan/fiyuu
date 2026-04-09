@@ -209,6 +209,15 @@ export class Table<T extends Document = Document> {
   toJSON(): Document[] {
     return [...this.data];
   }
+
+  /**
+   * Restore table data from a snapshot (used by transaction rollback).
+   */
+  restoreFromSnapshot(snapshot: Document[]): void {
+    this.data = snapshot;
+    this.rebuildIndexes();
+    this.storage.scheduleFlush(this.name, this.data);
+  }
 }
 
 function generateId(): string {

@@ -1,17 +1,36 @@
 {
   "name": "@fiyuu/runtime",
-  "version": "0.2.0",
+  "version": "0.4.1",
   "type": "module",
   "main": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
     "./cli": "./src/cli.ts"
   },
+  "publishConfig": {
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "import": "./dist/index.js",
+        "types": "./dist/index.d.ts"
+      },
+      "./cli": {
+        "import": "./dist/cli.js",
+        "types": "./dist/cli.d.ts"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": false,
   "dependencies": {
     "@geajs/core": "^1.0.12",
-    "@fiyuu/core": "0.2.0",
-    "@fiyuu/db": "0.3.0",
-    "@fiyuu/realtime": "0.3.0",
+    "@fiyuu/core": "^0.4.1",
+    "@fiyuu/db": "^0.4.1",
+    "@fiyuu/realtime": "^0.4.1",
     "chokidar": "^4.0.3",
     "esbuild": "^0.25.2",
     "ws": "^8.18.1"

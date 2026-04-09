@@ -1,6 +1,6 @@
 {
   "name": "hacimertgokhan.me",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,9 +11,12 @@
     "doctor": "fiyuu doctor"
   },
   "dependencies": {
-    "@fiyuu/cli": "0.2.0",
-    "@fiyuu/core": "0.2.0",
-    "@geajs/core": "1.1.3",
+    "@fiyuu/cli": "^0.4.1",
+    "@fiyuu/core": "^0.4.1",
+    "@fiyuu/runtime": "^0.4.1",
+    "@fiyuu/db": "^0.4.1",
+    "@fiyuu/realtime": "^0.4.1",
+    "@geajs/core": "^1.1.3",
     "zod": "^3.24.2"
   }
 }
