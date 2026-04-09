@@ -2,25 +2,24 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-# Override NODE_ENV for npm install
-ARG NODE_ENV=development
-ENV NODE_ENV=${NODE_ENV}
+# Force NODE_ENV to development for install/build
+ENV NODE_ENV=development
 
-# Copy and install
+# Copy and install (install ALL dependencies including dev)
 COPY package*.json ./
-RUN npm install --include=dev
+RUN npm install
 
-# Debug: Check if fiyuu is installed
-RUN ls -la node_modules/.bin/ | grep fiyuu || echo "fiyuu not in .bin"
-RUN cat package.json | grep -A5 dependencies
+# Verify fiyuu is installed
+RUN ls -la node_modules/.bin/ | grep fiyuu || (echo "ERROR: fiyuu not found" && exit 1)
+RUN ls -la node_modules/@fiyuu/ 2>/dev/null || (echo "ERROR: @fiyuu packages not found" && exit 1)
 
 # Copy source
 COPY . .
 
-# Build with npx
-RUN npx --yes fiyuu build
+# Build
+RUN ./node_modules/.bin/fiyuu build
 
-# Runtime env
+# Runtime env (only set at runtime, not build)
 ENV NODE_ENV=production
 EXPOSE 4060
-CMD ["npx", "fiyuu", "start"]
+CMD ["./node_modules/.bin/fiyuu", "start"]
