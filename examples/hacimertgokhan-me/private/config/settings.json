@@ -1,0 +1,21 @@
+{
+  "siteName": "hacimertgokhan.me",
+  "author": "Hacı Mert Gökhan",
+  "description": "Personal portfolio and blog",
+  "defaultLocale": "en",
+  "features": {
+    "darkMode": true,
+    "blog": true,
+    "projects": true,
+    "contact": true
+  },
+  "seo": {
+    "baseUrl": "https://hacimertgokhan.com",
+    "twitterHandle": "@hacimertgokhan",
+    "ogImage": "/og-image.png"
+  },
+  "analytics": {
+    "enabled": true,
+    "provider": "console"
+  }
+}

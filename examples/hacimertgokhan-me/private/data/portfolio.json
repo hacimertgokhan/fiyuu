@@ -1,0 +1,39 @@
+{
+  "profile": {
+    "name": "Hacı Mert Gökhan",
+    "title": "Full Stack Developer",
+    "location": "Turkey",
+    "bio": "Building modern web applications with cutting-edge technologies. Creator of Fiyuu Framework."
+  },
+  "projects": [
+    {
+      "id": "fiyuu",
+      "name": "Fiyuu Framework",
+      "description": "AI-native fullstack framework for TypeScript",
+      "url": "https://fiyuu.work",
+      "tags": ["TypeScript", "Node.js", "Framework"]
+    },
+    {
+      "id": "geajs",
+      "name": "GEA.js",
+      "description": "Next-generation JavaScript utilities",
+      "url": "https://github.com/hacimertgokhan/geajs",
+      "tags": ["JavaScript", "Utils", "Library"]
+    }
+  ],
+  "skills": [
+    { "name": "TypeScript", "level": "expert" },
+    { "name": "Node.js", "level": "expert" },
+    { "name": "React", "level": "advanced" },
+    { "name": "Vue", "level": "advanced" },
+    { "name": "Rust", "level": "intermediate" }
+  ],
+  "experience": [
+    {
+      "company": "Freelance",
+      "role": "Full Stack Developer",
+      "period": "2020 - Present",
+      "description": "Building web applications and open-source projects"
+    }
+  ]
+}

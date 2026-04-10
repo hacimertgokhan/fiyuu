@@ -1,0 +1,19 @@
+{
+  "siteName": "Fiyuu",
+  "description": "AI-native fullstack framework",
+  "version": "0.5.0",
+  "social": {
+    "github": "https://github.com/hacimertgokhan/fiyuu",
+    "twitter": "https://twitter.com/fiyuu",
+    "discord": "https://discord.gg/fiyuu"
+  },
+  "analytics": {
+    "enabled": true,
+    "provider": "console"
+  },
+  "features": {
+    "darkMode": true,
+    "search": false,
+    "i18n": false
+  }
+}
