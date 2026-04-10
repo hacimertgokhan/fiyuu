@@ -37,7 +37,7 @@ export default class HomePage extends Component<PageProps> {
         <div style="max-width:1200px; margin:0 auto; padding:0 24px; display:flex; align-items:center; justify-content:space-between; height:56px;">
           <a href="/" style="text-decoration:none; display:flex; align-items:center; gap:8px;">
             <span style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:800; color:var(--text); letter-spacing:-0.03em;">fiyuu</span>
-            <span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--text-muted); letter-spacing:0.1em; text-transform:uppercase; padding:2px 6px; border:1px solid var(--border); border-radius:2px;">v0.4.1</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--text-muted); letter-spacing:0.1em; text-transform:uppercase; padding:2px 6px; border:1px solid var(--border); border-radius:2px;">v0.4.7</span>
           </a>
           <div class="hidden md:flex" style="display:none; align-items:center; gap:32px;">
             <a href="/docs" class="nav-link">Docs</a>
@@ -71,7 +71,7 @@ export default class HomePage extends Component<PageProps> {
           <div class="reveal">
             <div style="display:inline-flex; align-items:center; gap:10px; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-muted); letter-spacing:0.06em; padding:8px 0; border-bottom:1px solid var(--border-subtle); margin-bottom:40px;">
               <span class="pulse-line" style="display:block; width:6px; height:6px; background:var(--accent); border-radius:50%;"></span>
-              AI-native fullstack framework — v0.4.1
+              AI-native fullstack framework — v0.4.7
             </div>
           </div>
 
@@ -415,7 +415,7 @@ export default class HomePage extends Component<PageProps> {
         <div style="max-width:1200px; margin:0 auto; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px;">
           <div style="display:flex; align-items:center; gap:12px;">
             <span style="font-family:'Bricolage Grotesque',sans-serif; font-size:20px; font-weight:800; color:var(--text); letter-spacing:-0.03em;">fiyuu</span>
-            <span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--text-dim); letter-spacing:0.1em;">v0.4.1</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--text-dim); letter-spacing:0.1em;">v0.4.7</span>
           </div>
           <p style="font-size:12px; color:var(--text-muted);">
             Built by Hacı Mert Gökhan — <a href="https://hacimertgokhan.com" target="_blank" rel="noreferrer" style="color:var(--text-secondary); text-decoration:none; border-bottom:1px solid var(--border); transition:color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-secondary)'">hacimertgokhan.com</a>
