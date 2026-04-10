@@ -69,7 +69,7 @@ export async function createProjectGraph(appDirectory: string): Promise<ProjectG
     routes: features.map((feature) => ({
       path: feature.route,
       feature: feature.feature,
-      hasPage: Boolean(feature.files["page.tsx"]),
+      hasPage: Boolean(feature.files["page.tsx"] || feature.files["page.ts"]),
     })),
     actions: features
       .filter((feature) => feature.files["action.ts"])
@@ -100,8 +100,9 @@ export async function createProjectGraph(appDirectory: string): Promise<ProjectG
         relations.push({ from: feature.route, to: feature.files["query.ts"]!, type: "uses" });
       }
 
-      if (feature.files["page.tsx"]) {
-        relations.push({ from: feature.route, to: feature.files["page.tsx"]!, type: "renders" });
+      const pageFile = feature.files["page.tsx"] || feature.files["page.ts"];
+      if (pageFile) {
+        relations.push({ from: feature.route, to: pageFile, type: "renders" });
       }
 
       if (feature.files["meta.ts"]) {
@@ -198,7 +199,8 @@ async function scanFeature(appDirectory: string, featureDirectory: string): Prom
   ) as FeatureRecord["files"];
 
   const metaSource = files["meta.ts"] ? await fs.readFile(path.join(featureDirectory, "meta.ts"), "utf8") : "";
-  const pageSource = files["page.tsx"] ? await fs.readFile(path.join(featureDirectory, "page.tsx"), "utf8") : "";
+  const pageFilePath = files["page.tsx"] ? "page.tsx" : files["page.ts"] ? "page.ts" : null;
+  const pageSource = pageFilePath ? await fs.readFile(path.join(featureDirectory, pageFilePath), "utf8") : "";
   const schemaSource = files["schema.ts"] ? await fs.readFile(path.join(featureDirectory, "schema.ts"), "utf8") : "";
   const featureEntries = await fs.readdir(featureDirectory, { withFileTypes: true });
   const extraFiles = featureEntries
