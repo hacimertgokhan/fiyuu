@@ -987,7 +987,7 @@ export const description = "Loads starter websocket metadata for the live counte
 
 function createLivePage() {
   return `import { Component } from "@geajs/core";
-import { definePage, escapeHtml, html, type PageProps } from "fiyuu/client";
+import { definePage, escapeHtml, html, raw, type PageProps } from "fiyuu/client";
 
 type LiveData = {
   initialCount: number;
@@ -1331,11 +1331,11 @@ export default class Page extends Component<PageProps<HomeData>> {
             <h1 class="mt-3 text-4xl font-semibold tracking-tight text-[#24311f] dark:text-[#ecf5ef] sm:text-5xl lg:text-6xl">Fiyuu is a structured fullstack framework for humans and AI.</h1>
             <p class="mt-4 max-w-4xl text-base leading-7 text-[#56654e] dark:text-[#b9cabc] sm:text-lg">It keeps route UI, server logic, and metadata in one deterministic layout so teams ship faster without losing clarity.</p>
           </header>
-          <div class="mt-5 grid gap-3 lg:grid-cols-3">\${explainHtml}</div>
-          <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">\${statsHtml}</div>
+          <div class="mt-5 grid gap-3 lg:grid-cols-3">\${raw(explainHtml)}</div>
+          <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">\${raw(statsHtml)}</div>
           <footer class="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-[#7a8f6b]/15 pt-4">
             <p class="text-sm text-[#5f6d58] dark:text-[#acc1b1]">AI-first fullstack framework structure with deterministic routing.</p>
-            <div class="flex flex-wrap gap-2">\${skillsHtml}</div>
+            <div class="flex flex-wrap gap-2">\${raw(skillsHtml)}</div>
           </footer>
         </section>
       </main>

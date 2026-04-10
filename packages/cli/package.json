@@ -1,8 +1,9 @@
 {
   "name": "@fiyuu/cli",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "type": "module",
-  "main": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "bin": {
     "fiyuu": "./bin/fiyuu"
   },

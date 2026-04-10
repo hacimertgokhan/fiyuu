@@ -3,12 +3,64 @@
  * and GEA component rendering for the Fiyuu runtime server.
  */
 
-import { existsSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { buildSync } from "esbuild";
 import type { FeatureRecord, MetaDefinition } from "@fiyuu/core";
 import type { GeaRenderable, LayoutModule, ModuleShape, RuntimeState } from "./server-types.js";
 import { QUERY_CACHE_MAX_ENTRIES, QUERY_CACHE_SWEEP_INTERVAL_MS } from "./server-router.js";
+
+// ── TypeScript compilation cache ──────────────────────────────────────────────
+
+const tsxCacheDir = path.join(process.cwd(), ".fiyuu", "dev", "tsx-cache");
+const tsxCache = new Map<string, string>();
+
+function getCompiledPath(originalPath: string): string {
+  const hash = Buffer.from(originalPath).toString("base64").replace(/[^a-zA-Z0-9]/g, "").slice(0, 16);
+  return path.join(tsxCacheDir, `${hash}.js`);
+}
+
+function compileTsxFile(tsxPath: string): string {
+  const compiledPath = getCompiledPath(tsxPath);
+  
+  // Check cache
+  const cached = tsxCache.get(tsxPath);
+  if (cached && cached === compiledPath) {
+    try {
+      const tsxStat = statSync(tsxPath);
+      const jsStat = statSync(compiledPath);
+      if (jsStat.mtimeMs >= tsxStat.mtimeMs) {
+        return compiledPath;
+      }
+    } catch {
+      // Cache miss, recompile
+    }
+  }
+  
+  // Ensure cache directory exists
+  mkdirSync(tsxCacheDir, { recursive: true });
+  
+  // Compile with esbuild
+  const result = buildSync({
+    entryPoints: [tsxPath],
+    bundle: false,
+    format: "esm",
+    platform: "node",
+    target: "node18",
+    jsx: "automatic",
+    jsxImportSource: "@geajs/core",
+    outfile: compiledPath,
+    sourcemap: false,
+  });
+  
+  if (result.errors.length > 0) {
+    throw new Error(`Failed to compile ${tsxPath}: ${result.errors.map(e => e.text).join(", ")}`);
+  }
+  
+  tsxCache.set(tsxPath, compiledPath);
+  return compiledPath;
+}
 
 // ── Dynamic module import ─────────────────────────────────────────────────────
 
@@ -26,6 +78,9 @@ export async function importModule(
       const jsPath = relativePath.replace(/\.tsx?$/, ".js");
       resolvedPath = path.join(serverDirectory, jsPath.replace(/^app\//, ""));
     }
+  } else if (mode === "dev" && (modulePath.endsWith(".tsx") || modulePath.endsWith(".ts"))) {
+    // In dev mode, compile .tsx/.ts files on the fly
+    resolvedPath = compileTsxFile(modulePath);
   }
   
   const fileUrl = pathToFileURL(resolvedPath).href;
