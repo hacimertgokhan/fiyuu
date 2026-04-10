@@ -16,6 +16,26 @@ export default class DocsPage extends Component<PageProps> {
           </p>
         </div>
 
+        <!-- Comprehensive Docs Link -->
+        <div style="background:linear-gradient(135deg, rgba(34,197,94,0.1), rgba(34,197,94,0.05)); border:1px solid rgba(34,197,94,0.3); border-radius:8px; padding:24px; margin-bottom:40px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+            <div>
+              <h3 style="font-size:18px; font-weight:600; color:#22c55e; margin-bottom:8px;">📚 Comprehensive Documentation</h3>
+              <p style="font-size:14px; color:var(--text-secondary);">21 detailed guides covering everything from installation to deployment.</p>
+            </div>
+            <a href="https://github.com/hacimertgokhan/fiyuu/tree/main/docs" target="_blank" rel="noreferrer" style="display:inline-flex; align-items:center; gap:8px; background:#22c55e; color:#000; padding:12px 24px; border-radius:6px; text-decoration:none; font-weight:600; white-space:nowrap;">
+              View Docs
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+            </a>
+          </div>
+          <div style="display:flex; flex-wrap:wrap; gap:12px; margin-top:16px; padding-top:16px; border-top:1px solid rgba(34,197,94,0.2);">
+            <a href="https://github.com/hacimertgokhan/fiyuu/blob/main/docs/getting-started/installation.md" target="_blank" rel="noreferrer" style="font-size:13px; color:#22c55e; text-decoration:none;">Getting Started →</a>
+            <a href="https://github.com/hacimertgokhan/fiyuu/blob/main/docs/api-reference/decorators.md" target="_blank" rel="noreferrer" style="font-size:13px; color:#22c55e; text-decoration:none;">API Reference →</a>
+            <a href="https://github.com/hacimertgokhan/fiyuu/blob/main/docs/guides/authentication.md" target="_blank" rel="noreferrer" style="font-size:13px; color:#22c55e; text-decoration:none;">Guides →</a>
+            <a href="https://github.com/hacimertgokhan/fiyuu/tree/main/examples/fiyuu-work-backend" target="_blank" rel="noreferrer" style="font-size:13px; color:#22c55e; text-decoration:none;">Backend Demo →</a>
+          </div>
+        </div>
+
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px; margin-bottom:80px;">
           <!-- Getting Started -->
           <a href="#getting-started" style="text-decoration:none;">
