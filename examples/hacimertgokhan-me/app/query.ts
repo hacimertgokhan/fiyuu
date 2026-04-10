@@ -58,7 +58,9 @@ export const query = defineQuery({
 });
 
 export async function execute() {
-  const file = new URL("../data/profile.json", import.meta.url);
+  // Support both dev (relative to app/) and production (relative to .fiyuu/server/)
+  const rootDir = process.cwd();
+  const file = new URL("file://" + rootDir + "/data/profile.json");
   const raw = await readFile(file, "utf-8");
   const profile = JSON.parse(raw) as Omit<z.infer<typeof output>, "githubStats">;
   const githubStats = await fetchGithubStats("hacimertgokhan");

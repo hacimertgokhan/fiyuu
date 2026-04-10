@@ -1279,73 +1279,64 @@ export const description = "Loads the starter content for the Fiyuu home page";
 }
 
 function createHomePage(answers) {
-  const themeMainClasses = answers.theming
-    ? 'min-h-screen bg-[linear-gradient(180deg,#f7f3ea_0%,#f1ebde_58%,#e9e0d0_100%)] px-4 py-4 text-[#33412f] dark:bg-[linear-gradient(180deg,#121614_0%,#171f1a_100%)] dark:text-[#e6efe8] sm:px-6 sm:py-5'
-    : 'min-h-screen bg-[linear-gradient(180deg,#f7f3ea_0%,#f1ebde_58%,#e9e0d0_100%)] px-4 py-4 text-[#33412f] sm:px-6 sm:py-5';
-  const themeSectionClasses = answers.theming
-    ? 'flex min-h-[calc(100vh-2rem)] w-full flex-col justify-between rounded-[1.5rem] border border-[#7a8f6b]/20 bg-[#f8f4ec]/80 p-5 dark:border-[#4f6756]/35 dark:bg-[#1b241f]/90 sm:min-h-[calc(100vh-2.5rem)] sm:p-7'
-    : 'flex min-h-[calc(100vh-2rem)] w-full flex-col justify-between rounded-[1.5rem] border border-[#7a8f6b]/20 bg-[#f8f4ec]/80 p-5 sm:min-h-[calc(100vh-2.5rem)] sm:p-7';
-  const themeNav = answers.theming
-    ? '<nav class="flex items-center justify-between"><p class="text-xs uppercase tracking-[0.22em] text-[#627356] dark:text-[#95b39d]">Fiyuu starter</p><button id="fiyuu-theme-toggle" type="button" class="rounded-full border border-[#7a8f6b]/20 px-3 py-1 text-xs text-[#43523f] dark:border-[#6f8d77]/30 dark:text-[#d1e3d6]">Dark</button></nav>'
-    : '<p class="text-xs uppercase tracking-[0.22em] text-[#627356]">Fiyuu starter</p>';
   const themeScript = answers.theming
-    ? "const root=document.documentElement;const button=document.getElementById('fiyuu-theme-toggle');const saved=localStorage.getItem('fiyuu-theme');const initial=saved||'light';if(initial==='dark'){root.classList.add('dark');}if(button){button.textContent=root.classList.contains('dark')?'Light':'Dark';button.addEventListener('click',()=>{const next=root.classList.contains('dark')?'light':'dark';root.classList.toggle('dark',next==='dark');localStorage.setItem('fiyuu-theme',next);button.textContent=next==='dark'?'Light':'Dark';});}"
+    ? `const root=document.documentElement;const saved=localStorage.getItem('fiyuu-theme');const prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;if(saved==='dark'||(!saved&&prefersDark)){root.classList.add('dark');}`
     : "";
+  
   return `import { Component } from "@geajs/core";
-import { definePage, escapeHtml, html, type PageProps } from "fiyuu/client";
-
-type HomeData = {
-  stats: Array<{
-    label: string;
-    value: string;
-  }>;
-  skills: string[];
-};
+import { definePage, html, type PageProps } from "fiyuu/client";
 
 export const page = definePage({
-  intent: "Minimal one-page home route for a focused Fiyuu starter",
+  intent: "Simple one-page personal site",
 });
 
-export default class Page extends Component<PageProps<HomeData>> {
-  template({ data }: PageProps<HomeData> = this.props) {
-    const statsHtml = (data?.stats ?? [])
-      .map(
-        (item) => html\`<div class="rounded-xl border border-[#7a8f6b]/18 bg-[#fcfaf5] px-4 py-3"><p class="text-[11px] uppercase tracking-[0.2em] text-[#708067]">\${escapeHtml(item.label)}</p><p class="mt-1 text-2xl font-semibold text-[#263320]">\${escapeHtml(item.value)}</p></div>\`,
-      )
-      .join("");
-    const skillsHtml = (data?.skills ?? [])
-      .map((skill) => html\`<span class="rounded-full border border-[#7a8f6b]/20 px-3 py-1 text-xs text-[#44513f]">\${escapeHtml(skill)}</span>\`)
-      .join("");
-    const explainHtml = [
-      { title: "Single structure", body: "Routes, queries, actions, and metadata live in predictable folders." },
-      { title: "AI-readable", body: "Project docs and contracts stay explicit so assistants can reason safely." },
-      { title: "Gea-first runtime", body: "Rendering is optimized for Gea components with deterministic behavior." },
-    ]
-      .map((item) => html\`<article class="rounded-xl border border-[#7a8f6b]/16 bg-[#fcfaf5] px-4 py-4"><h2 class="text-sm font-semibold text-[#24311f]">\${item.title}</h2><p class="mt-2 text-sm leading-6 text-[#5c6955]">\${item.body}</p></article>\`)
-      .join("");
-    return html\`
-      <main class="${themeMainClasses}">
-        <section class="${themeSectionClasses}">
-          ${themeNav}
-          <header>
-            <h1 class="mt-3 text-4xl font-semibold tracking-tight text-[#24311f] dark:text-[#ecf5ef] sm:text-5xl lg:text-6xl">Fiyuu is a structured fullstack framework for humans and AI.</h1>
-            <p class="mt-4 max-w-4xl text-base leading-7 text-[#56654e] dark:text-[#b9cabc] sm:text-lg">It keeps route UI, server logic, and metadata in one deterministic layout so teams ship faster without losing clarity.</p>
-          </header>
-          <div class="mt-5 grid gap-3 lg:grid-cols-3">\${raw(explainHtml)}</div>
-          <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">\${raw(statsHtml)}</div>
-          <footer class="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-[#7a8f6b]/15 pt-4">
-            <p class="text-sm text-[#5f6d58] dark:text-[#acc1b1]">AI-first fullstack framework structure with deterministic routing.</p>
-            <div class="flex flex-wrap gap-2">\${raw(skillsHtml)}</div>
-          </footer>
-        </section>
+export default class HomePage extends Component<PageProps> {
+  template() {
+    return html\\`
+      <main class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center p-6">
+        <div class="max-w-md w-full text-center">
+          <div class="mb-8">
+            <div class="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+              YN
+            </div>
+            <h1 class="text-3xl font-bold text-slate-800 dark:text-white mb-2">
+              Your Name
+            </h1>
+            <p class="text-slate-600 dark:text-slate-300">
+              Developer & Creator
+            </p>
+          </div>
+
+          <p class="text-slate-600 dark:text-slate-300 mb-8 leading-relaxed">
+            Building things with code. Focused on creating simple, beautiful, and functional web experiences.
+          </p>
+
+          <div class="space-y-3">
+            <a href="https://github.com" target="_blank" rel="noopener" 
+               class="block w-full py-3 px-6 rounded-xl bg-slate-800 dark:bg-white text-white dark:text-slate-900 font-medium hover:opacity-90 transition-opacity shadow-md">
+              GitHub
+            </a>
+            <a href="https://twitter.com" target="_blank" rel="noopener"
+               class="block w-full py-3 px-6 rounded-xl bg-blue-500 text-white font-medium hover:opacity-90 transition-opacity shadow-md">
+              Twitter
+            </a>
+            <a href="mailto:hello@example.com"
+               class="block w-full py-3 px-6 rounded-xl border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-medium hover:border-slate-400 dark:hover:border-slate-500 transition-colors">
+              Contact
+            </a>
+          </div>
+
+          <p class="mt-8 text-sm text-slate-400 dark:text-slate-500">
+            Built with Fiyuu
+          </p>
+        </div>
       </main>
-      ${answers.theming ? `<script type="module">${themeScript}</script>` : ''}
-    \`;
+      ${answers.theming ? `<script>${themeScript}</script>` : ''}
+    \\`;
   }
 }
 `;
 }
-
 function createF1Schema() {
   return `message TodoDraft {
   string id = 1;
