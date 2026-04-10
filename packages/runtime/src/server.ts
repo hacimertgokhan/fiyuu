@@ -555,13 +555,15 @@ async function handleRoute(
     return;
   }
 
-  if (!feature.files["page.tsx"]) {
+  // Check for page.tsx or page.ts (intent-based)
+  const pageFile = feature.files["page.tsx"] || feature.files["page.ts"];
+  if (!pageFile) {
     sendDocumentStatusPage(response, {
       statusCode: 404, title: "Page file missing",
-      summary: "The route exists, but it does not provide a `page.tsx` entry.",
+      summary: "The route exists, but it does not provide a page entry.",
       detail: `Feature ${feature.feature || "/"} is missing its page component.`,
       route: pathname, method: request.method ?? "GET", requestId,
-      hints: ["Add `page.tsx` to the feature directory."],
+      hints: ["Add `page.tsx` or `page.ts` to the feature directory."],
       diagnostics: [
         `Feature path: ${feature.feature || "/"}`,
         `Known files: ${Object.keys(feature.files).join(", ") || "none"}`,
