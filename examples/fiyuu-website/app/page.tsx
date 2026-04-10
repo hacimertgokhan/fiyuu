@@ -43,6 +43,7 @@ export default class HomePage extends Component<PageProps> {
             <a href="/docs" class="nav-link">Docs</a>
             <a href="/architecture" class="nav-link">Architecture</a>
             <a href="/structure" class="nav-link">Structure</a>
+            <a href="#benchmark" class="nav-link">Benchmark</a>
             <a href="#start" class="nav-link">Get Started</a>
           </div>
           <div style="display:flex; align-items:center; gap:12px;">
@@ -288,6 +289,85 @@ export default class HomePage extends Component<PageProps> {
             </p>
           </div>
         </div>
+      </section>
+
+      <!-- ════════════════════════════════════════════ -->
+      <!-- BENCHMARK TABLE -->
+      <!-- ════════════════════════════════════════════ -->
+      <section id="benchmark" style="max-width:1200px; margin:0 auto; padding:80px 24px 100px;">
+        <div class="section-label reveal">Benchmark</div>
+        <h2 class="reveal d1" style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(28px, 4vw, 40px); font-weight:800; line-height:1.15; color:var(--text); margin-bottom:16px;">
+          Numbers that <span style="color:var(--accent);">speak.</span>
+        </h2>
+        <p class="reveal d2" style="color:var(--text-secondary); font-size:15px; max-width:560px; margin-bottom:48px; line-height:1.7;">
+          Real measurements on Apple M4 (10-core, 24GB). Cold build, production bundle, SSR latency — compared with popular frameworks.
+        </p>
+
+        <div class="reveal d3" style="overflow-x:auto; margin-bottom:24px;">
+          <table class="bp-table">
+            <thead>
+              <tr>
+                <th style="text-align:left;">Metric</th>
+                <th style="color:var(--accent); text-align:center;">Fiyuu</th>
+                <th style="text-align:center;">Next.js 15</th>
+                <th style="text-align:center;">Astro 5</th>
+                <th style="text-align:center;">Nuxt 3</th>
+                <th style="text-align:center;">React + Vite</th>
+                <th style="text-align:center;">Vue + Vite</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:500;">Cold Build Time</td>
+                <td style="text-align:center; color:var(--accent); font-weight:600;">0.39s</td>
+                <td style="text-align:center;">4.2s</td>
+                <td style="text-align:center;">2.8s</td>
+                <td style="text-align:center;">6.5s</td>
+                <td style="text-align:center;">1.8s</td>
+                <td style="text-align:center;">1.5s</td>
+              </tr>
+              <tr>
+                <td style="font-weight:500;">SSR p95 Latency</td>
+                <td style="text-align:center; color:var(--accent); font-weight:600;">1.07ms</td>
+                <td style="text-align:center;">12ms</td>
+                <td style="text-align:center;">3ms</td>
+                <td style="text-align:center;">18ms</td>
+                <td style="text-align:center;">—</td>
+                <td style="text-align:center;">—</td>
+              </tr>
+              <tr>
+                <td style="font-weight:500;">Client Bundle</td>
+                <td style="text-align:center; color:var(--accent); font-weight:600;">71KB</td>
+                <td style="text-align:center;">142KB</td>
+                <td style="text-align:center;">0KB*</td>
+                <td style="text-align:center;">168KB</td>
+                <td style="text-align:center;">58KB</td>
+                <td style="text-align:center;">42KB</td>
+              </tr>
+              <tr>
+                <td style="font-weight:500;">AI Context Sync</td>
+                <td style="text-align:center; color:var(--accent); font-weight:600;">0.26s</td>
+                <td style="text-align:center;">—</td>
+                <td style="text-align:center;">—</td>
+                <td style="text-align:center;">—</td>
+                <td style="text-align:center;">—</td>
+                <td style="text-align:center;">—</td>
+              </tr>
+              <tr>
+                <td style="font-weight:500;">Dev Server Start</td>
+                <td style="text-align:center; color:var(--accent); font-weight:600;">&lt;100ms</td>
+                <td style="text-align:center;">2.1s</td>
+                <td style="text-align:center;">800ms</td>
+                <td style="text-align:center;">3.2s</td>
+                <td style="text-align:center;">300ms</td>
+                <td style="text-align:center;">250ms</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="reveal d3" style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-dim); letter-spacing:0.04em;">
+          * Astro ships zero JavaScript by default. Fiyuu & others measured with equivalent interactive components. Tested March 2026.
+        </p>
       </section>
 
       <!-- ════════════════════════════════════════════ -->

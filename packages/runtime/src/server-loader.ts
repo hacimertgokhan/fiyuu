@@ -154,19 +154,46 @@ export function mergeMetaDefinitions(...definitions: MetaDefinition[]): MetaDefi
 
 // ── Layout stack loading ──────────────────────────────────────────────────────
 
+export interface ProviderModule {
+  default?: (props: { children: string; route?: string }) => string;
+  Provider?: (props: { children: string; route?: string }) => string;
+}
+
 export async function loadLayoutStack(
   appDirectory: string,
   feature: FeatureRecord,
   mode: "dev" | "start",
   serverDirectory?: string,
-): Promise<Array<{ component: unknown; meta: MetaDefinition }>> {
+  providers?: ProviderRecord[],
+): Promise<Array<{ component: unknown; meta: MetaDefinition; isProvider?: boolean }>> {
   const parts = feature.feature ? feature.feature.split("/") : [];
   const directories = [appDirectory];
   for (let index = 0; index < parts.length; index += 1) {
     directories.push(path.join(appDirectory, ...parts.slice(0, index + 1)));
   }
 
-  const stack: Array<{ component: unknown; meta: MetaDefinition }> = [];
+  const stack: Array<{ component: unknown; meta: MetaDefinition; isProvider?: boolean }> = [];
+
+  // First, load global providers (if any)
+  if (providers && providers.length > 0) {
+    for (const provider of providers.filter((p) => p.target === "global" || p.target === "layout")) {
+      try {
+        const module = (await importModule(provider.filePath, mode, serverDirectory)) as ProviderModule;
+        const component = module.default ?? module.Provider;
+        if (component) {
+          stack.push({
+            component,
+            meta: { intent: provider.intent ?? `${provider.name} provider` },
+            isProvider: true,
+          });
+        }
+      } catch (err) {
+        console.warn(`[fiyuu] Failed to load provider ${provider.name}:`, err);
+      }
+    }
+  }
+
+  // Then load layouts
   for (const directory of directories) {
     const layoutFile = path.join(directory, "layout.tsx");
     const metaFile = path.join(directory, "layout.meta.ts");
@@ -177,8 +204,30 @@ export async function loadLayoutStack(
       }
     }
   }
+
+  // Finally, load page-specific providers
+  if (providers && providers.length > 0) {
+    for (const provider of providers.filter((p) => p.target === "page")) {
+      try {
+        const module = (await importModule(provider.filePath, mode, serverDirectory)) as ProviderModule;
+        const component = module.default ?? module.Provider;
+        if (component) {
+          stack.push({
+            component,
+            meta: { intent: provider.intent ?? `${provider.name} provider` },
+            isProvider: true,
+          });
+        }
+      } catch (err) {
+        console.warn(`[fiyuu] Failed to load provider ${provider.name}:`, err);
+      }
+    }
+  }
+
   return stack;
 }
+
+import type { ProviderRecord } from "@fiyuu/core";
 
 export async function loadFeatureMeta(feature: FeatureRecord, mode: "dev" | "start", serverDirectory?: string): Promise<MetaDefinition> {
   return feature.files["meta.ts"]
@@ -193,11 +242,12 @@ export async function getCachedLayoutStack(
   appDirectory: string,
   feature: FeatureRecord,
   mode: "dev" | "start",
-): Promise<Array<{ component: unknown; meta: MetaDefinition }>> {
+  providers?: ProviderRecord[],
+): Promise<Array<{ component: unknown; meta: MetaDefinition; isProvider?: boolean }>> {
   const cached = state.layoutStackCache.get(feature.route);
   if (cached) return cached;
 
-  const layoutStack = await loadLayoutStack(appDirectory, feature, mode, state.serverDirectory);
+  const layoutStack = await loadLayoutStack(appDirectory, feature, mode, state.serverDirectory, providers);
   state.layoutStackCache.set(feature.route, layoutStack);
   return layoutStack;
 }

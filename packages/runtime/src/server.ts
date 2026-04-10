@@ -18,7 +18,7 @@ import type { AddressInfo } from "node:net";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import chokidar from "chokidar";
-import { createProjectGraph, scanApp, syncProjectArtifacts, type MetaDefinition, type RenderMode } from "@fiyuu/core";
+import { createProjectGraph, scanApp, syncProjectArtifacts, scanProviders, type MetaDefinition, type RenderMode } from "@fiyuu/core";
 import { FiyuuDB } from "@fiyuu/db";
 import { FiyuuRealtime } from "@fiyuu/realtime";
 import { bundleClient } from "./bundler.js";
@@ -84,6 +84,9 @@ import {
 // ── Middleware & WebSocket ────────────────────────────────────────────────────
 import { runMiddleware } from "./server-middleware.js";
 import { attachWebsocketServer } from "./server-websocket.js";
+
+// ── Private Assets ────────────────────────────────────────────────────────────
+import { blockPrivateAccess } from "./server-private.js";
 
 // ── Window augmentation (client type hints) ───────────────────────────────────
 
@@ -190,6 +193,12 @@ export async function startServer(options: StartServerOptions): Promise<StartedS
       }
 
       const url = new URL(request.url, `http://localhost:${options.port ?? 4050}`);
+
+      // Block direct access to private/ directory - server-side only
+      if (blockPrivateAccess(response, url.pathname)) {
+        pushServerEvent(state, "warn", "request.blocked", `Blocked access to private path: ${url.pathname}`);
+        return;
+      }
 
       if (await handleTinyRoute({ request, response, url, state, options, liveClients })) {
         return;
@@ -338,6 +347,8 @@ export async function startServer(options: StartServerOptions): Promise<StartedS
 async function createRuntimeState(options: StartServerOptions): Promise<RuntimeState> {
   const graph = await createProjectGraph(options.appDirectory);
   const features = await scanApp(options.appDirectory);
+  const providersDirectory = options.config?.providers?.directory ?? path.join(options.rootDirectory, "app", "providers");
+  const providers = await scanProviders(providersDirectory);
   await syncProjectArtifacts(options.rootDirectory, options.appDirectory);
   const assets = await bundleClient(features, options.clientOutputDirectory);
   const insights = await buildInsightsReport({
@@ -371,6 +382,7 @@ async function createRuntimeState(options: StartServerOptions): Promise<RuntimeS
   return {
     graph,
     features,
+    providers,
     routeIndex: buildRouteIndex(features),
     assets,
     assetsByRoute: new Map(assets.map((asset) => [asset.route, asset])),
@@ -647,8 +659,8 @@ async function handleRoute(
 
   const layoutStack =
     mode === "start"
-      ? await getCachedLayoutStack(state, appDirectory, feature, mode)
-      : await loadLayoutStack(appDirectory, feature, mode, state.serverDirectory);
+      ? await getCachedLayoutStack(state, appDirectory, feature, mode, state.providers)
+      : await loadLayoutStack(appDirectory, feature, mode, state.serverDirectory, state.providers);
 
   const mergedMeta =
     mode === "start"

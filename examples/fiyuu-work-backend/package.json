@@ -1,0 +1,27 @@
+{
+  "name": "fiyuu-work-backend",
+  "version": "0.4.7",
+  "description": "Full-featured Fiyuu backend demo - Task Management SaaS",
+  "type": "module",
+  "scripts": {
+    "dev": "fiyuu dev",
+    "build": "fiyuu build",
+    "start": "fiyuu start",
+    "sync": "fiyuu sync",
+    "doctor": "fiyuu doctor"
+  },
+  "dependencies": {
+    "@fiyuu/cli": "^0.4.7",
+    "@fiyuu/core": "^0.4.6",
+    "@fiyuu/db": "^0.4.6",
+    "@fiyuu/realtime": "^0.4.6",
+    "@fiyuu/runtime": "^0.4.7",
+    "@geajs/core": "^1.2.3",
+    "bcrypt": "^5.1.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/node": "^20.0.0"
+  }
+}

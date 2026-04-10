@@ -5,14 +5,14 @@
 
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { WebSocket } from "ws";
-import type { createProjectGraph, FeatureRecord, FiyuuConfig, MetaDefinition, RenderMode } from "@fiyuu/core";
+import type { createProjectGraph, FeatureRecord, FiyuuConfig, MetaDefinition, RenderMode, ProviderRecord } from "@fiyuu/core";
 import type { FiyuuDB } from "@fiyuu/db";
 import type { FiyuuRealtime } from "@fiyuu/realtime";
 import type { ClientAsset } from "./bundler.js";
 import type { InsightsReport } from "./inspector.js";
 
 export type { IncomingMessage, ServerResponse };
-export type { FeatureRecord, FiyuuConfig, MetaDefinition, RenderMode };
+export type { FeatureRecord, FiyuuConfig, MetaDefinition, RenderMode, ProviderRecord };
 
 // ── Module shapes ─────────────────────────────────────────────────────────────
 
@@ -128,6 +128,7 @@ export interface SsgCacheEntry {
 export interface RuntimeState {
   graph: Awaited<ReturnType<typeof createProjectGraph>>;
   features: FeatureRecord[];
+  providers: ProviderRecord[];
   routeIndex: RouteIndex;
   assets: ClientAsset[];
   assetsByRoute: Map<string, ClientAsset>;
@@ -136,7 +137,7 @@ export interface RuntimeState {
   queryCache: Map<string, QueryCacheEntry>;
   queryInflight: Map<string, Promise<unknown>>;
   queryCacheLastPruneAt: number;
-  layoutStackCache: Map<string, Array<{ component: unknown; meta: MetaDefinition }>>;
+  layoutStackCache: Map<string, Array<{ component: unknown; meta: MetaDefinition; isProvider?: boolean }>>;
   featureMetaCache: Map<string, MetaDefinition>;
   mergedMetaCache: Map<string, MetaDefinition>;
   serverEvents: Array<{ at: string; level: "info" | "warn" | "error"; event: string; details?: string }>;

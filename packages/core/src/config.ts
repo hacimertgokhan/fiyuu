@@ -9,6 +9,49 @@ export interface FiyuuConfig {
     runtime?: "node" | "bun";
     port?: number;
   };
+  /** Provider and layout configuration */
+  providers?: {
+    /** Directory containing providers (default: app/providers) */
+    directory?: string;
+    /** Auto-discover providers from directory */
+    autoDiscover?: boolean;
+    /** Explicit provider order (overrides auto-discovery) */
+    order?: string[];
+    /** Global providers applied to all routes */
+    global?: string[];
+    /** Layout providers (wrap layout.tsx) */
+    layout?: string[];
+    /** Page providers (wrap page.tsx) */
+    page?: string[];
+  };
+  /** Private assets configuration */
+  private?: {
+    /** Directory for private assets (default: private) */
+    directory?: string;
+    /** Maximum file size for private assets (default: 100MB) */
+    maxFileSize?: number;
+    /** Allowed MIME types (undefined = all) */
+    allowedMimeTypes?: string[];
+    /** Server-side caching */
+    enableCache?: boolean;
+  };
+  /** Error handling and fallback configuration */
+  errors?: {
+    /** Show detailed error information */
+    showDetails?: boolean;
+    /** Enable error boundaries */
+    enableBoundaries?: boolean;
+    /** Enable skeleton loading states */
+    enableSkeletons?: boolean;
+    /** Default skeleton variant */
+    defaultSkeleton?: string;
+    /** Custom error handler */
+    onError?: (error: { code: string; message: string; source: string; stack?: string }) => void;
+    /** Called for every unhandled server error */
+    handler?: (error: Error, context: { route: string; method: string; requestId: string }) => void | Promise<void>;
+    /** Whether to expose error details (stack trace, message) in responses */
+    expose?: boolean;
+  };
   ai?: {
     enabled?: boolean;
     skillsDirectory?: string;

@@ -9,6 +9,8 @@ export * from "./scanner.js";
 export * from "./state.js";
 export * from "./virtual.js";
 export * from "./reactive.js";
+export * from "./providers.js";
+export * from "./errors.js";
 
 // Decorators & DI
 export * from "./decorators/index.js";
