@@ -10,7 +10,7 @@ import { existsSync, createReadStream } from "node:fs";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import type { ServerResponse } from "node:http";
-import { sendText, sendJson } from "server-utils.js";
+import { sendText, sendJson } from "./server-utils.js";
 
 export interface PrivateAsset {
   /** Asset name/path relative to private directory */

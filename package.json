@@ -1,6 +1,6 @@
 {
   "name": "fiyuu",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "type": "module",
   "exports": {
     "./client": "./client.ts"
@@ -31,11 +31,11 @@
     "postinstall": "node scripts/patch-gea.mjs"
   },
   "dependencies": {
-    "@fiyuu/cli": "^0.4.4",
-    "@fiyuu/core": "^0.4.3",
-    "@fiyuu/db": "^0.4.3",
-    "@fiyuu/realtime": "^0.4.3",
-    "@fiyuu/runtime": "^0.4.3",
+    "@fiyuu/cli": "^0.5.0",
+    "@fiyuu/core": "^0.5.0",
+    "@fiyuu/db": "^0.5.0",
+    "@fiyuu/realtime": "^0.5.0",
+    "@fiyuu/runtime": "^0.5.0",
     "chokidar": "^4.0.3",
     "esbuild": "^0.25.2",
     "tsx": "^4.19.3",

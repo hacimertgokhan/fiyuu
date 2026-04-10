@@ -1,6 +1,6 @@
 {
   "name": "@fiyuu/runtime",
-  "version": "0.4.7",
+  "version": "0.5.0",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -35,9 +35,9 @@
   "sideEffects": false,
   "dependencies": {
     "@geajs/core": "^1.0.12",
-    "@fiyuu/core": "^0.4.1",
-    "@fiyuu/db": "^0.4.1",
-    "@fiyuu/realtime": "^0.4.1",
+    "@fiyuu/core": "^0.5.0",
+    "@fiyuu/db": "^0.5.0",
+    "@fiyuu/realtime": "^0.5.0",
     "chokidar": "^4.0.3",
     "esbuild": "^0.25.2",
     "ws": "^8.18.1"

@@ -35,23 +35,6 @@ export interface FiyuuConfig {
     /** Server-side caching */
     enableCache?: boolean;
   };
-  /** Error handling and fallback configuration */
-  errors?: {
-    /** Show detailed error information */
-    showDetails?: boolean;
-    /** Enable error boundaries */
-    enableBoundaries?: boolean;
-    /** Enable skeleton loading states */
-    enableSkeletons?: boolean;
-    /** Default skeleton variant */
-    defaultSkeleton?: string;
-    /** Custom error handler */
-    onError?: (error: { code: string; message: string; source: string; stack?: string }) => void;
-    /** Called for every unhandled server error */
-    handler?: (error: Error, context: { route: string; method: string; requestId: string }) => void | Promise<void>;
-    /** Whether to expose error details (stack trace, message) in responses */
-    expose?: boolean;
-  };
   ai?: {
     enabled?: boolean;
     skillsDirectory?: string;
@@ -129,6 +112,16 @@ export interface FiyuuConfig {
     defaults?: Record<string, boolean>;
   };
   errors?: {
+    /** Show detailed error information in UI */
+    showDetails?: boolean;
+    /** Enable error boundaries */
+    enableBoundaries?: boolean;
+    /** Enable skeleton loading states */
+    enableSkeletons?: boolean;
+    /** Default skeleton variant */
+    defaultSkeleton?: string;
+    /** Custom error handler */
+    onError?: (error: { code: string; message: string; source: string; stack?: string }) => void;
     /**
      * Called for every unhandled server error.
      * Use this to send errors to Sentry, Datadog, etc.

@@ -7,7 +7,14 @@
     "outDir": "dist/packages",
     "rootDir": "packages",
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "paths": {
+      "@fiyuu/core": ["./packages/core/src/index.ts"],
+      "@fiyuu/db": ["./packages/db/src/index.ts"],
+      "@fiyuu/realtime": ["./packages/realtime/src/index.ts"],
+      "@fiyuu/runtime": ["./packages/runtime/src/index.ts"],
+      "@fiyuu/cli": ["./packages/cli/src/index.ts"]
+    }
   },
   "include": [
     "packages/*/src/**/*.ts",

@@ -1,0 +1,14 @@
+{
+  "requireAuth": [
+    "/dashboard",
+    "/admin",
+    "/profile"
+  ],
+  "publicRoutes": [
+    "/",
+    "/about",
+    "/auth/login",
+    "/auth/register"
+  ],
+  "sessionDurationHours": 24
+}
