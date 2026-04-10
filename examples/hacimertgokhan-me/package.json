@@ -11,11 +11,11 @@
     "doctor": "npx fiyuu doctor"
   },
   "dependencies": {
-    "@fiyuu/cli": "^0.4.7",
-    "@fiyuu/core": "^0.4.6",
-    "@fiyuu/db": "^0.4.6",
-    "@fiyuu/realtime": "^0.4.6",
-    "@fiyuu/runtime": "^0.4.7",
+    "@fiyuu/cli": "^0.5.1",
+    "@fiyuu/core": "^0.5.1",
+    "@fiyuu/db": "^0.5.1",
+    "@fiyuu/realtime": "^0.5.1",
+    "@fiyuu/runtime": "^0.5.1",
     "@geajs/core": "^1.2.3",
     "zod": "^3.25.76"
   }

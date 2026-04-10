@@ -1,9 +1,9 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 
-const FIXED_FILES = ["page.tsx", "action.ts", "query.ts", "schema.ts", "meta.ts"] as const;
+const FIXED_FILES = ["page.tsx", "page.ts", "action.ts", "query.ts", "schema.ts", "meta.ts"] as const;
 const REQUIRED_FILES = ["schema.ts", "meta.ts"] as const;
-const SUPPLEMENTARY_FILES = ["middleware.ts", "layout.tsx", "layout.meta.ts", "route.ts", "not-found.tsx", "error.tsx"] as const;
+const SUPPLEMENTARY_FILES = ["middleware.ts", "layout.tsx", "layout.ts", "layout.meta.ts", "route.ts", "not-found.tsx", "not-found.ts", "error.tsx", "error.ts"] as const;
 const GENERATED_FILE_PATTERN = /\.(js|jsx|d\.ts|map)$/;
 
 export interface FeatureRecord {
