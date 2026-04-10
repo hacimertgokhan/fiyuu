@@ -28,7 +28,8 @@ export function createSignal<T>(initial: T): Signal<T> {
   };
 }
 
-export function when(condition: unknown, content: string | (() => string)): string {
+// Note: 'when' is also defined in intent.ts with more features
+export function whenCondition(condition: unknown, content: string | (() => string)): string {
   if (!condition) return "";
   return typeof content === "function" ? content() : content;
 }

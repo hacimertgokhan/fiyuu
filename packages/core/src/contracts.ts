@@ -25,6 +25,9 @@ export interface QueryCacheConfig {
   vary?: string[];
 }
 
+// Import RenderMode from intent.ts
+import type { RenderMode } from "./intent.js";
+
 export interface MetaDefinition {
   intent: string;
   title?: string;
@@ -55,7 +58,9 @@ export interface LayoutDefinition {
   name?: string;
 }
 
-export type RenderMode = "ssr" | "csr" | "ssg";
+// Note: RenderMode is defined in intent.ts as "ssr" | "csr" | "static" | "edge"
+// This type is kept for backward compatibility
+export type LegacyRenderMode = "ssr" | "csr" | "ssg";
 
 export interface PageProps<TData = unknown> {
   data: TData | null;
@@ -71,13 +76,6 @@ export interface LayoutProps {
   route: string;
 }
 
-export function defineAction<TInput extends AnyZodSchema, TOutput extends AnyZodSchema>(config: SchemaContract<TInput, TOutput>): ActionDefinition<TInput, TOutput> {
-  return {
-    kind: "action",
-    ...config,
-  };
-}
-
 export function defineQuery<TInput extends AnyZodSchema, TOutput extends AnyZodSchema>(config: SchemaContract<TInput, TOutput>): QueryDefinition<TInput, TOutput> {
   return {
     kind: "query",
@@ -85,19 +83,8 @@ export function defineQuery<TInput extends AnyZodSchema, TOutput extends AnyZodS
   };
 }
 
-export function definePage(config: { intent: string }): PageDefinition {
-  return {
-    kind: "page",
-    ...config,
-  };
-}
-
-export function defineLayout(config: { name?: string } = {}): LayoutDefinition {
-  return {
-    kind: "layout",
-    ...config,
-  };
-}
+// Note: definePage, defineLayout, defineAction are now exported from intent.js
+// These implementations are kept for backward compatibility but will be removed in v0.6.0
 
 export function defineMeta(config: MetaDefinition): MetaDefinition {
   return config;
