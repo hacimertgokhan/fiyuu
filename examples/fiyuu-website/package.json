@@ -1,6 +1,6 @@
 {
   "name": "fiyuu-website",
-  "version": "0.4.7",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "@fiyuu/cli": "^0.4.7",
-    "@fiyuu/core": "^0.4.7",
-    "@fiyuu/db": "^0.4.7",
-    "@fiyuu/realtime": "^0.4.7",
+    "@fiyuu/core": "^0.4.6",
+    "@fiyuu/db": "^0.4.6",
+    "@fiyuu/realtime": "^0.4.6",
     "@fiyuu/runtime": "^0.4.7",
     "@geajs/core": "^1.2.3",
     "tailwindcss": "^3.4.19",
