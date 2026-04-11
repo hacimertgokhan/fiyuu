@@ -672,7 +672,16 @@ async function handleRoute(
   // SSR body
   let body = "";
   if (render === "ssr") {
-    const pageBody = renderGeaComponent(Page, { data, route: pathname, intent, render, params: routeParams });
+    // Check if Page is a PageIntent (has render function) or a Gea component
+    const pageIntent = Page as { render?: (ctx: { data: unknown }) => string };
+    let pageBody: string;
+    if (pageIntent.render && typeof pageIntent.render === "function") {
+      // PageIntent pattern (definePage)
+      pageBody = pageIntent.render({ data });
+    } else {
+      // Gea component pattern
+      pageBody = renderGeaComponent(Page, { data, route: pathname, intent, render, params: routeParams });
+    }
     body = layoutStack.reduceRight<string>(
       (children, layout) => renderGeaComponent(layout.component, { route: pathname, children }),
       pageBody,
