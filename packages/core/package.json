@@ -1,6 +1,6 @@
 {
   "name": "@fiyuu/core",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -24,6 +24,10 @@
     "./di": {
       "import": "./dist/di/container.js",
       "types": "./dist/di/container.d.ts"
+    },
+    "./errors": {
+      "import": "./dist/errors.js",
+      "types": "./dist/errors.d.ts"
     }
   },
   "publishConfig": {
@@ -49,6 +53,10 @@
       "./di": {
         "import": "./dist/di/container.js",
         "types": "./dist/di/container.d.ts"
+      },
+      "./errors": {
+        "import": "./dist/errors.js",
+        "types": "./dist/errors.d.ts"
       }
     }
   },

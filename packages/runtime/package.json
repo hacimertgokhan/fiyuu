@@ -1,6 +1,6 @@
 {
   "name": "@fiyuu/runtime",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -12,6 +12,10 @@
     "./cli": {
       "import": "./dist/cli.js",
       "types": "./dist/cli.d.ts"
+    },
+    "./server-private": {
+      "import": "./dist/server-private.js",
+      "types": "./dist/server-private.d.ts"
     }
   },
   "publishConfig": {
@@ -25,6 +29,10 @@
       "./cli": {
         "import": "./dist/cli.js",
         "types": "./dist/cli.d.ts"
+      },
+      "./server-private": {
+        "import": "./dist/server-private.js",
+        "types": "./dist/server-private.d.ts"
       }
     }
   },
