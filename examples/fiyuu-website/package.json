@@ -11,10 +11,10 @@
     "doctor": "fiyuu doctor"
   },
   "dependencies": {
-    "@fiyuu/cli": "^0.5.3",
-    "@fiyuu/core": "^0.5.3",
-    "@fiyuu/db": "^0.5.3",
-    "@fiyuu/realtime": "^0.5.3",
+    "@fiyuu/cli": "^0.5.2",
+    "@fiyuu/core": "^0.5.4",
+    "@fiyuu/db": "^0.5.2",
+    "@fiyuu/realtime": "^0.5.2",
     "@fiyuu/runtime": "^0.5.3",
     "@geajs/core": "^1.2.3",
     "tailwindcss": "^3.4.19",
