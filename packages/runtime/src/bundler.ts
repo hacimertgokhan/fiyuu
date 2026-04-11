@@ -146,6 +146,9 @@ function resolveLayoutFiles(feature: FeatureRecord, pageFile: string): string[] 
   const directories = [appDirectory, ...featureParts.map((_, index) => path.join(appDirectory, ...featureParts.slice(0, index + 1)))];
 
   return directories
-    .map((directory) => path.join(directory, "layout.tsx"))
-    .filter((layoutPath) => existsSync(layoutPath));
+    .flatMap((directory) => {
+      const layoutTsx = path.join(directory, "layout.tsx");
+      const layoutTs = path.join(directory, "layout.ts");
+      return existsSync(layoutTsx) ? [layoutTsx] : existsSync(layoutTs) ? [layoutTs] : [];
+    });
 }

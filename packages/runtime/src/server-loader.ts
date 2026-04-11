@@ -195,9 +195,11 @@ export async function loadLayoutStack(
 
   // Then load layouts
   for (const directory of directories) {
-    const layoutFile = path.join(directory, "layout.tsx");
+    const layoutFileTsx = path.join(directory, "layout.tsx");
+    const layoutFileTs = path.join(directory, "layout.ts");
+    const layoutFile = existsSync(layoutFileTsx) ? layoutFileTsx : existsSync(layoutFileTs) ? layoutFileTs : null;
     const metaFile = path.join(directory, "layout.meta.ts");
-    if (existsSync(layoutFile)) {
+    if (layoutFile) {
       const module = (await importModule(layoutFile, mode, serverDirectory)) as LayoutModule;
       if (module.default) {
         stack.push({ component: module.default, meta: await loadMetaFile(metaFile, mode, serverDirectory) });

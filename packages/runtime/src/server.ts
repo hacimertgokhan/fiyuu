@@ -600,7 +600,7 @@ async function handleRoute(
     }
   }
 
-  const pageModule = (await importModule(feature.files["page.tsx"]!, mode, state.serverDirectory)) as ModuleShape;
+  const pageModule = (await importModule(pageFile, mode, state.serverDirectory)) as ModuleShape;
   const queryModule = feature.files["query.ts"]
     ? ((await importModule(feature.files["query.ts"]!, mode, state.serverDirectory)) as ModuleShape)
     : null;
@@ -611,7 +611,7 @@ async function handleRoute(
     sendDocumentStatusPage(response, {
       statusCode: 500, title: "Invalid page module",
       summary: "The route loaded successfully, but its page module has no default export.",
-      detail: `Expected a default Gea component in ${feature.files["page.tsx"]}.`,
+      detail: `Expected a default Gea component in ${pageFile}.`,
       route: pathname, method: request.method ?? "GET", requestId,
       hints: ["Export a default Gea component from `page.tsx`."],
     });
@@ -783,8 +783,10 @@ async function tryRenderSystemPage(input: {
     render: "ssr",
   });
 
-  const rootLayoutPath = path.join(input.appDirectory, "layout.tsx");
-  if (existsSync(rootLayoutPath)) {
+  const rootLayoutPathTsx = path.join(input.appDirectory, "layout.tsx");
+  const rootLayoutPathTs = path.join(input.appDirectory, "layout.ts");
+  const rootLayoutPath = existsSync(rootLayoutPathTsx) ? rootLayoutPathTsx : existsSync(rootLayoutPathTs) ? rootLayoutPathTs : null;
+  if (rootLayoutPath) {
     const rootLayoutModule = (await importModule(rootLayoutPath, input.mode, input.serverDirectory)) as LayoutModule;
     if (rootLayoutModule.default) {
       body = renderGeaComponent(rootLayoutModule.default, { route: input.route, children: body });
@@ -871,7 +873,7 @@ async function handleSitemap(
   }
 
   const cleanBaseUrl = baseUrl.replace(/\/$/, "");
-  const features = state.features.filter((f) => f.files["page.tsx"] && !f.isDynamic);
+  const features = state.features.filter((f) => (f.files["page.tsx"] || f.files["page.ts"]) && !f.isDynamic);
 
   let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
   xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;

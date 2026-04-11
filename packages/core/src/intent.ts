@@ -27,7 +27,7 @@ import type { HttpMethod } from "./decorators/controller.js";
 export type { HttpMethod };
 
 /** Render modları - ne zaman çalışacağı belli */
-export type RenderMode = "ssr" | "csr" | "static" | "edge";
+export type RenderMode = "ssr" | "csr" | "ssg" | "static" | "edge";
 
 /** Temel context - her handler'da var */
 export interface BaseContext {
@@ -365,9 +365,9 @@ export function defineApi<T, B = unknown, P = unknown, Q = unknown>(
   intent: ApiIntent<T, B, P, Q>
 ): ApiIntent<T, B, P, Q> {
   return {
-    method: "POST",
     auth: false,
     ...intent,
+    method: intent.method ?? "POST",
   };
 }
 
