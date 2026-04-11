@@ -12,10 +12,10 @@
   },
   "dependencies": {
     "@fiyuu/cli": "^0.5.3",
-    "@fiyuu/core": "^0.5.3",
+    "@fiyuu/core": "^0.5.5",
     "@fiyuu/db": "^0.5.3",
     "@fiyuu/realtime": "^0.5.3",
-    "@fiyuu/runtime": "^0.5.5",
+    "@fiyuu/runtime": "^0.5.6",
     "@geajs/core": "^1.2.3",
     "tailwindcss": "^3.4.19",
     "zod": "^3.25.76"
