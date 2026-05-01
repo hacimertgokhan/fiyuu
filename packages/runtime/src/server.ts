@@ -683,7 +683,13 @@ async function handleRoute(
       pageBody = renderGeaComponent(Page, { data, route: pathname, intent, render, params: routeParams });
     }
     body = layoutStack.reduceRight<string>(
-      (children, layout) => renderGeaComponent(layout.component, { route: pathname, children }),
+      (children, layout) => {
+        const layoutIntent = layout.component as { wrapper?: (props: Record<string, unknown>) => string };
+        if (layoutIntent.wrapper && typeof layoutIntent.wrapper === "function") {
+          return layoutIntent.wrapper({ route: pathname, body: children });
+        }
+        return renderGeaComponent(layout.component, { route: pathname, children });
+      },
       pageBody,
     );
   }
