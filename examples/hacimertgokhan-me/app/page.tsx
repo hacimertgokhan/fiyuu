@@ -4,7 +4,7 @@
  * Portfolio - Intent-Based
  */
 
-import { definePage, html, when, memoAsync } from "@fiyuu/core";
+import { definePage, html, when } from "@fiyuu/core";
 
 // Icons
 const iconMail = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="m4 6 8 6 8-6"/><rect x="3" y="5" width="18" height="14" rx="2"/></svg>`;
@@ -12,8 +12,7 @@ const iconGithub = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" s
 const iconLinkedIn = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><rect x="3" y="3" width="18" height="18" rx="2"/><path stroke-linecap="round" d="M8 11v6m0-9v.01M12 17v-3a2 2 0 1 1 4 0v3"/></svg>`;
 const iconExternal = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5h5v5m-9 9h9V10M5 14V5h9"/></svg>`;
 
-// Memoized data
-const getPortfolio = memoAsync(async () => ({
+const getPortfolio = async () => ({
   fullName: "Hacı Mert Gökhan",
   title: { tr: "Yazılım Geliştirici", en: "Software Developer" },
   location: { tr: "Türkiye", en: "Turkey" },
@@ -55,7 +54,7 @@ const getPortfolio = memoAsync(async () => ({
     },
   ],
   githubStats: { stars: 150, forks: 25, commits: 500 },
-}), { ttl: 3600, tags: ["portfolio"] });
+});
 
 export default definePage({
   load: () => getPortfolio(),
