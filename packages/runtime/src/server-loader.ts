@@ -4,6 +4,7 @@
  */
 
 import { existsSync, mkdirSync, writeFileSync, readFileSync, statSync } from "node:fs";
+import { createHash } from "node:crypto";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { buildSync } from "esbuild";
@@ -17,7 +18,7 @@ const tsxCacheDir = path.join(process.cwd(), ".fiyuu", "dev", "tsx-cache");
 const tsxCache = new Map<string, string>();
 
 function getCompiledPath(originalPath: string): string {
-  const hash = Buffer.from(originalPath).toString("base64").replace(/[^a-zA-Z0-9]/g, "").slice(0, 16);
+  const hash = createHash("sha256").update(originalPath).digest("hex").slice(0, 16);
   return path.join(tsxCacheDir, `${hash}.js`);
 }
 
