@@ -1,6 +1,18 @@
-import { definePage, html } from "@fiyuu/core";
+import { Component } from "@geajs/core";
+import { html } from "@fiyuu/core";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
-const unsafeHtml = (value: string) => ({ toString: () => value });
+const unsafeHtml = (value: string) => ({ value, toString: () => value });
+
+function getPortfolioFallback() {
+  const file = resolve(process.cwd(), "app/data/profile.json");
+  const profile = JSON.parse(readFileSync(file, "utf-8"));
+  return {
+    ...profile,
+    githubStats: profile.githubStats ?? { stars: 0, forks: 0, commits: 0 },
+  };
+}
 
 // ─── Icons ──────────────────────────────────────────────────────────
 const icon = (d: string) => unsafeHtml(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="${d}"/></svg>`);
@@ -184,9 +196,11 @@ function renderFooter() {
 }
 
 // ─── Main Page ──────────────────────────────────────────────────────
-export default definePage({
-  render: ({ data }) => {
-    const profile = data as any;
+export const page = { intent: "Personal CV-style portfolio page" };
+
+export default class HomePage extends Component {
+  template({ data }: any = this.props) {
+    const profile = data ?? getPortfolioFallback();
 
     return html`
       ${unsafeHtml(renderNav())}
@@ -329,5 +343,5 @@ export default definePage({
         })();
       </script>
     `;
-  },
-});
+  }
+}

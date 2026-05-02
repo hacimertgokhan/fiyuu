@@ -1,11 +1,11 @@
-import { defineLayout, html } from "@fiyuu/core";
+import { html } from "@fiyuu/core";
 
-const unsafeHtml = (value: string) => ({ toString: () => value });
+const unsafeHtml = (value: string) => ({ value, toString: () => value });
 
-export default defineLayout({
-  name: "root",
+export const layout = { name: "root" };
 
-  wrapper: ({ head, body }) => html`
+export default function RootLayout({ children }: any = {}) {
+  return html`
     <style>
       @import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&display=swap");
 
@@ -355,8 +355,7 @@ export default defineLayout({
       }
     </style>
 
-    ${head ? unsafeHtml(head) : ""}
-    ${body ? unsafeHtml(body) : ""}
+    ${children ? unsafeHtml(children) : ""}
 
     <script>
       (() => {
@@ -364,5 +363,5 @@ export default defineLayout({
         if (theme === "dark") document.documentElement.setAttribute("data-theme", "dark");
       })();
     </script>
-  `,
-});
+  `;
+}
