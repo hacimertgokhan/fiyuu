@@ -1,7 +1,7 @@
-import { definePage, html, raw } from "@fiyuu/core";
+import { definePage, html, unsafeHtml } from "@fiyuu/core";
 
 // ─── Icons ──────────────────────────────────────────────────────────
-const icon = (d: string) => raw(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="${d}"/></svg>`);
+const icon = (d: string) => unsafeHtml(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="${d}"/></svg>`);
 
 const Icons = {
   mail: icon("m4 6 8 6 8-6"),
@@ -70,7 +70,7 @@ function renderHero(profile) {
     { key: "commits", label: "Commit", value: profile.githubStats.commits, icon: Icons.commit },
   ];
 
-  const statsHtml = raw(stats.map(s => `
+  const statsHtml = unsafeHtml(stats.map(s => `
     <div class="stat-item">
       <span class="inline-flex items-center gap-2 text-[color:var(--text-muted)]">${s.icon.value}<span data-stat-label="${s.key}">${s.label}</span></span>
       <span class="font-semibold">${s.value.toLocaleString("en-US")}</span>
@@ -96,7 +96,7 @@ function renderHero(profile) {
 
 // ─── About ──────────────────────────────────────────────────────────
 function renderAbout(profile) {
-  const paragraphsHtml = raw(profile.about.tr.map((p, i) => `
+  const paragraphsHtml = unsafeHtml(profile.about.tr.map((p, i) => `
     <p data-i18n-tr="${p}" data-i18n-en="${profile.about.en[i] ?? p}" class="text-base md:text-lg leading-8 text-[color:var(--text-secondary)]">${p}</p>`).join(""));
 
   return html`
@@ -111,7 +111,7 @@ function renderAbout(profile) {
 
 // ─── Experience ─────────────────────────────────────────────────────
 function renderExperience(profile) {
-  const itemsHtml = raw(profile.experiences.map((exp, idx) => `
+  const itemsHtml = unsafeHtml(profile.experiences.map((exp, idx) => `
     <article class="experience-item animate-slide-up" style="animation-delay:${idx*100}ms;animation-fill-mode:both;">
       <div class="experience-dot" aria-hidden="true"></div>
       <div class="experience-content">
@@ -141,10 +141,10 @@ const categoryLabels = {
 
 function renderProjects(profile) {
   const categories = ["all", ...new Set(profile.projects.map(p => p.category))];
-  const tabsHtml = raw(categories.map((c, i) => `
+  const tabsHtml = unsafeHtml(categories.map((c, i) => `
     <button type="button" class="project-tab" data-category="${c}" data-active="${i===0?"true":"false"}">${categoryLabels[c] ?? c}</button>`).join(""));
 
-  const projectsHtml = raw(profile.projects.map((p, idx) => `
+  const projectsHtml = unsafeHtml(profile.projects.map((p, idx) => `
     <article class="card accent-border-top animate-slide-up" data-project-card="true" data-category="${p.category}" style="animation-delay:${idx*100}ms;animation-fill-mode:both;">
       <div class="flex items-start justify-between gap-3">
         <h3 class="text-lg md:text-xl font-bold">${p.name}</h3>
@@ -187,14 +187,14 @@ export default definePage({
     const profile = data as any;
 
     return html`
-      ${raw(renderNav())}
+      ${unsafeHtml(renderNav())}
       <main>
-        ${raw(renderHero(profile))}
-        ${raw(renderAbout(profile))}
-        ${raw(renderExperience(profile))}
-        ${raw(renderProjects(profile))}
+        ${unsafeHtml(renderHero(profile))}
+        ${unsafeHtml(renderAbout(profile))}
+        ${unsafeHtml(renderExperience(profile))}
+        ${unsafeHtml(renderProjects(profile))}
       </main>
-      ${raw(renderFooter())}
+      ${unsafeHtml(renderFooter())}
 
       <script type="module">
         (() => {

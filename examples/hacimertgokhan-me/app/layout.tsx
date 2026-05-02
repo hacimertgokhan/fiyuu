@@ -1,4 +1,4 @@
-import { defineLayout, html, raw } from "@fiyuu/core";
+import { defineLayout, html, unsafeHtml } from "@fiyuu/core";
 
 export default defineLayout({
   name: "root",
@@ -353,8 +353,8 @@ export default defineLayout({
       }
     </style>
 
-    ${head ? raw(head) : ""}
-    ${body ? raw(body) : ""}
+    ${head ? unsafeHtml(head) : ""}
+    ${body ? unsafeHtml(body) : ""}
 
     <script>
       (() => {
