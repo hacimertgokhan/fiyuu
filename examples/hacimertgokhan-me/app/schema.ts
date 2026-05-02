@@ -16,7 +16,7 @@ export const projectSchema = z.object({
     tr: z.string(),
     en: z.string(),
   }),
-  category: z.enum(["IDE", "Database Engine", "SaaS", "B2B"]),
+  category: z.enum(["IDE", "Database Engine", "SaaS", "B2B", "Framework"]),
   stack: z.array(z.string()),
   liveUrl: z.string(),
   githubUrl: z.string(),

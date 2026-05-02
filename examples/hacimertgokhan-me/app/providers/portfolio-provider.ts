@@ -9,7 +9,7 @@
 import { readPrivateJson } from "@fiyuu/runtime/server-private";
 
 export interface PortfolioProviderProps {
-  children: string;
+  children: string | Promise<string>;
 }
 
 export default async function PortfolioProvider({ children }: PortfolioProviderProps): Promise<string> {
@@ -22,12 +22,14 @@ export default async function PortfolioProvider({ children }: PortfolioProviderP
     console.warn("[PortfolioProvider] Could not load portfolio data:", error);
     portfolioData = { projects: [], skills: [], experience: [] };
   }
+
+  const resolvedChildren = await children;
   
   return `
     <div data-portfolio-provider="true" 
-         data-projects="${portfolioData.projects?.length || 0}"
-         data-skills="${portfolioData.skills?.length || 0}">
-      ${children}
+         data-projects="${portfolioData?.projects?.length || 0}"
+         data-skills="${portfolioData?.skills?.length || 0}">
+      ${resolvedChildren}
     </div>
   `;
 }

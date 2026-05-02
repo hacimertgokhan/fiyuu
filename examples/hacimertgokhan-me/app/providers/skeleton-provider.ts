@@ -6,7 +6,7 @@
  * @priority 30
  */
 
-import { wrapWithSkeleton } from "@fiyuu/core/errors";
+import { wrapWithSkeleton } from "@fiyuu/core";
 
 export interface SkeletonProviderProps {
   children: string;

@@ -15,8 +15,8 @@
     "@fiyuu/core": "^0.5.5",
     "@fiyuu/db": "^0.5.3",
     "@fiyuu/realtime": "^0.5.3",
-    "@fiyuu/runtime": "^0.5.6",
-    "@geajs/core": "^1.2.3",
+    "@fiyuu/runtime": "^0.5.7",
+    "@geajs/core": "^1.3.0",
     "zod": "^3.25.76"
   }
 }

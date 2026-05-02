@@ -9,23 +9,23 @@ importers:
   .:
     dependencies:
       '@fiyuu/cli':
-        specifier: ^0.4.7
-        version: 0.4.7(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+        specifier: ^0.5.3
+        version: 0.5.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@fiyuu/core':
-        specifier: ^0.4.6
-        version: 0.4.6(react@19.2.5)
+        specifier: ^0.5.5
+        version: 0.5.5(react@19.2.5)
       '@fiyuu/db':
-        specifier: ^0.4.6
-        version: 0.4.6
+        specifier: ^0.5.3
+        version: 0.5.3
       '@fiyuu/realtime':
-        specifier: ^0.4.6
-        version: 0.4.6
+        specifier: ^0.5.3
+        version: 0.5.3
       '@fiyuu/runtime':
-        specifier: ^0.4.7
-        version: 0.4.7(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+        specifier: ^0.5.7
+        version: 0.5.7(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@geajs/core':
-        specifier: ^1.2.3
-        version: 1.2.3
+        specifier: ^1.3.0
+        version: 1.3.0
       zod:
         specifier: ^3.25.76
         version: 3.25.76
@@ -344,34 +344,34 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@fiyuu/cli@0.4.7':
-    resolution: {integrity: sha512-uBhxtaQCtcEnNppqVrJOzWOCrRyTS14s98PnxnP9kA6KXJKC9ANtpNAIs7PCzSj7OchezIMTJIYFgWNOexeyvg==}
+  '@fiyuu/cli@0.5.3':
+    resolution: {integrity: sha512-ooWsBFUSTH4g9jVG02y4D0IImV5YZMJFcyacWctzdcueuP7p3MxKOV1XHOj4bO/vPvZd0k7ssTk4nXLyjpOd2w==}
     hasBin: true
 
-  '@fiyuu/core@0.4.6':
-    resolution: {integrity: sha512-CEMD0Ja2AhFK2L+/xNUEu2lto8aDBUBiCEu+Tt5Eg8+1bKw6j99JFS5RdAcXj19wbVcjkBcTZAOc9Il52gnCNA==}
+  '@fiyuu/core@0.5.5':
+    resolution: {integrity: sha512-zsunyRmkxyGwkrjK/Z5/vJFrgZnDke0AfaX4utGG6n4ElqsJCGbsNxVB2ikZhcdeY6zB5gvUPh99mXlqRfHv6A==}
     peerDependencies:
       react: ^19.1.0
 
-  '@fiyuu/db@0.4.6':
-    resolution: {integrity: sha512-yuFWGtEjXDyTj7wMkzABE5wybU3u7dHJIUlWrK8Pbngyapp3DrkawpWui+rbX2TwtdwqgsMRlGMUVP6ibjwqXA==}
+  '@fiyuu/db@0.5.3':
+    resolution: {integrity: sha512-sVerL42O1ruQ3OdsrZdFBbJFkz6Zg1bc3g7YBpPE/T0v0ROXudCKjJEV+l0o6VZYB7o6RIQ53VSC83DnBdpSmQ==}
 
-  '@fiyuu/realtime@0.4.6':
-    resolution: {integrity: sha512-bCOdKlZVXul2kGTslHz8aK+xHehC9mm3L8eMq5OQBNJrIWRUX2+UaUstx1v3Gy+j4+YNcx2xkdwtEQQaGyZT5Q==}
+  '@fiyuu/realtime@0.5.3':
+    resolution: {integrity: sha512-X7FzZ/Vdcp3M0c+SGRHNQd8bgr5JZW0KBL3Db3HrEjZvINmWePsG8togf3vWGxSrhxOSg5rdE4Mqmi7j3BVVJQ==}
     peerDependencies:
       nats: ^2.0.0
     peerDependenciesMeta:
       nats:
         optional: true
 
-  '@fiyuu/runtime@0.4.7':
-    resolution: {integrity: sha512-I7/oJktamsMkZlggQS5Tu1iP35e4t6GOzT05bellRTZaPNFqpBzh4pdmFZG5d8aBQvJ306OEw+77LqWy0XS4oQ==}
+  '@fiyuu/runtime@0.5.7':
+    resolution: {integrity: sha512-C2UuOD7z+w9dQromj55ZyKitnwBs83n4zWPX98LPl8L/Q2z+r6iPIoa1wJ4hT10uJAQhVabiz7Vo6byiNtTkJQ==}
     peerDependencies:
       react: ^19.1.0
       react-dom: ^19.1.0
 
-  '@geajs/core@1.2.3':
-    resolution: {integrity: sha512-fIcpue0GoiKfbRPVl721NHXWQRyKsrBnJntfH16/6Cav4uZ4eFiRYQgeHpkgz0kSQSApemVcNBuJydj+f7oXVw==}
+  '@geajs/core@1.3.0':
+    resolution: {integrity: sha512-eU2Qq6aWAONkfS7qR4WIEyeCCctzM2wXXkgBslLrruKQlFdTQpm7xjUNAS9DmZ8GMQ4vTIdHFgNk+z6V+OAndg==}
 
   '@types/react@19.2.14':
     resolution: {integrity: sha512-ilcTH/UniCkMdtexkoCN0bI7pMcJDvmQFPvuPvmEaYA/NSfFTAgdUSLAoVjaRJm7+6PvcM+q1zYOwS4wTYMF9w==}
@@ -398,8 +398,8 @@ packages:
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
 
-  get-tsconfig@4.13.7:
-    resolution: {integrity: sha512-7tN6rFgBlMgpBML5j8typ92BKFi2sFQvIdpAqLA2beia5avZDrMs0FLZiM5etShWq5irVyGcGMEA1jcDaK7A/Q==}
+  get-tsconfig@4.14.0:
+    resolution: {integrity: sha512-yTb+8DXzDREzgvYmh6s9vHsSVCHeC0G3PI5bEXNBHtmshPnO+S5O7qgLEOn0I5QvMy6kpZN8K1NKGyilLb93wA==}
 
   react-dom@19.2.5:
     resolution: {integrity: sha512-J5bAZz+DXMMwW/wV3xzKke59Af6CHY7G4uYLN1OvBcKEsWOs4pQExj86BBKamxl/Ik5bx9whOrvBlSDfWzgSag==}
@@ -603,10 +603,10 @@ snapshots:
   '@esbuild/win32-x64@0.27.7':
     optional: true
 
-  '@fiyuu/cli@0.4.7(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
+  '@fiyuu/cli@0.5.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
     dependencies:
-      '@fiyuu/core': 0.4.6(react@19.2.5)
-      '@fiyuu/runtime': 0.4.7(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@fiyuu/core': 0.5.5(react@19.2.5)
+      '@fiyuu/runtime': 0.5.7(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       tsx: 4.21.0
       typescript: 5.9.3
     transitivePeerDependencies:
@@ -616,26 +616,26 @@ snapshots:
       - react-dom
       - utf-8-validate
 
-  '@fiyuu/core@0.4.6(react@19.2.5)':
+  '@fiyuu/core@0.5.5(react@19.2.5)':
     dependencies:
       react: 19.2.5
       zod: 3.25.76
 
-  '@fiyuu/db@0.4.6': {}
+  '@fiyuu/db@0.5.3': {}
 
-  '@fiyuu/realtime@0.4.6':
+  '@fiyuu/realtime@0.5.3':
     dependencies:
       ws: 8.20.0
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
 
-  '@fiyuu/runtime@0.4.7(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
+  '@fiyuu/runtime@0.5.7(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
     dependencies:
-      '@fiyuu/core': 0.4.6(react@19.2.5)
-      '@fiyuu/db': 0.4.6
-      '@fiyuu/realtime': 0.4.6
-      '@geajs/core': 1.2.3
+      '@fiyuu/core': 0.5.5(react@19.2.5)
+      '@fiyuu/db': 0.5.3
+      '@fiyuu/realtime': 0.5.3
+      '@geajs/core': 1.3.0
       chokidar: 4.0.3
       esbuild: 0.25.12
       react: 19.2.5
@@ -646,7 +646,7 @@ snapshots:
       - nats
       - utf-8-validate
 
-  '@geajs/core@1.2.3':
+  '@geajs/core@1.3.0':
     dependencies:
       '@types/react': 19.2.14
 
@@ -721,7 +721,7 @@ snapshots:
   fsevents@2.3.3:
     optional: true
 
-  get-tsconfig@4.13.7:
+  get-tsconfig@4.14.0:
     dependencies:
       resolve-pkg-maps: 1.0.0
 
@@ -741,7 +741,7 @@ snapshots:
   tsx@4.21.0:
     dependencies:
       esbuild: 0.27.7
-      get-tsconfig: 4.13.7
+      get-tsconfig: 4.14.0
     optionalDependencies:
       fsevents: 2.3.3
 
