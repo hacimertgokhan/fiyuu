@@ -1,4 +1,6 @@
-import { defineLayout, html, unsafeHtml } from "@fiyuu/core";
+import { defineLayout, html } from "@fiyuu/core";
+
+const unsafeHtml = (value: string) => ({ toString: () => value });
 
 export default defineLayout({
   name: "root",

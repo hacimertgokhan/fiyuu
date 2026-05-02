@@ -1,4 +1,6 @@
-import { definePage, html, unsafeHtml } from "@fiyuu/core";
+import { definePage, html } from "@fiyuu/core";
+
+const unsafeHtml = (value: string) => ({ toString: () => value });
 
 // ─── Icons ──────────────────────────────────────────────────────────
 const icon = (d: string) => unsafeHtml(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="${d}"/></svg>`);
