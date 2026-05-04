@@ -7,6 +7,7 @@ import { startServer } from "@fiyuu/runtime";
 import { c, ensurePrompt, ensureValue, fiyuuError, resolveAppDirectory } from "./shared.js";
 import { build, start } from "./commands/build.js";
 import { sync } from "./commands/sync.js";
+import { compileFiuFiles, watchFiuFiles } from "./fiu-compile.js";
 import { generate } from "./commands/generate.js";
 import { runAi } from "./commands/ai.js";
 import { handleGraphCommand } from "./commands/graph.js";
@@ -71,6 +72,8 @@ async function main(): Promise<void> {
   switch (command ?? "") {
     case "dev":
       await sync(rootDirectory, appDirectory);
+      await compileFiuFiles(appDirectory);
+      watchFiuFiles(appDirectory);
       await startServer({
         mode: "dev",
         rootDirectory,
@@ -84,6 +87,7 @@ async function main(): Promise<void> {
       return;
 
     case "build":
+      await compileFiuFiles(appDirectory);
       await build(rootDirectory, appDirectory, config);
       return;
 

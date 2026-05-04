@@ -108,3 +108,58 @@ export function component<Props extends ComponentProps = ComponentProps>(
 ): (props: Props) => string {
   return render;
 }
+
+/**
+ * defineComponent — tip-güvenli, okunabilir component factory.
+ *
+ * Birden fazla component'i aynı dosyada yazmak için kullanılır.
+ * Her component bağımsız scope'a sahiptir.
+ *
+ * @example
+ * const Hero = defineComponent<{ name: string }>(({ name }) =>
+ *   html`<h1>${name}</h1>`
+ * );
+ *
+ * // Kullanım:
+ * Hero({ name: "Mert" })
+ */
+export function defineComponent<Props extends ComponentProps = Record<string, never>>(
+  render: (props: Props) => string,
+): (props: Props) => string {
+  return (props: Props) => render(props);
+}
+
+/**
+ * compose — birden fazla component çıktısını birleştirir.
+ *
+ * HTML string'leri veya component çağrılarını sırayla birleştirir.
+ * Fragment gibi düşün — wrapper element oluşturmaz.
+ *
+ * @example
+ * compose(
+ *   Nav(),
+ *   Hero({ profile: data }),
+ *   About({ profile: data }),
+ * )
+ */
+export function compose(...parts: (string | null | undefined | false)[]): string {
+  return parts.filter(Boolean).join("");
+}
+
+/**
+ * when — koşullu render helper.
+ *
+ * @example
+ * when(isLoggedIn, () => html`<Dashboard />`, () => html`<Login />`)
+ */
+export function when(
+  condition: unknown,
+  thenPart: string | (() => string),
+  elsePart?: string | (() => string),
+): string {
+  if (condition) {
+    return typeof thenPart === "function" ? thenPart() : thenPart;
+  }
+  if (elsePart == null) return "";
+  return typeof elsePart === "function" ? elsePart() : elsePart;
+}

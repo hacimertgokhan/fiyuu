@@ -1,0 +1,466 @@
+// hacimertgokhan.me — portfolio sayfası
+// .fiu formatı: her component kendi bloğunda, okunabilir, tip-güvenli
+
+// ─── Nav ─────────────────────────────────────────────────────────────────────
+
+@component
+component Nav {
+  template() {
+    <aside id="floatbar" class="floating-nav hidden xl:flex">
+      <a href="#hero" class="float-item" data-target="hero" data-active="true" aria-label="Ana bölüm">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 10.5 12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>
+        </svg>
+      </a>
+      <a href="#about" class="float-item" data-target="about" data-active="false" aria-label="Hakkımda">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8h0M5 20a7 7 0 0 1 14 0"/>
+        </svg>
+      </a>
+      <a href="#experience" class="float-item" data-target="experience" data-active="false" aria-label="Tecrübelerim">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16 3v4M8 3v4M3 11h18"/>
+        </svg>
+      </a>
+      <a href="#projects" class="float-item" data-target="projects" data-active="false" aria-label="Projelerim">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8 20h8"/>
+        </svg>
+      </a>
+      <button class="float-item" type="button" data-locale-toggle="true" aria-label="Dili değiştir">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/>
+        </svg>
+      </button>
+    </aside>
+
+    <nav class="mobile-toolbar xl:hidden" aria-label="Hizli erisim">
+      <div class="mobile-toolbar-scroll">
+        <a href="#hero" class="mobile-toolbar-link">Ana Sayfa</a>
+        <a href="#about" class="mobile-toolbar-link">Hakkımda</a>
+        <a href="#experience" class="mobile-toolbar-link">Deneyim</a>
+        <a href="#projects" class="mobile-toolbar-link">Projeler</a>
+      </div>
+      <div class="mobile-toolbar-actions">
+        <button class="toolbar-toggle" type="button" data-locale-toggle="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/>
+          </svg>
+          <span data-locale-label="true">TR</span>
+        </button>
+      </div>
+    </nav>
+  }
+}
+
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+
+@component
+component Hero(profile) {
+  template(profile) {
+    <section id="hero" class="section-container pt-6 pb-6 md:pt-16">
+      <div class="hero-section p-6 md:p-10 md:pr-72">
+        <p class="text-xs leading-6 tracking-[0.22em] text-[color:var(--text-muted)]">
+          fiyuu / denis / quark / plexus / locai
+        </p>
+        <h1 class="mt-4 text-3xl sm:text-4xl md:text-5xl font-black leading-tight">
+          {profile.fullName}
+        </h1>
+        <p
+          data-i18n-tr="{profile.title.tr}"
+          data-i18n-en="{profile.title.en}"
+          class="mt-3 text-base sm:text-lg md:text-xl text-gradient font-medium"
+        >
+          {profile.title.tr}
+        </p>
+        <p
+          data-i18n-tr="{profile.location.tr}"
+          data-i18n-en="{profile.location.en}"
+          class="mt-2 text-sm md:text-base text-[color:var(--text-muted)]"
+        >
+          {profile.location.tr}
+        </p>
+
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a href="mailto:{profile.contacts.email}" class="btn-icon w-full sm:w-auto">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m4 6 8 6 8-6"/>
+            </svg>
+            <span id="email-label">E-posta</span>
+          </a>
+          <a href="{profile.contacts.github}" target="_blank" rel="noreferrer" class="btn-icon w-full sm:w-auto">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 19c-4 1.5-4-2.5-6-3m12 6v-3.9a3.3 3.3 0 0 0-.9-2.5c3-.4 6.2-1.5 6.2-6.7A5.2 5.2 0 0 0 19 5.3 4.8 4.8 0 0 0 18.9 2S17.7 1.6 15 3.4a13.3 13.3 0 0 0-6 0C6.3 1.6 5.1 2 5.1 2a4.8 4.8 0 0 0-.1 3.3A5.2 5.2 0 0 0 3.7 8.9c0 5.2 3.2 6.3 6.2 6.7a3.3 3.3 0 0 0-.9 2.5V22"/>
+            </svg>
+            GitHub
+          </a>
+          <a href="{profile.contacts.linkedin}" target="_blank" rel="noreferrer" class="btn-icon w-full sm:w-auto">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 11v6m0-9v.01M12 17v-3a2 2 0 1 1 4 0v3"/>
+            </svg>
+            LinkedIn
+          </a>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 gap-2.5 sm:grid-cols-3 md:absolute md:bottom-8 md:right-8 md:mt-0 md:w-56 md:grid-cols-1">
+          <StatItem key="stars" icon="star" value="{profile.githubStats.stars}" label="Yıldız" />
+          <StatItem key="forks" icon="fork" value="{profile.githubStats.forks}" label="Fork" />
+          <StatItem key="commits" icon="commit" value="{profile.githubStats.commits}" label="Commit" />
+        </div>
+      </div>
+    </section>
+  }
+}
+
+// ─── StatItem ─────────────────────────────────────────────────────────────────
+
+@component
+component StatItem(key, value, label) {
+  template(key, value, label) {
+    <div class="stat-item">
+      <span class="inline-flex items-center gap-2 text-[color:var(--text-muted)]">
+        <span data-stat-label="{key}">{label}</span>
+      </span>
+      <span class="font-semibold">{value}</span>
+    </div>
+  }
+}
+
+// ─── About ────────────────────────────────────────────────────────────────────
+
+@component
+component About(profile) {
+  template(profile) {
+    <section id="about" class="section-container py-5 md:py-7">
+      <div class="space-y-4">
+        <h2 id="heading-about" class="section-title animate-slide-in-left">Hakkımda</h2>
+        <div class="space-y-4 rounded-2xl border border-[color:var(--border)] bg-[color:var(--bg-secondary)] p-5 sm:p-6">
+          {profile.about.tr.map((p, i) =>
+            `<p data-i18n-tr="${p}" data-i18n-en="${profile.about.en[i] ?? p}"
+                class="text-base md:text-lg leading-8 text-[color:var(--text-secondary)]">${p}</p>`
+          ).join("")}
+        </div>
+      </div>
+    </section>
+  }
+}
+
+// ─── ExperienceItem ───────────────────────────────────────────────────────────
+
+@component
+component ExperienceItem(exp, index) {
+  template(exp, index) {
+    <article class="experience-item animate-slide-up" style="animation-delay:{index*100}ms;animation-fill-mode:both;">
+      <div class="experience-dot" aria-hidden="true"></div>
+      <div class="experience-content">
+        <div class="flex flex-wrap items-start justify-between gap-2">
+          <h3 class="text-lg md:text-xl font-bold">{exp.role}</h3>
+          <span class="text-xs uppercase tracking-[0.15em] text-[color:var(--text-muted)]">
+            {exp.startDate} - {exp.endDate}
+          </span>
+        </div>
+        <p class="mt-1 text-sm text-[color:var(--text-secondary)]">{exp.company}</p>
+        <div class="mt-3 flex flex-wrap gap-2">
+          {exp.techStack.map(t => `<span class="chip">${t}</span>`).join("")}
+        </div>
+      </div>
+    </article>
+  }
+}
+
+// ─── Experience ───────────────────────────────────────────────────────────────
+
+@component
+component Experience(profile) {
+  template(profile) {
+    <section id="experience" class="section-container pb-8 pt-4 md:pb-10 md:pt-5">
+      <div class="space-y-4 mt-12">
+        <h2 id="heading-experience" class="section-title animate-slide-in-left">Tecrübelerim</h2>
+        <div class="experience-timeline">
+          {profile.experiences.map((exp, i) => ExperienceItem({ exp, index: i }))}
+        </div>
+      </div>
+    </section>
+  }
+}
+
+// ─── ProjectCard ──────────────────────────────────────────────────────────────
+
+@component
+component ProjectCard(project, index) {
+  template(project, index) {
+    <article
+      class="card accent-border-top animate-slide-up"
+      data-project-card="true"
+      data-category="{project.category}"
+      style="animation-delay:{index*100}ms;animation-fill-mode:both;"
+    >
+      <div class="flex items-start justify-between gap-3">
+        <h3 class="text-lg md:text-xl font-bold">{project.name}</h3>
+        <span class="chip-accent">{project.category}</span>
+      </div>
+      <p
+        data-i18n-tr="{project.summary.tr}"
+        data-i18n-en="{project.summary.en}"
+        class="mt-3 text-sm md:text-base leading-7 text-[color:var(--text-secondary)]"
+      >
+        {project.summary.tr}
+      </p>
+      <div class="mt-4 flex flex-wrap gap-2">
+        {project.stack.map(s => `<span class="chip">${s}</span>`).join("")}
+      </div>
+      <div class="mt-5 flex flex-wrap gap-3">
+        <a href="{project.liveUrl}" target="_blank" rel="noreferrer" data-i18n-live="true" class="btn-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5h5v5m-9 9h9V10M5 14V5h9"/>
+          </svg>
+          <span>Canlı</span>
+        </a>
+        <a href="{project.githubUrl}" target="_blank" rel="noreferrer" data-i18n-source="true" class="btn-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-4 w-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19c-4 1.5-4-2.5-6-3m12 6v-3.9a3.3 3.3 0 0 0-.9-2.5c3-.4 6.2-1.5 6.2-6.7A5.2 5.2 0 0 0 19 5.3 4.8 4.8 0 0 0 18.9 2S17.7 1.6 15 3.4a13.3 13.3 0 0 0-6 0C6.3 1.6 5.1 2 5.1 2a4.8 4.8 0 0 0-.1 3.3A5.2 5.2 0 0 0 3.7 8.9c0 5.2 3.2 6.3 6.2 6.7a3.3 3.3 0 0 0-.9 2.5V22"/>
+          </svg>
+          <span>Kaynak</span>
+        </a>
+      </div>
+    </article>
+  }
+}
+
+// ─── Projects ─────────────────────────────────────────────────────────────────
+
+@component
+component Projects(profile) {
+  @state category = "all"
+  @state page = 1
+
+  template(profile) {
+    <section id="projects" class="section-container pb-12 md:pb-14">
+      <div class="space-y-4 mt-12">
+        <h2 id="heading-projects" class="section-title animate-slide-in-left">Projelerim</h2>
+
+        <div class="project-tabs">
+          {["all", ...new Set(profile.projects.map(p => p.category))].map((cat, i) =>
+            `<button type="button" class="project-tab" data-category="${cat}" data-active="${i === 0}">
+              ${{ all: "Tümü", IDE: "IDE", "Database Engine": "Veritabanı Motoru", SaaS: "SaaS", B2B: "B2B" }[cat] ?? cat}
+            </button>`
+          ).join("")}
+        </div>
+
+        <div class="projects-stage">
+          <div id="projects-grid" class="grid gap-5 md:grid-cols-2">
+            {profile.projects.map((p, i) => ProjectCard({ project: p, index: i }))}
+          </div>
+        </div>
+
+        <div id="project-pagination" class="project-pagination" aria-label="Proje sayfalama"></div>
+      </div>
+    </section>
+  }
+}
+
+// ─── Footer ───────────────────────────────────────────────────────────────────
+
+@component
+component Footer {
+  template() {
+    <footer class="flex w-full items-center justify-center gap-1 px-5 py-8 text-center text-sm text-[color:var(--text-muted)]">
+      <span data-i18n-built="true"></span>
+      <a class="link-hover" href="https://fiyuu.work">fiyuu</a>
+    </footer>
+  }
+}
+
+// ─── ClientRuntime ────────────────────────────────────────────────────────────
+// Client-side interaktivite: i18n, scroll spy, proje filtresi, sayfalama
+// SSR sırasında render edilmez — tarayıcıda çalışır
+
+@component
+component ClientRuntime {
+  template() {
+    <script type="module">
+      (() => {
+        // i18n sözlüğü
+        const i18n = {
+          tr: {
+            email: "E-posta", about: "Hakkımda", experience: "Tecrübelerim", projects: "Projelerim",
+            live: "Canlı", source: "Kaynak",
+            stats: { stars: "Yıldız", forks: "Fork", commits: "Commit" },
+            categories: { all: "Tümü", IDE: "IDE", "Database Engine": "Veritabanı Motoru", SaaS: "SaaS", B2B: "B2B" },
+            locale: "TR", builtWith: "built with",
+          },
+          en: {
+            email: "Email", about: "About", experience: "Experience", projects: "Projects",
+            live: "Live", source: "Source",
+            stats: { stars: "Stars", forks: "Forks", commits: "Commits" },
+            categories: { all: "All", IDE: "IDE", "Database Engine": "Data & Engine", SaaS: "SaaS", B2B: "B2B" },
+            locale: "EN", builtWith: "built with",
+          },
+        };
+
+        // Scroll spy — aktif nav item'ı günceller
+        const navItems = [...document.querySelectorAll(".float-item[data-target]")];
+        const sections = navItems
+          .map(i => document.getElementById(i.getAttribute("data-target") || ""))
+          .filter(Boolean);
+
+        const updateActiveNav = () => {
+          const threshold = window.innerHeight * 0.45;
+          let activeId = sections[0]?.id || "hero";
+
+          for (const s of sections) {
+            const rect = s.getBoundingClientRect();
+            if (rect.top <= threshold && rect.bottom > threshold) {
+              activeId = s.id;
+              break;
+            }
+          }
+
+          const pageBottom = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+          if (window.scrollY + window.innerHeight >= pageBottom - 4 && sections.length) {
+            activeId = sections[sections.length - 1].id;
+          }
+
+          navItems.forEach(item =>
+            item.setAttribute("data-active", item.getAttribute("data-target") === activeId ? "true" : "false")
+          );
+        };
+
+        if (navItems.length && sections.length) {
+          window.addEventListener("scroll", updateActiveNav, { passive: true });
+          updateActiveNav();
+        }
+
+        // i18n locale uygulama
+        const LOCALE_KEY = "portfolio-locale";
+
+        const applyLocale = (locale) => {
+          const d = i18n[locale] || i18n.tr;
+          document.documentElement.lang = locale;
+
+          const setText = (id, text) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+          };
+
+          setText("email-label", d.email);
+          setText("heading-about", d.about);
+          setText("heading-experience", d.experience);
+          setText("heading-projects", d.projects);
+
+          document.querySelectorAll("[data-stat-label]").forEach(el => {
+            el.textContent = d.stats[el.getAttribute("data-stat-label")] || "";
+          });
+
+          document.querySelectorAll("[data-i18n-tr][data-i18n-en]").forEach(el => {
+            const text = locale === "en" ? el.getAttribute("data-i18n-en") : el.getAttribute("data-i18n-tr");
+            if (text) el.textContent = text;
+          });
+
+          document.querySelectorAll("[data-i18n-live='true'] span").forEach(el => el.textContent = d.live);
+          document.querySelectorAll("[data-i18n-source='true'] span").forEach(el => el.textContent = d.source);
+
+          document.querySelectorAll(".project-tab").forEach(tab => {
+            const key = tab.getAttribute("data-category");
+            tab.textContent = d.categories[key] || key;
+          });
+
+          document.querySelectorAll("[data-locale-label='true']").forEach(el => el.textContent = d.locale);
+          document.querySelectorAll("[data-i18n-built='true']").forEach(el => el.textContent = d.builtWith + " ");
+
+          localStorage.setItem(LOCALE_KEY, locale);
+        };
+
+        // Proje filtresi + sayfalama
+        const PAGE_SIZE = 4;
+        let currentCategory = "all";
+        let currentPage = 1;
+
+        const getMatchingCards = () =>
+          [...document.querySelectorAll("[data-project-card='true']")].filter(
+            card => currentCategory === "all" || card.getAttribute("data-category") === currentCategory
+          );
+
+        const renderPagination = (pageCount) => {
+          const pagination = document.getElementById("project-pagination");
+          if (!pagination) return;
+
+          pagination.innerHTML = "";
+          pagination.style.display = pageCount > 1 ? "flex" : "none";
+
+          for (let p = 1; p <= pageCount; p++) {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "project-page-button";
+            btn.textContent = String(p);
+            btn.setAttribute("data-active", p === currentPage ? "true" : "false");
+            btn.setAttribute("aria-label", "Proje sayfası " + p);
+            btn.addEventListener("click", () => {
+              currentPage = p;
+              renderProjects();
+              document.getElementById("projects")?.scrollIntoView({ behavior: "smooth", block: "start" });
+            });
+            pagination.appendChild(btn);
+          }
+        };
+
+        const renderProjects = () => {
+          const allCards = [...document.querySelectorAll("[data-project-card='true']")];
+          const matching = getMatchingCards();
+          const pageCount = Math.max(1, Math.ceil(matching.length / PAGE_SIZE));
+          currentPage = Math.min(currentPage, pageCount);
+
+          allCards.forEach(card => card.style.display = "none");
+          matching.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+            .forEach(card => card.style.display = "");
+
+          renderPagination(pageCount);
+        };
+
+        const applyCategory = (cat) => {
+          currentCategory = cat;
+          currentPage = 1;
+          document.querySelectorAll(".project-tab").forEach(t =>
+            t.setAttribute("data-active", t.getAttribute("data-category") === cat ? "true" : "false")
+          );
+          renderProjects();
+        };
+
+        // Event listener'lar
+        document.querySelectorAll(".project-tab").forEach(t =>
+          t.addEventListener("click", () => applyCategory(t.getAttribute("data-category") || "all"))
+        );
+
+        document.querySelectorAll("[data-locale-toggle='true']").forEach(t =>
+          t.addEventListener("click", () => {
+            const current = localStorage.getItem(LOCALE_KEY) === "en" ? "en" : "tr";
+            applyLocale(current === "tr" ? "en" : "tr");
+          })
+        );
+
+        // Başlat
+        applyLocale(localStorage.getItem(LOCALE_KEY) === "en" ? "en" : "tr");
+        applyCategory("all");
+      })();
+    </script>
+  }
+}
+
+// ─── HomePage (sayfa girişi) ───────────────────────────────────────────────────
+
+@page(route="/", mode="ssr")
+component HomePage {
+  @query → ProfileQuery
+
+  template(data) {
+    <Nav />
+    <main>
+      <Hero profile={data} />
+      <About profile={data} />
+      <Experience profile={data} />
+      <Projects profile={data} />
+    </main>
+    <Footer />
+    <ClientRuntime />
+  }
+}

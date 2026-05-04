@@ -1,3 +1,7 @@
+// Template utilities — compose, clientData, raw, unsafeHtml are new additions
+// Note: html, defineComponent, when, ComponentProps live in intent.ts
+export { compose, clientData, raw, unsafeHtml, escapeHtml, RawHtml } from "./template.js";
+
 // Core contracts (excluding definePage/defineLayout/defineAction - see intent.js)
 export * from "./contracts.js";
 export * from "./artifacts.js";

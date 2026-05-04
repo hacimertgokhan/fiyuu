@@ -1,0 +1,25 @@
+{
+  "name": "fiu-language",
+  "displayName": "Fiyuu (.fiu)",
+  "description": "Syntax highlighting for Fiyuu framework .fiu files",
+  "version": "0.1.0",
+  "publisher": "fiyuu",
+  "license": "MIT",
+  "contributes": {
+    "languages": [
+      {
+        "id": "fiu",
+        "aliases": ["Fiyuu", "fiu"],
+        "extensions": [".fiu"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "fiu",
+        "scopeName": "source.fiu",
+        "path": "./fiu.tmLanguage.json"
+      }
+    ]
+  }
+}
