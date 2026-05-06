@@ -1,8 +1,3 @@
-// hacimertgokhan.me — portfolio sayfası
-// .fiu formatı: her component kendi bloğunda, okunabilir, tip-güvenli
-
-// ─── Nav ─────────────────────────────────────────────────────────────────────
-
 @component
 component Nav {
   template() {
@@ -53,7 +48,6 @@ component Nav {
   }
 }
 
-// ─── Hero ─────────────────────────────────────────────────────────────────────
 
 @component
 component Hero(profile) {

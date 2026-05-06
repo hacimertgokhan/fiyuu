@@ -12,6 +12,7 @@
     { "include": "#decorator-generic" },
     { "include": "#component-decl" },
     { "include": "#template-decl" },
+    { "include": "#template-interpolation" },
     { "include": "#keywords" },
     { "include": "#strings" },
     { "include": "#numbers" },
@@ -35,11 +36,11 @@
     },
 
     "decorator-page": {
-      "name": "meta.decorator.page.fiu",
+      "name": "meta.annotation.page.fiu",
       "begin": "(@page)\\s*(\\()",
       "end": "\\)",
       "beginCaptures": {
-        "1": { "name": "storage.modifier.fiu" },
+        "1": { "name": "storage.type.annotation" },
         "2": { "name": "punctuation.definition.parameters.begin.fiu" }
       },
       "endCaptures": {
@@ -47,11 +48,11 @@
       },
       "patterns": [
         {
-          "match": "([a-zA-Z_]\\w*)\\s*(=)\\s*((\"[^\"]*\")|('[^']*'))",
+          "match": "([a-zA-Z_]\\w*)\\s*(=)\\s*((\"[^\"]*\")|('[^']*')|\\btrue\\b|\\bfalse\\b|\\b[a-zA-Z_]\\w*\\b|\\b\\d+(?:\\.\\d+)?\\b)",
           "captures": {
-            "1": { "name": "variable.parameter.fiu" },
-            "2": { "name": "keyword.operator.assignment.fiu" },
-            "3": { "name": "string.quoted.double.fiu" }
+            "1": { "name": "variable.parameter" },
+            "2": { "name": "keyword.operator.assignment" },
+            "3": { "name": "meta.annotation.argument-value.fiu" }
           }
         },
         { "include": "#strings" }
@@ -59,11 +60,11 @@
     },
 
     "decorator-layout": {
-      "name": "meta.decorator.layout.fiu",
+      "name": "meta.annotation.layout.fiu",
       "begin": "(@layout)\\s*(\\()",
       "end": "\\)",
       "beginCaptures": {
-        "1": { "name": "storage.modifier.fiu" },
+        "1": { "name": "storage.type.annotation" },
         "2": { "name": "punctuation.definition.parameters.begin.fiu" }
       },
       "endCaptures": {
@@ -71,11 +72,11 @@
       },
       "patterns": [
         {
-          "match": "([a-zA-Z_]\\w*)\\s*(=)\\s*((\"[^\"]*\")|('[^']*'))",
+          "match": "([a-zA-Z_]\\w*)\\s*(=)\\s*((\"[^\"]*\")|('[^']*')|\\btrue\\b|\\bfalse\\b|\\b[a-zA-Z_]\\w*\\b|\\b\\d+(?:\\.\\d+)?\\b)",
           "captures": {
-            "1": { "name": "variable.parameter.fiu" },
-            "2": { "name": "keyword.operator.assignment.fiu" },
-            "3": { "name": "string.quoted.double.fiu" }
+            "1": { "name": "variable.parameter" },
+            "2": { "name": "keyword.operator.assignment" },
+            "3": { "name": "meta.annotation.argument-value.fiu" }
           }
         },
         { "include": "#strings" }
@@ -83,37 +84,51 @@
     },
 
     "decorator-query": {
-      "name": "meta.decorator.query.fiu",
+      "name": "meta.annotation.query.fiu",
       "match": "(@query)\\s*(→|->)\\s*([A-Za-z_]\\w*)",
       "captures": {
-        "1": { "name": "storage.modifier.fiu" },
-        "2": { "name": "keyword.operator.arrow.fiu" },
-        "3": { "name": "entity.name.type.class.fiu" }
+        "1": { "name": "storage.type.annotation" },
+        "2": { "name": "keyword.operator.arrow" },
+        "3": { "name": "entity.name.type.class" }
       }
     },
 
     "decorator-state": {
-      "name": "meta.decorator.state.fiu",
-      "match": "(@state)\\s+([a-zA-Z_]\\w*)\\s*(=)",
-      "captures": {
-        "1": { "name": "storage.modifier.fiu" },
-        "2": { "name": "variable.other.readwrite.fiu" },
-        "3": { "name": "keyword.operator.assignment.fiu" }
-      }
+      "name": "meta.annotation.state.fiu",
+      "begin": "(@state)\\s+([a-zA-Z_]\\w*)\\s*(=)",
+      "end": "(?=$|//|/\\*|\\n)",
+      "beginCaptures": {
+        "1": { "name": "storage.type.annotation" },
+        "2": { "name": "variable.other.readwrite" },
+        "3": { "name": "keyword.operator.assignment" }
+      },
+      "patterns": [
+        { "include": "#strings" },
+        { "include": "#numbers" },
+        {
+          "name": "constant.language.boolean",
+          "match": "\\b(true|false|null|undefined)\\b"
+        },
+        {
+          "name": "variable.other",
+          "match": "\\b[a-zA-Z_$][a-zA-Z0-9_$.]*\\b"
+        }
+      ]
     },
 
     "decorator-component": {
-      "name": "meta.decorator.component.fiu",
+      "name": "meta.annotation.component.fiu",
       "match": "(@component)\\b",
       "captures": {
-        "1": { "name": "storage.modifier.fiu" }
+        "1": { "name": "storage.type.annotation" }
       }
     },
 
     "decorator-generic": {
+      "name": "meta.annotation.fiu",
       "match": "(@[a-zA-Z_]\\w*)\\b",
       "captures": {
-        "1": { "name": "storage.modifier.fiu" }
+        "1": { "name": "storage.type.annotation" }
       }
     },
 
@@ -122,19 +137,19 @@
       "begin": "\\b(component)\\b",
       "end": "(?<=\\})",
       "beginCaptures": {
-        "1": { "name": "keyword.declaration.class.fiu" }
+        "1": { "name": "storage.type.class" }
       },
       "patterns": [
         {
           "match": "\\s+([A-Z][a-zA-Z0-9_]*)\\s*(?=\\()",
           "captures": {
-            "1": { "name": "entity.name.type.fiu" }
+            "1": { "name": "entity.name.type.class" }
           }
         },
         {
           "match": "\\s+([A-Z][a-zA-Z0-9_]*)\\s*(?=\\{)",
           "captures": {
-            "1": { "name": "entity.name.type.fiu" }
+            "1": { "name": "entity.name.type.class" }
           }
         },
         {
@@ -146,7 +161,7 @@
           "patterns": [
             {
               "match": "\\b([a-z_]\\w*)\\b",
-              "captures": { "1": { "name": "variable.parameter.fiu" } }
+              "captures": { "1": { "name": "variable.parameter" } }
             },
             { "name": "punctuation.separator.parameter.fiu", "match": "," }
           ]
@@ -166,6 +181,7 @@
             { "include": "#decorator-component" },
             { "include": "#decorator-generic" },
             { "include": "#template-decl" },
+            { "include": "#template-interpolation" },
             { "include": "#keywords" },
             { "include": "#strings" },
             { "include": "#numbers" },
@@ -180,7 +196,7 @@
       "begin": "\\b(template)\\s*(\\()",
       "end": "(?<=\\})",
       "beginCaptures": {
-        "1": { "name": "keyword.declaration.function.fiu" },
+        "1": { "name": "storage.type.function" },
         "2": { "name": "punctuation.definition.parameters.begin.fiu" }
       },
       "patterns": [
@@ -192,7 +208,7 @@
           "patterns": [
             {
               "match": "\\b([a-z_]\\w*)\\b",
-              "captures": { "1": { "name": "variable.parameter.fiu" } }
+              "captures": { "1": { "name": "variable.parameter" } }
             },
             { "name": "punctuation.separator.parameter.fiu", "match": "," }
           ]
@@ -205,13 +221,92 @@
           "endCaptures": { "0": { "name": "punctuation.section.block.end.fiu" } },
           "patterns": [
             { "include": "#comments" },
+            { "include": "#script-tag" },
+            { "include": "#style-tag" },
             { "include": "#closing-tag" },
             { "include": "#component-tag-selfclose" },
             { "include": "#component-tag-open" },
             { "include": "#html-tag-selfclose" },
             { "include": "#html-tag-open" },
             { "include": "#template-text" },
+            { "include": "#template-interpolation" },
             { "include": "#numbers" }
+          ]
+        }
+      ]
+    },
+
+    "script-tag": {
+      "name": "meta.tag.script.fiu",
+      "begin": "(<)(script)\\b",
+      "end": "(</)(script)(\\s*)(>)",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.fiu" },
+        "2": { "name": "entity.name.tag.script" }
+      },
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.fiu" },
+        "2": { "name": "entity.name.tag.script" },
+        "4": { "name": "punctuation.definition.tag.end.fiu" }
+      },
+      "patterns": [
+        { "include": "#tag-attributes" },
+        {
+          "name": "meta.embedded.block.javascript.fiu",
+          "begin": "(?<!/)>",
+          "beginCaptures": {
+            "0": { "name": "punctuation.definition.tag.end.fiu" }
+          },
+          "end": "(?=</script\\s*>)",
+          "contentName": "source.js",
+          "patterns": [
+            { "include": "#comments" },
+            { "include": "#strings" },
+            { "include": "#numbers" },
+            { "include": "#js-expr" }
+          ]
+        }
+      ]
+    },
+
+    "style-tag": {
+      "name": "meta.tag.style.fiu",
+      "begin": "(<)(style)\\b",
+      "end": "(</)(style)(\\s*)(>)",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.fiu" },
+        "2": { "name": "entity.name.tag.style" }
+      },
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.fiu" },
+        "2": { "name": "entity.name.tag.style" },
+        "4": { "name": "punctuation.definition.tag.end.fiu" }
+      },
+      "patterns": [
+        { "include": "#tag-attributes" },
+        {
+          "name": "meta.embedded.block.css.fiu",
+          "begin": "(?<!/)>",
+          "beginCaptures": {
+            "0": { "name": "punctuation.definition.tag.end.fiu" }
+          },
+          "end": "(?=</style\\s*>)",
+          "contentName": "source.css",
+          "patterns": [
+            {
+          "name": "support.type.property-name.css",
+              "match": "(^|[;{\\s])([a-zA-Z-]+)(?=\\s*:)",
+              "captures": {
+                "2": { "name": "support.type.property-name.css" }
+              }
+            },
+            {
+          "name": "keyword.operator.assignment.css",
+              "match": ":"
+            },
+            { "include": "#strings" },
+            { "include": "#numbers" },
+            { "include": "#template-interpolation" }
           ]
         }
       ]
@@ -219,10 +314,10 @@
 
     "closing-tag": {
       "name": "meta.tag.closing.fiu",
-      "match": "(</)([A-Za-z][A-Za-z0-9-]*)(\\s*)(>)",
+      "match": "(</)([A-Za-z][A-Za-z0-9_-]*)(\\s*)(>)",
       "captures": {
         "1": { "name": "punctuation.definition.tag.begin.fiu" },
-        "2": { "name": "entity.name.tag.fiu" },
+        "2": { "name": "entity.name.tag" },
         "4": { "name": "punctuation.definition.tag.end.fiu" }
       }
     },
@@ -233,7 +328,7 @@
       "end": "/>",
       "beginCaptures": {
         "1": { "name": "punctuation.definition.tag.begin.fiu" },
-        "2": { "name": "entity.name.type.instance.fiu" }
+        "2": { "name": "support.class.component" }
       },
       "endCaptures": {
         "0": { "name": "punctuation.definition.tag.end.fiu" }
@@ -249,7 +344,7 @@
       "end": "(?<!/)>",
       "beginCaptures": {
         "1": { "name": "punctuation.definition.tag.begin.fiu" },
-        "2": { "name": "entity.name.type.instance.fiu" }
+        "2": { "name": "support.class.component" }
       },
       "endCaptures": {
         "0": { "name": "punctuation.definition.tag.end.fiu" }
@@ -265,7 +360,7 @@
       "end": "/>",
       "beginCaptures": {
         "1": { "name": "punctuation.definition.tag.begin.fiu" },
-        "2": { "name": "entity.name.tag.html.fiu" }
+        "2": { "name": "entity.name.tag" }
       },
       "endCaptures": {
         "0": { "name": "punctuation.definition.tag.end.fiu" }
@@ -281,7 +376,7 @@
       "end": "(?<!/)>",
       "beginCaptures": {
         "1": { "name": "punctuation.definition.tag.begin.fiu" },
-        "2": { "name": "entity.name.tag.html.fiu" }
+        "2": { "name": "entity.name.tag" }
       },
       "endCaptures": {
         "0": { "name": "punctuation.definition.tag.end.fiu" }
@@ -299,8 +394,8 @@
           "begin": "([a-zA-Z_:][-a-zA-Z0-9_:.]*)\\s*(=)\\s*(\\{)",
           "end": "\\}",
           "beginCaptures": {
-            "1": { "name": "entity.other.attribute-name.fiu" },
-            "2": { "name": "keyword.operator.assignment.fiu" },
+            "1": { "name": "entity.other.attribute-name" },
+            "2": { "name": "keyword.operator.assignment" },
             "3": { "name": "punctuation.section.embedded.begin.fiu" }
           },
           "endCaptures": {
@@ -312,18 +407,43 @@
         },
         {
           "comment": "attr=\"value\"",
-          "match": "([a-zA-Z_:][-a-zA-Z0-9_:.]*)\\s*(=)\\s*(\"[^\"]*\"|'[^']*')",
-          "captures": {
-            "1": { "name": "entity.other.attribute-name.fiu" },
-            "2": { "name": "keyword.operator.assignment.fiu" },
-            "3": { "name": "string.quoted.double.html.fiu" }
-          }
+          "begin": "([a-zA-Z_:][-a-zA-Z0-9_:.]*)\\s*(=)\\s*(\")",
+          "end": "\"",
+          "beginCaptures": {
+            "1": { "name": "entity.other.attribute-name" },
+            "2": { "name": "keyword.operator.assignment" },
+            "3": { "name": "punctuation.definition.string.begin.html" }
+          },
+          "endCaptures": {
+            "0": { "name": "punctuation.definition.string.end.html" }
+          },
+          "contentName": "string.quoted.double.html",
+          "patterns": [
+            { "include": "#quoted-attr-interpolation" }
+          ]
+        },
+        {
+          "comment": "attr='value'",
+          "begin": "([a-zA-Z_:][-a-zA-Z0-9_:.]*)\\s*(=)\\s*(')",
+          "end": "'",
+          "beginCaptures": {
+            "1": { "name": "entity.other.attribute-name" },
+            "2": { "name": "keyword.operator.assignment" },
+            "3": { "name": "punctuation.definition.string.begin.html" }
+          },
+          "endCaptures": {
+            "0": { "name": "punctuation.definition.string.end.html" }
+          },
+          "contentName": "string.quoted.single.html",
+          "patterns": [
+            { "include": "#quoted-attr-interpolation" }
+          ]
         },
         {
           "comment": "boolean attribute",
           "match": "\\b([a-zA-Z_][-a-zA-Z0-9_]*)\\b",
           "captures": {
-            "1": { "name": "entity.other.attribute-name.fiu" }
+            "1": { "name": "entity.other.attribute-name" }
           }
         }
       ]
@@ -333,8 +453,44 @@
       "patterns": [
         { "include": "#interpolation" },
         {
-          "name": "string.unquoted.template.fiu",
-          "match": "[^<>{}/]+"
+          "name": "string.unquoted.html",
+          "match": "[^<>{}]+"
+        }
+      ]
+    },
+
+    "template-interpolation": {
+      "name": "meta.embedded.expression.fiu",
+      "begin": "\\{",
+      "end": "\\}",
+      "beginCaptures": {
+        "0": { "name": "punctuation.section.embedded.begin.fiu" }
+      },
+      "endCaptures": {
+        "0": { "name": "punctuation.section.embedded.end.fiu" }
+      },
+      "contentName": "source.js",
+      "patterns": [
+        { "include": "#js-expr" }
+      ]
+    },
+
+    "quoted-attr-interpolation": {
+      "patterns": [
+        {
+          "name": "meta.embedded.expression.fiu",
+          "begin": "\\{",
+          "end": "\\}",
+          "beginCaptures": {
+            "0": { "name": "punctuation.section.embedded.begin.fiu" }
+          },
+          "endCaptures": {
+            "0": { "name": "punctuation.section.embedded.end.fiu" }
+          },
+          "contentName": "source.js",
+          "patterns": [
+            { "include": "#js-expr" }
+          ]
         }
       ]
     },
@@ -349,7 +505,7 @@
       "endCaptures": {
         "0": { "name": "punctuation.section.embedded.end.fiu" }
       },
-      "contentName": "source.js.embedded.fiu",
+      "contentName": "source.js",
       "patterns": [
         { "include": "#js-expr" }
       ]
@@ -360,23 +516,56 @@
         { "include": "#strings" },
         { "include": "#numbers" },
         {
-          "name": "keyword.control.fiu",
+          "name": "comment.line.double-slash.js",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.block.js",
+          "begin": "/\\*",
+          "end": "\\*/"
+        },
+        {
+          "name": "keyword.control.js",
           "match": "\\b(if|else|for|while|return|const|let|var|function|class|new|typeof|instanceof|null|undefined|true|false|this|super|import|export|default|async|await|of|in|throw|try|catch|finally|switch|case|break|continue)\\b"
         },
         {
-          "name": "support.function.fiu",
+          "name": "storage.type.js",
+          "match": "\\b(string|number|boolean|object|any|void|unknown|never)\\b"
+        },
+        {
+          "name": "support.function.js",
           "match": "\\b([a-zA-Z_$][a-zA-Z0-9_$]*)(?=\\s*\\()"
         },
         {
-          "name": "variable.other.object.property.fiu",
+          "name": "support.type.property-name.json",
+          "match": "\\b([a-zA-Z_$][a-zA-Z0-9_$]*)(?=\\s*:)"
+        },
+        {
+          "name": "variable.other.property",
           "match": "(?<=\\.)[a-zA-Z_$][a-zA-Z0-9_$]*"
         },
         {
-          "name": "keyword.operator.fiu",
+          "name": "punctuation.accessor.js",
+          "match": "\\."
+        },
+        {
+          "name": "punctuation.separator.key-value.js",
+          "match": ":"
+        },
+        {
+          "name": "keyword.operator.js",
           "match": "=>|\\?\\.|\\?\\?|&&|\\|\\||\\.\\.\\.|===|!==|==|!=|>=|<=|[+\\-*/%=!<>&|^~?]"
         },
         {
-          "name": "variable.other.fiu",
+          "name": "constant.language.boolean.js",
+          "match": "\\b(true|false|null|undefined)\\b"
+        },
+        {
+          "name": "support.class",
+          "match": "\\b(document|window|localStorage|Math|JSON|Object|Array|String|Number|Boolean|Set|Map|Date|console)\\b"
+        },
+        {
+          "name": "variable.other",
           "match": "\\b[a-zA-Z_$][a-zA-Z0-9_$.]*\\b"
         }
       ]
@@ -385,7 +574,7 @@
     "keywords": {
       "patterns": [
         {
-          "name": "keyword.declaration.class.fiu",
+          "name": "storage.type",
           "match": "\\b(component|template)\\b"
         }
       ]
@@ -394,36 +583,36 @@
     "strings": {
       "patterns": [
         {
-          "name": "string.quoted.double.fiu",
+          "name": "string.quoted.double",
           "begin": "\"",
           "end": "\"",
-          "beginCaptures": { "0": { "name": "punctuation.definition.string.begin.fiu" } },
-          "endCaptures": { "0": { "name": "punctuation.definition.string.end.fiu" } },
+          "beginCaptures": { "0": { "name": "punctuation.definition.string.begin" } },
+          "endCaptures": { "0": { "name": "punctuation.definition.string.end" } },
           "patterns": [
-            { "name": "constant.character.escape.fiu", "match": "\\\\." },
+            { "name": "constant.character.escape", "match": "\\\\." },
             { "include": "#template-string-interp" }
           ]
         },
         {
-          "name": "string.quoted.single.fiu",
+          "name": "string.quoted.single",
           "begin": "'",
           "end": "'",
-          "beginCaptures": { "0": { "name": "punctuation.definition.string.begin.fiu" } },
-          "endCaptures": { "0": { "name": "punctuation.definition.string.end.fiu" } },
+          "beginCaptures": { "0": { "name": "punctuation.definition.string.begin" } },
+          "endCaptures": { "0": { "name": "punctuation.definition.string.end" } },
           "patterns": [
-            { "name": "constant.character.escape.fiu", "match": "\\\\." },
+            { "name": "constant.character.escape", "match": "\\\\." },
             { "include": "#template-string-interp" }
           ]
         },
         {
-          "name": "string.template.fiu",
+          "name": "string.template",
           "begin": "`",
           "end": "`",
-          "beginCaptures": { "0": { "name": "punctuation.definition.string.begin.fiu" } },
-          "endCaptures": { "0": { "name": "punctuation.definition.string.end.fiu" } },
+          "beginCaptures": { "0": { "name": "punctuation.definition.string.begin" } },
+          "endCaptures": { "0": { "name": "punctuation.definition.string.end" } },
           "patterns": [
             { "include": "#template-string-interp" },
-            { "name": "constant.character.escape.fiu", "match": "\\\\." }
+            { "name": "constant.character.escape", "match": "\\\\." }
           ]
         }
       ]
@@ -443,18 +632,18 @@
     "operators": {
       "patterns": [
         {
-          "name": "keyword.operator.arrow.fiu",
+          "name": "keyword.operator.arrow",
           "match": "→|->"
         },
         {
-          "name": "keyword.operator.assignment.fiu",
+          "name": "keyword.operator.assignment",
           "match": "=(?!=)"
         }
       ]
     },
 
     "numbers": {
-      "name": "constant.numeric.fiu",
+      "name": "constant.numeric",
       "match": "\\b(0x[0-9a-fA-F]+|\\d+\\.?\\d*([eE][+-]?\\d+)?)\\b"
     },
 

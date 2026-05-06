@@ -18,7 +18,20 @@
       {
         "language": "fiu",
         "scopeName": "source.fiu",
-        "path": "./fiu.tmLanguage.json"
+        "path": "./fiu.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.expression.fiu": "javascript",
+          "meta.embedded.block.javascript.fiu": "javascript",
+          "meta.embedded.block.css.fiu": "css",
+          "meta.template.expression.fiu": "javascript"
+        }
+      }
+    ],
+    "themes": [
+      {
+        "label": "Fiyuu Neon",
+        "uiTheme": "vs-dark",
+        "path": "./themes/fiyuu-neon-color-theme.json"
       }
     ]
   }

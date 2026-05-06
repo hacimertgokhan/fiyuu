@@ -13,6 +13,8 @@ TextMate bundle. Kurulum 3 adım.
 
 Artık `.fiu` dosyaları renkli görünür.
 
+Daha canlı görünüm istersen VS Code'da `Fiyuu Neon` temasını seç.
+
 ---
 
 ## Ne Renklendirir?
@@ -41,6 +43,7 @@ Bu bundle VS Code ile de çalışır.
 1. `.vscode/extensions/fiu-language/` klasörü oluştur
 2. `fiu.tmLanguage.json`, `package.json`, `language-configuration.json` dosyalarını kopyala
 3. VS Code'u yeniden başlat
+4. `Preferences: Color Theme` içinden `Fiyuu Neon` temasını seç
 
 ---
 
